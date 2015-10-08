@@ -1,0 +1,15 @@
+wordpress:
+  image: wordpress
+  links:
+    - db:mysql
+  ports:
+    - 8888:80
+  net: "bridge"
+  dns:
+    - 8.8.8.8
+    - 4.4.4.4
+
+db:
+  image: mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: example

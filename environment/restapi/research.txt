@@ -1,0 +1,144 @@
+{
+  "status": "ok",
+  "controller": "user",
+  "method": "register",
+  "nonce": "f00d942fbf"
+}
+
+{
+  "status": "ok",
+  "controller": "user",
+  "method": "get_userinfo",
+  "nonce": "c44dce0be0"
+}
+
+{
+  "status": "ok",
+  "controller": "posts",
+  "method": "create_post",
+  "nonce": "b7c9a8fb44"
+}
+
+{
+  "status": "ok",
+  "controller": "user",
+  "method": "generate_auth_cookie",
+  "nonce": "5de198ad74"
+}
+wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea
+
+
+
+### Get register new user nonce
+curl -vd "controller=user&method=register" "http://192.168.99.100:8888/api/get_nonce/"
+http://localhost/api/get_nonce/?controller=user&method=register
+
+===
+{"status":"ok","controller":"user","method":"register","nonce":"a4f5440abc"}
+{"status":"ok","controller":"user","method":"register","nonce":"a49b876f87"}
+
+
+### Register a new user
+curl -vd "username=tom&email=rlee@book.com&nonce=a49b876f87&display_name=Tom&user_pass=12345678" "http://192.168.99.100:8888/api/user/register/"
+http://192.168.99.100:8888/api/user/register/?username=john&email=john@domain.com&nonce=f00d942fbf&display_name=John
+
+===
+{"status":"ok","cookie":"tom|1445405577|1tm2Go8O6Vwju8o7ZRvazzIT6X3GF9hkaPslboWL8t1|e052fed38cc309250b85df2902c263a2c70f987166b2e618052496a4b07ed56d","user_id":3}
+{"status":"ok","cookie":"tom|1445410261|GAR520cAy0enzHLLcigPUQjV5jXrBPKYvwcPPWL5deX|ceb90bae051cec70f0188a95c61ced94fcf6bfc5c250cecd9d42c4b88e6ec3b4","user_id":2}
+
+curl -vd "username=sam&email=sam@domain.com&nonce=a4f5440abc&display_name=Sam&user_pass=12345678" "http://192.168.99.100:8888/api/user/register/"
+
+===
+{"status":"ok","cookie":"sam|1445406890|CIJtpAJ4CMEsa8CuF2Jtj0o36mbk0deakoUbyaNfFxS|b1d6b900c6ced3fda3c4105ecd56945d3c4d3f958e78d0029a0a0c8903f98378","user_id":4}
+
+
+### Retrieve password
+curl -vd "user_login=sam" "http://192.168.99.100:8888/api/user/retrieve_password/"
+http://localhost/api/user/retrieve_password/?user_login=sam
+
+
+
+### Get nonce for generating auth cookie
+curl -vd "controller=user&method=generate_auth_cookie" "http://192.168.99.100:8888/api/get_nonce/"
+#http://192.168.99.100:8888/api/get_nonce/?controller=user&method=generate_auth_cookie
+
+===
+{"status":"ok","controller":"user","method":"generate_auth_cookie","nonce":"9ff32ad10a"}
+{"status":"ok","controller":"user","method":"generate_auth_cookie","nonce":"a15b2f6d70"}
+
+
+### Get auth cookie
+curl -vd "username=tom&password=12345678&nonce=a15b2f6d70" "http://192.168.99.100:8888/api/user/generate_auth_cookie/"
+http://localhost/api/user/generate_auth_cookie/?username=john&password=PASSWORD-HERE
+
+curl -vd "username=sam&password=12345678&nonce=9ff32ad10a" "http://192.168.99.100:8888/api/user/generate_auth_cookie/"
+===
+{"status":"ok","cookie":"sam|1445407166|m7ONokSZ7cPkg8zFVFH7XXx4pJAoQNbFVUxVA56etay|542cb01e28da1913fd137e7e4eb811244aeb8e2f038ff2aa87932baa8e1a9a9e","cookie_name":"wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea","user":{"id":4,"username":"sam","nicename":"sam","email":"sam@domain.com","url":"","registered":"2015-10-07 05:54:50","displayname":"Sam","firstname":"","lastname":"","nickname":"sam","description":"","capabilities":{"author":true},"avatar":null}}
+
+{"status":"ok","cookie":"tom|1445411190|0wt7YQOIw3aZbzEs4SUrd9Ye7rJj9nutmk7DpnOZoSA|015b1437e18fb5a0200aa3d5861e2fc51f72379dc9fb92f435c61bc9501183c0","cookie_name":"wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea","user":{"id":2,"username":"tom","nicename":"tom","email":"rlee@book.com","url":"","registered":"2015-10-07 06:51:01","displayname":"Tom","firstname":"","lastname":"","nickname":"tom","description":"","capabilities":{"subscriber":true},"avatar":null}}
+
+
+### Get user_pass
+curl -vd "cookie=tom|1445405577|1tm2Go8O6Vwju8o7ZRvazzIT6X3GF9hkaPslboWL8t1|e052fed38cc309250b85df2902c263a2c70f987166b2e618052496a4b07ed56d&meta_key=user_pass" "http://192.168.99.100:8888/api/user/get_user_meta/"
+http://localhost/api/user/get_user_meta/?cookie=COOKIE-HERE&meta_key=KEY-HERE
+
+===
+{"status":"ok","user_pass":[]}
+
+
+curl -vd "cookie=sam|1445406890|CIJtpAJ4CMEsa8CuF2Jtj0o36mbk0deakoUbyaNfFxS|b1d6b900c6ced3fda3c4105ecd56945d3c4d3f958e78d0029a0a0c8903f98378&meta_key=user_pass" "http://192.168.99.100:8888/api/user/get_user_meta/"
+===
+{"status":"ok","user_pass":[]}
+
+### Update user_pass
+curl -vd "cookie=tom|1445405577|1tm2Go8O6Vwju8o7ZRvazzIT6X3GF9hkaPslboWL8t1|e052fed38cc309250b85df2902c263a2c70f987166b2e618052496a4b07ed56d&meta_key=user_pass&meta_value=1234567" "http://192.168.99.100:8888/api/user/update_user_meta/"
+http://localhost/api/user/update_user_meta/?cookie=COOKIE-HERE&meta_key=KEY-HERE&meta_value=VALUE-HERE
+
+===
+{"status":"ok","updated":42} || {"status":"ok","updated":false}
+
+### Get create post nonce
+curl -b "wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea=tom|1445411190|0wt7YQOIw3aZbzEs4SUrd9Ye7rJj9nutmk7DpnOZoSA|015b1437e18fb5a0200aa3d5861e2fc51f72379dc9fb92f435c61bc9501183c0" -vd "controller=posts&method=create_post" "http://192.168.99.100:8888/?json=get_nonce"
+
+===
+{"status":"ok","controller":"posts","method":"create_post","nonce":"a14962bbf1"}
+{"status":"ok","controller":"posts","method":"create_post","nonce":"a415728090"}
+
+### Post a new post
+curl -b "wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea=tom|1445411190|0wt7YQOIw3aZbzEs4SUrd9Ye7rJj9nutmk7DpnOZoSA|015b1437e18fb5a0200aa3d5861e2fc51f72379dc9fb92f435c61bc9501183c0" -vd "nonce=a415728090&title=Test Title&content=Test Content and something publish&author=tom&status=publish" "http://192.168.99.100:8888/?json=create_post"
+
+curl -b "wordpress_logged_in_f9a5a90cae4c25c7efe87f4a51efa6ea=tom|1445411190|0wt7YQOIw3aZbzEs4SUrd9Ye7rJj9nutmk7DpnOZoSA|015b1437e18fb5a0200aa3d5861e2fc51f72379dc9fb92f435c61bc9501183c0" -vd "nonce=a415728090&title=Test Title&content=Test Content and something publish&author=tom&status=publish" "http://192.168.99.100:8888/?json=create_post"
+
+
+===
+{"status":"ok","post":{"id":5,"type":"post","slug":"","url":"http:\/\/192.168.99.100:8888\/?p=5","status":"draft","title":"Test Title","title_plain":"Test Title","content":"<p>Test Content and something<\/p>\n","excerpt":"<p>Test Content and something<\/p>\n","date":"2015-10-07 06:47:52","modified":"2015-10-07 07:09:26","categories":[],"tags":[],"author":{"id":2,"slug":"tom","name":"Tom","first_name":"","last_name":"","nickname":"tom","url":"","description":""},"comments":[],"attachments":[],"comment_count":0,"comment_status":"open","custom_fields":{}}}
+
+
+
+
+COOKIE_HEADER=wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8
+curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "controller=posts&method=create_post" "http://yourhost.com/wordpress/?json=get_nonce"
+
+COOKIE_HEADER=wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8
+curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "nonce=nonceVal&title=TestTitle&content=TestContent&author=usernameForCookie" "http://yourhost.com/wordpress/?json=create_post"
+
+
+
+
+
+
+1. Determine my site logged in cookie name, something like: wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8. It seems that this does not change for your site.
+
+2. get nonce for 'generate_auth_cookie', eg:
+curl -vd "controller=auth&method=generate_auth_cookie" "http://yourhost.com/wordpress/?json=get_nonce"
+
+3. generate the auth cookie, eg:
+curl -vd "nonce=nonceValFromAbove&username=username&password=pass" "http://yourhost.com/wordpress/?json=auth.generate_auth_cookie"
+
+4. get nonce for 'create_posts', eg:
+COOKIE_HEADER=wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8
+curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "controller=posts&method=create_post" "http://yourhost.com/wordpress/?json=get_nonce"
+
+5. create post, eg:
+COOKIE_HEADER=wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8
+curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "nonce=nonceVal&title=TestTitle&content=TestContent&author=usernameForCookie" "http://yourhost.com/wordpress/?json=create_post"

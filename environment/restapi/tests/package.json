@@ -1,0 +1,18 @@
+{
+  "name": "automation",
+  "version": "0.1.0",
+  "description": "automation test for RESTful API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "automation"
+  ],
+  "author": "Richard Lee <lifuzu@gmail.com> (http://lifuzu.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "chance": "^0.8.0",
+    "frisby": "^0.8.5"
+  }
+}
