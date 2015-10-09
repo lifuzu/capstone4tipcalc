@@ -1,7 +1,7 @@
 var frisby = require('frisby');
 var chance = require('chance').Chance();
 
-var host_path = "http://192.168.99.100:8888/api";
+var host_path = "http://192.168.99.100:8080/api";
 
 var get_nonce_path = "/get_nonce/";
 var get_nonce_param = "controller=user&method=register";
@@ -105,6 +105,7 @@ frisby.create('Capstone user register getting nonce')
                     frisby.create('Create a new post')
                       .get(host_path + create_post_path + '?' + create_post_params, {headers: {"Cookie": cookie}})
                       // .inspectJSON()
+                      // .inspectHeaders()
                       .expectStatus(200)
                       .expectHeaderContains('content-type', 'application/json')
                       .expectJSON({
