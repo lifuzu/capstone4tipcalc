@@ -10,6 +10,9 @@ var {
 
 var SplashScreen = require('./components/SplashScreen');
 var FormScreen   = require('./components/FormScreen');
+var LoginPage    = require('./components/LoginPage');
+var PersonPage   = require('./components/PersonPage');
+var NoNavigatorPage = require('./components/NoNavigatorPage');
 var MainPage     = require('./components/MainPage');
 
 class Routes {
@@ -34,16 +37,28 @@ class Routes {
           navigator={navigator} />
       );
     }
+    if (routeId === 'LoginPage') {
+      return (
+        <LoginPage
+          navigator={navigator} />
+      );
+    }
+    if (routeId === 'PersonPage') {
+      return (
+        <PersonPage
+          navigator={navigator} />
+      );
+    }
     if (routeId === 'NoNavigatorPage') {
       return (
         <NoNavigatorPage
             navigator={navigator} />
       );
     }
-    return this.noRoute(navigator);
+    return Routes.noRoute(navigator);
   }
 
-  noRoute(navigator) {
+  static noRoute(navigator) {
     return (
       <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
         <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}

@@ -16,7 +16,7 @@ class SplashScreen extends Component {
     var navigator = this.props.navigator;
     setTimeout(() => {
       navigator.replace({
-        id: 'MainPage',
+        id: 'LoginPage',
       });
     }, 1000);
   }

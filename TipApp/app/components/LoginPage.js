@@ -11,46 +11,38 @@ var {
   TouchableOpacity,
 } = React;
 
-class MainPage extends Component {
+class LoginPage extends Component {
   render() {
     return (
       <Navigator
           renderScene={this.renderScene.bind(this)}
-          navigator={this.props.navigator}
           navigationBar={
-            <Navigator.NavigationBar style={{backgroundColor: '#246dd5'}}
+            <Navigator.NavigationBar style={{backgroundColor: '#246dd5', alignItems: 'center'}}
                 routeMapper={NavigationBarRouteMapper} />
           } />
     );
   }
   renderScene(route, navigator) {
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
-        <TouchableHighlight style={{backgroundColor: 'yellow', padding: 10}}
-            onPress={this.gotoPersonPage.bind(this)}>
-          <Text style={{color: 'green'}}>下一页</Text>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableHighlight
+            onPress={this.gotoNext.bind(this)}>
+          <Text style={{color: 'red'}}>下一页</Text>
         </TouchableHighlight>
       </View>
     );
   }
-  gotoPersonPage() {
+  gotoNext() {
     this.props.navigator.push({
-      id: 'PersonPage',
-      name: '我的主页',
+      id: 'MainPage',
+      name: '主页',
     });
   }
 }
 
 var NavigationBarRouteMapper = {
   LeftButton(route, navigator, index, navState) {
-    return (
-      <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-          onPress={() => navigator.parentNavigator.pop()}>
-        <Text style={{color: 'white', margin: 10,}}>
-          返回
-        </Text>
-      </TouchableOpacity>
-    );
+    return null;
   },
   RightButton(route, navigator, index, navState) {
     return null;
@@ -59,11 +51,11 @@ var NavigationBarRouteMapper = {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}>
         <Text style={{color: 'white', margin: 10, fontSize: 16}}>
-          主页
+          登录
         </Text>
       </TouchableOpacity>
     );
   }
 };
 
-module.exports = MainPage;
+module.exports = LoginPage;

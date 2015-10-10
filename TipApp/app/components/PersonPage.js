@@ -7,11 +7,10 @@ var {
   View,
   Text,
   Navigator,
-  TouchableHighlight,
   TouchableOpacity,
 } = React;
 
-class MainPage extends Component {
+class PersonPage extends Component {
   render() {
     return (
       <Navigator
@@ -25,24 +24,24 @@ class MainPage extends Component {
   }
   renderScene(route, navigator) {
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
-        <TouchableHighlight style={{backgroundColor: 'yellow', padding: 10}}
-            onPress={this.gotoPersonPage.bind(this)}>
-          <Text style={{color: 'green'}}>下一页</Text>
-        </TouchableHighlight>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableOpacity
+            onPress={this.gotoNext.bind(this)}>
+          <Text>我的个人主页，漂亮吧 @.@</Text>
+        </TouchableOpacity>
       </View>
     );
   }
-  gotoPersonPage() {
+  gotoNext() {
     this.props.navigator.push({
-      id: 'PersonPage',
-      name: '我的主页',
+      id: 'NoNavigatorPage',
+      sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
     });
   }
 }
 
 var NavigationBarRouteMapper = {
-  LeftButton(route, navigator, index, navState) {
+  LeftButton(route, navigator, index, nextState) {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
           onPress={() => navigator.parentNavigator.pop()}>
@@ -52,18 +51,25 @@ var NavigationBarRouteMapper = {
       </TouchableOpacity>
     );
   },
-  RightButton(route, navigator, index, navState) {
-    return null;
+  RightButton(route, navigator, index, nextState) {
+    return (
+      <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
+          onPress={() => navigator.parentNavigator.push({id: 'unknown'})}>
+        <Text style={{color: 'white', margin: 10,}}>
+          试试手气
+        </Text>
+      </TouchableOpacity>
+    );
   },
-  Title(route, navigator, index, navState) {
+  Title(route, navigator, index, nextState) {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}>
         <Text style={{color: 'white', margin: 10, fontSize: 16}}>
-          主页
+          个人主页
         </Text>
       </TouchableOpacity>
     );
   }
 };
 
-module.exports = MainPage;
+module.exports = PersonPage;
