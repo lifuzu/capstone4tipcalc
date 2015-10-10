@@ -10,12 +10,22 @@ var {
   Navigator,
   StyleSheet,
   Text,
+  TextInput,
   TouchableHighlight,
   TouchableOpacity,
   View,
 } = React;
 
 class FormScreen extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      title: '',
+      content: '',
+    }
+  }
+
   render() {
     return (
       <Navigator 
@@ -28,11 +38,30 @@ class FormScreen extends Component {
   }
 
   renderScene(route, navigator) {
+    // return (
+    //   <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    //     <TouchableHighlight
+    //         onPress={this.gotoNext.bind(this)}>
+    //       <Text style={{color: 'red'}}>下一页</Text>
+    //     </TouchableHighlight>
+    //   </View>
+    // );
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <View style={styles.container}>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({title:text})}
+          placeholder = 'Title Here'
+          value={this.state.title} />
+        <TextInput
+          style={{height: 120, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({content:text})}
+          multiline = {true}
+          placeholder = 'Content Here'
+          value={this.state.content} />
         <TouchableHighlight
-            onPress={this.gotoNext.bind(this)}>
-          <Text style={{color: 'red'}}>下一页</Text>
+            onPress={this.save.bind(this)}>
+          <Text style={{color: 'red'}}>Save</Text>
         </TouchableHighlight>
       </View>
     );
@@ -57,6 +86,10 @@ class FormScreen extends Component {
       id: 'MainPage',
       name: '主页',
     });
+  }
+
+  save() {
+    console.log(this.state.title + ' ' + this.state.content);
   }
 }
 

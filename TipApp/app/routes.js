@@ -12,8 +12,8 @@ var SplashScreen = require('./components/SplashScreen');
 var FormScreen   = require('./components/FormScreen');
 var LoginPage    = require('./components/LoginPage');
 var PersonPage   = require('./components/PersonPage');
-var NoNavigatorPage = require('./components/NoNavigatorPage');
 var MainPage     = require('./components/MainPage');
+var NoNavigatorPage = require('./components/NoNavigatorPage');
 
 class Routes {
 
