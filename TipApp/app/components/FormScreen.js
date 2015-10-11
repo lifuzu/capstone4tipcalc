@@ -16,14 +16,32 @@ var {
   View,
 } = React;
 
+var usersActions = require('../actions/users');
+var usersStores = require('../stores/users');
+
 class FormScreen extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      title: '',
-      content: '',
+      title: 'T',
+      content: 'Content',
+      username: 'Q',
+      email: 'q@q.com',
+      user_pass: 'w',
+      display_name: 'DN',
     }
+  }
+
+  componentDidMount() {
+    this.unsubscribe = usersStores.listen(this.onUserRegisterDone.bind(this));
+  }
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+  onUserRegisterDone(res) {
+    console.log("Inside FormScreen");
+    console.log(res);
   }
 
   render() {
@@ -48,6 +66,34 @@ class FormScreen extends Component {
     // );
     return (
       <View style={styles.container}>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({username:text})}
+          placeholder = 'Username'
+          value={this.state.username} />
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({email:text})}
+          multiline = {true}
+          placeholder = 'Email address'
+          value={this.state.email} />
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({user_pass:text})}
+          multiline = {true}
+          placeholder = 'Password'
+          value={this.state.user_pass} />
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({display_name:text})}
+          multiline = {true}
+          placeholder = 'Display name'
+          value={this.state.display_name} />
+        <TouchableHighlight
+            onPress={this.register.bind(this)}>
+          <Text style={{color: 'red'}}>Register</Text>
+        </TouchableHighlight>
+
         <TextInput
           style={{height: 40, borderColor: 'gray', borderWidth: 1}}
           onChangeText={(text) => this.setState({title:text})}
@@ -86,6 +132,17 @@ class FormScreen extends Component {
       id: 'MainPage',
       name: '主页',
     });
+  }
+
+  register() {
+    var options = {
+      username: this.state.username,
+      email: this.state.email,
+      password: this.state.password,
+      display_name: this.state.display_name,
+    }
+    console.log(options);
+    usersActions.register(options);
   }
 
   save() {
