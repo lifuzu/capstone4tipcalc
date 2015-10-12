@@ -140,7 +140,7 @@ class FormScreen extends Component {
     var options = {
       username: this.state.username,
       email: this.state.email,
-      password: this.state.password,
+      user_pass: this.state.user_pass,
       display_name: this.state.display_name,
     }
     console.log(options);

@@ -4,10 +4,12 @@ var reflux = require("reflux");
 var merge  = require("merge");
 var querystring = require("querystring");
 var config = require("../config");
+var db = require("../db.js");
 
 var actions = reflux.createActions({
   'register': {children: ['completed', 'failed']},
   // 'login'
+  // 'logout'
 });
 
 var base_url = config.Settings.BASE_URL;
@@ -39,8 +41,13 @@ actions.register.listen(function(options) {
           // failed if response status is error
           if (responseJSON.status === 'error') { self.failed(responseJSON); }
           else {
-            // TODO: write user name and password into local storage
-            self.completed(responseJSON);
+            // write user name and password into local storage
+            db.users.erase_db(function(removed_data){
+              db.users.add(register_params, function(added_data){
+                console.log(added_data);
+                self.completed(added_data);
+              });
+            });
           }
         })
         .catch((error) => {
