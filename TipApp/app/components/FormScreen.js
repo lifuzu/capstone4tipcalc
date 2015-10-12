@@ -18,6 +18,8 @@ var {
 
 var usersActions = require('../actions/users');
 var usersStores = require('../stores/users');
+var postsActions = require('../actions/posts');
+// var postsStores = require('../stores/posts');
 
 class FormScreen extends Component {
 
@@ -146,7 +148,12 @@ class FormScreen extends Component {
   }
 
   save() {
-    console.log(this.state.title + ' ' + this.state.content);
+    var options = {
+      title: this.state.title,
+      content: this.state.content,
+    }
+    console.log(options);
+    postsActions.create(options);
   }
 }
 

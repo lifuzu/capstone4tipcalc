@@ -7,6 +7,7 @@ var config = require("../config");
 
 var actions = reflux.createActions({
   'register': {children: ['completed', 'failed']},
+  // 'login'
 });
 
 var base_url = config.Settings.BASE_URL;
@@ -37,7 +38,10 @@ actions.register.listen(function(options) {
           // console.log(responseJSON);
           // failed if response status is error
           if (responseJSON.status === 'error') { self.failed(responseJSON); }
-          else self.completed(responseJSON);
+          else {
+            // TODO: write user name and password into local storage
+            self.completed(responseJSON);
+          }
         })
         .catch((error) => {
           console.error(error);
