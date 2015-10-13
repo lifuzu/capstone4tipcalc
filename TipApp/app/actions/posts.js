@@ -65,7 +65,7 @@ function generate_auth_cookie(options, completed, failed) {
             console.log(responseJSON);
             var cookie = responseJSON.cookie_name + '=' + responseJSON.cookie
             db.users.update({'username': options.username}, {'cookie': cookie}, function(updated_table){
-              create_post({title: options.title, content: options.content, author: 'Q', cookie: cookie}, completed, failed);
+              create_post({title: options.title, content: options.content, author: options.username, cookie: cookie}, completed, failed);
             });
           }
         })

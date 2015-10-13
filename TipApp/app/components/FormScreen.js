@@ -5,6 +5,8 @@
 'use strict';
 
 var React = require('react-native');
+var chance = require('chance').Chance();
+
 var {
   Component,
   Navigator,
@@ -26,12 +28,12 @@ class FormScreen extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      title: 'T',
-      content: 'Content',
-      username: 'Q',
-      email: 'q@q.com',
+      title: chance.sentence(),
+      content: chance.paragraph(),
+      username: chance.word(),
+      email: chance.email(),
       user_pass: 'w',
-      display_name: 'DN',
+      display_name: chance.name(),
     }
   }
 
