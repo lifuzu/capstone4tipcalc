@@ -2,6 +2,8 @@ wordpress:
   image: wordpress
   links:
     - db:mysql
+  volumes:
+    - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
   ports:
     - 8080:80
   net: "bridge"
@@ -12,4 +14,4 @@ wordpress:
 db:
   image: mysql
   environment:
-    MYSQL_ROOT_PASSWORD: example
+    MYSQL_ROOT_PASSWORD: 3x@mp!e
