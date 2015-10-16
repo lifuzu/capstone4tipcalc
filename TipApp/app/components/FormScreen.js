@@ -4,12 +4,16 @@
  */
 'use strict';
 
+// TODO: var -> const
 var React = require('react-native');
 var chance = require('chance').Chance();
 
 var {
+  CameraRoll,
   Component,
+  Image,
   Navigator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -22,6 +26,10 @@ var usersActions = require('../actions/users');
 var usersStores = require('../stores/users');
 var postsActions = require('../actions/posts');
 // var postsStores = require('../stores/posts');
+var imagesActions = require('../actions/images');
+// var imagesStores = require('../stores/images');
+
+var PAGE_SIZE = 5;
 
 class FormScreen extends Component {
 
@@ -34,18 +42,45 @@ class FormScreen extends Component {
       email: chance.email(),
       user_pass: 'w',
       display_name: chance.name(),
+      imageSource: {},
     }
   }
 
   componentDidMount() {
     this.unsubscribe = usersStores.listen(this.onUserRegisterDone.bind(this));
+
+    // config upload images done unsubcribe call back
+    // this.unsubscribeImagesDone = imagesStores.listen(this.onImageUploadDone.bind(this));
+
+    // random select one image from camera roll, set them to state array
+    // TODO: change one to n later
+    this._fetchRandomPhoto();
   }
   componentWillUnmount() {
     this.unsubscribe();
+    // this.unsubscribeImagesDone();
   }
   onUserRegisterDone(res) {
     console.log("Inside FormScreen");
     console.log(res);
+  }
+  onImageUploadDone(res) {
+    console.log(res);
+  }
+  _fetchRandomPhoto() {
+    CameraRoll.getPhotos(
+      {first: PAGE_SIZE},
+      (data) => {
+        var edges = data.edges;
+        var edge = edges[Math.floor(Math.random() * edges.length)];
+        var randomPhoto = edge && edge.node && edge.node.image;
+        if (randomPhoto) {
+          // console.log(randomPhoto);
+          this.setState({imageSource: randomPhoto});
+        }
+      },
+      (error) => undefined
+    );
   }
 
   render() {
@@ -68,8 +103,12 @@ class FormScreen extends Component {
     //     </TouchableHighlight>
     //   </View>
     // );
+
+    // TODO: create subview to display all of the images in state array
+    var images_display = this.state.imageSource ?
+      <Image source={this.state.imageSource} style={styles.image} /> : null;
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <TextInput
           style={{height: 40, borderColor: 'gray', borderWidth: 1}}
           onChangeText={(text) => this.setState({username:text})}
@@ -113,7 +152,12 @@ class FormScreen extends Component {
             onPress={this.save.bind(this)}>
           <Text style={{color: 'red'}}>Save</Text>
         </TouchableHighlight>
-      </View>
+        {images_display}
+        <TouchableHighlight
+            onPress={this.upload.bind(this)}>
+          <Text style={{color: 'red'}}>Upload</Text>
+        </TouchableHighlight>
+      </ScrollView>
     );
     // return (
     //   <View style={styles.container}>
@@ -157,6 +201,14 @@ class FormScreen extends Component {
     console.log(options);
     postsActions.create(options);
   }
+
+  upload() {
+    var options = {
+      images: this.state.imageSource,
+    }
+    console.log(options);
+    imagesActions.upload(options);
+  }
 }
 
 var NavigationBarRouteMapper = {
@@ -193,6 +245,10 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  image: {
+    width: 180,
+    height: 180,
   },
 });
 
