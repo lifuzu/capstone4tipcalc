@@ -142,3 +142,32 @@ curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "controller=posts&method=creat
 5. create post, eg:
 COOKIE_HEADER=wordpress_logged_in_09451d069f48070a06dbaa1d519fd5b8
 curl -b "$COOKIE_HEADER=cookieValueFromAbove" -vd "nonce=nonceVal&title=TestTitle&content=TestContent&author=usernameForCookie" "http://yourhost.com/wordpress/?json=create_post"
+
+
+curl -X POST http://localhost:8888/wc-api/v2/products \
+    -u ck_8ab4cde77e0198500a7e51afa4dd7171:cs_44b85122896374217f1f1bd055c815a6 \
+    -H "Content-Type: application/json" \
+    -d '{
+  "product": {
+    "title": "Premium Quality",
+    "type": "simple",
+    "regular_price": "21.99",
+    "description": "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.",
+    "short_description": "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+    "categories": [
+      9,
+      14
+    ],
+    "images": [
+      {
+        "src": "http://example.com/wp-content/uploads/2015/01/premium-quality-front.jpg",
+        "position": 0
+      },
+      {
+        "src": "http://example.com/wp-content/uploads/2015/01/premium-quality-back.jpg",
+        "position": 1
+      }
+    ]
+  }
+}'
+

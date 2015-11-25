@@ -9,6 +9,7 @@ var {
 } = React;
 
 var SplashScreen = require('./components/SplashScreen');
+var MainView     = require('./components/MainView');
 var FormScreen   = require('./components/FormScreen');
 var LoginPage    = require('./components/LoginPage');
 var PersonPage   = require('./components/PersonPage');
@@ -22,6 +23,12 @@ class Routes {
     if (routeId === 'SplashScreen') {
       return (
         <SplashScreen
+          navigator={navigator} />
+      );
+    }
+    if (routeId === 'MainView') {
+      return (
+        <MainView
           navigator={navigator} />
       );
     }

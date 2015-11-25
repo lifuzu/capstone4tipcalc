@@ -1,7 +1,8 @@
 var frisby = require('frisby');
 var chance = require('chance').Chance();
 
-var host_path = "http://192.168.99.100:8080/api";
+//var host_path = "http://192.168.99.100:8080/api";
+var host_path = "http://lab.weimed.com:8090/api";
 
 var get_nonce_path = "/get_nonce/";
 var get_nonce_param = "controller=user&method=register";
