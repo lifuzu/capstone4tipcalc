@@ -53,12 +53,18 @@ var PageTwo = React.createClass({
   },
 });
 
+var OrderListView = require('./OrderListView');
+var ScanView = require('./ScanView');
+var ItemDetailView = require('./ItemDetailView');
+
 var OrderView = React.createClass({
   _renderScene(route, navigator) {
-    if (route.id === 1) {
-      return <PageOne navigator={navigator} />
-    } else if (route.id === 2) {
-      return <PageTwo navigator={navigator} />
+    if (route.id === 'list') {
+      return <OrderListView navigator={navigator} />
+    } else if (route.id === 'scan') {
+      return <ScanView navigator={navigator} />
+    } else if (route.id === 'detail') {
+      return <ItemDetailView navigator={navigator} />
     }
   },
 
@@ -71,7 +77,7 @@ var OrderView = React.createClass({
   render() {
     return (
       <Navigator
-        initialRoute = {{id: 1, }}
+        initialRoute = {{id: 'list', }}
         renderScene  = { this._renderScene }
         configureScene = {this._configureScene}/>
     );
