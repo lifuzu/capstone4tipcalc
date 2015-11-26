@@ -73,18 +73,6 @@ var PageTwo = React.createClass({
 });
 
 var SearchView = React.createClass({
-  // render() {
-  //   return (
-  //     <View style={[styles.container, {backgroundColor: 'purple'}]}>
-  //       <Text style={styles.welcome}>This is page two!</Text>
-  //       <TouchableOpacity onPress={this._handlePress}>
-  //         <View style={{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: 'black'}}>
-  //           <Text style={styles.welcome}>Go back</Text>
-  //         </View>
-  //       </TouchableOpacity>
-  //      </View>
-  //   )
-  // },
   _renderScene(route, navigator) {
     if (route.id === 1) {
       return <PageOne navigator={navigator} />
