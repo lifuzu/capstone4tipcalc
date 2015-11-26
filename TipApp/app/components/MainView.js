@@ -21,19 +21,19 @@ var MainView = React.createClass({
     return (
       <View style={styles.container}>
       <ScrollableTabView tabBarPosition="bottom" renderTabBar={() => <TabBar />}>
-        <View tabLabel="ion|ios-paper" style={styles.tabView}>
+        <View tabLabel="ion|android-search" style={styles.tabView}>
           <SearchView/>
         </View>
 
-        <View tabLabel="ion|person-stalker" style={styles.tabView}>
+        <View tabLabel="ion|disc" style={styles.tabView}>
           <OrderView/>
         </View>
-        <ScrollView tabLabel="ion|ios-chatboxes" style={styles.tabView}>
+        <ScrollView tabLabel="ion|share" style={styles.tabView}>
           <View style={styles.card}>
-            <Text>Messenger</Text>
+            <Text>Share</Text>
           </View>
         </ScrollView>
-        <ScrollView tabLabel="ion|ios-world" style={styles.tabView}>
+        <ScrollView tabLabel="ion|ios-chatboxes" style={styles.tabView}>
           <View style={styles.card}>
             <Text>Notifications</Text>
           </View>
