@@ -11,8 +11,16 @@ var {
 } = React;
 
 var { Icon, } = require('react-native-icons');
+var Camera = require("react-native-camera");
 
-class OrderListView extends Component {
+class ScanView extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      showCamera: true,
+      cameraType: Camera.constants.Type.back
+    }
+  }
   render() {
     return (
       <Navigator
@@ -26,17 +34,44 @@ class OrderListView extends Component {
   }
   _renderScene(route, navigator) {
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <TouchableOpacity
-            onPress={this._gotoNext.bind(this)}>
-          <Text>scanner here</Text>
-        </TouchableOpacity>
-      </View>
+      this._renderCamera()
     );
+    // return (
+    //   <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    //     <TouchableOpacity
+    //         onPress={this._gotoNext.bind(this)}>
+    //       <Text>scanner here</Text>
+    //     </TouchableOpacity>
+    //   </View>
+    // );
   }
   _gotoNext() {
     this.props.navigator.push({
       id: 'NoNavigatorPage',
+      // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+    });
+  }
+  _renderCamera() {
+    if(this.state.showCamera) {
+      return (
+        <Camera
+          ref="cam"
+          style={styles.container}
+          onBarCodeRead={this._onBarCodeRead.bind(this)}
+          type={this.state.cameraType}>
+        </Camera>
+      );
+    } else {
+      return (
+        <View></View>
+      );
+    }
+  }
+  _onBarCodeRead(e) {
+    console.log(e.type + ":" + e.data)
+    this.setState({showCamera: false});
+    this.props.navigator.push({
+      id: 'detail',
       // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
     });
   }
@@ -67,4 +102,13 @@ var NavigationBarRouteMapper = {
   }
 };
 
-module.exports = OrderListView;
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  }
+});
+
+module.exports = ScanView;
