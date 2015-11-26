@@ -48,7 +48,7 @@ var FacebookTabBar = React.createClass({
   renderTabOption(name, page) {
     var numberOfTabs = this.props.tabs.length;
     var isTabActive = this.props.activeTab === page;
-    console.log(isTabActive);
+    // console.log(isTabActive);
     var icon = isTabActive ? 
       <Icon name={name} size={40} color='#3B5998' style={{width: 40, height: 40, position: 'absolute', top: 0, left: deviceWidth / (2*numberOfTabs) - 20}}
               ref={(icon) => { this.selectedTabIcons[page] = icon }}/> :

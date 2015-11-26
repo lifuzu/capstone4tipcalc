@@ -10,8 +10,11 @@ var {
   TouchableOpacity,
 } = React;
 
+var { Icon, } = require('react-native-icons');
+
 class OrderListView extends Component {
   render() {
+    // console.log(this.props.params);
     return (
       <Navigator
         renderScene={this._renderScene.bind(this)}
@@ -27,7 +30,7 @@ class OrderListView extends Component {
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <TouchableOpacity
             onPress={this._gotoNext.bind(this)}>
-          <Text>item details here</Text>
+          <Text>{this.props.params.data}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -44,10 +47,12 @@ var NavigationBarRouteMapper = {
   LeftButton(route, navigator, index, nextState) {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-          onPress={() => navigator.parentNavigator.pop()}>
-        <Text style={{color: 'white', margin: 10,}}>
-          Back
-        </Text>
+          onPress={() => navigator.parentNavigator.popToTop()}>
+        <Icon
+          name='ion|ios-arrow-back'
+          size={40}
+          color='#887700'
+          style={{width: 40, height: 40}} />
       </TouchableOpacity>
     );
   },
@@ -55,9 +60,11 @@ var NavigationBarRouteMapper = {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
           onPress={() => navigator.parentNavigator.push({id: 'unknown'})}>
-        <Text style={{color: 'white', margin: 10,}}>
-          Next
-        </Text>
+        <Icon
+          name='ion|ios-checkmark'
+          size={40}
+          color='#887700'
+          style={{width: 40, height: 40}} />
       </TouchableOpacity>
     );
   },
@@ -65,7 +72,7 @@ var NavigationBarRouteMapper = {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}>
         <Text style={{color: 'white', margin: 10, fontSize: 16}}>
-          Ordered List
+          Item Details
         </Text>
       </TouchableOpacity>
     );

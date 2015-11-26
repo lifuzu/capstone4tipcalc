@@ -64,7 +64,11 @@ var OrderView = React.createClass({
     } else if (route.id === 'scan') {
       return <ScanView navigator={navigator} />
     } else if (route.id === 'detail') {
-      return <ItemDetailView navigator={navigator} />
+      if (route.params !== null) {
+        return <ItemDetailView navigator={navigator} params={route.params}/>
+      } else {
+        return <ItemDetailView navigator={navigator} />
+      }
     }
   },
 

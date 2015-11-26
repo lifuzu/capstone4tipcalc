@@ -68,10 +68,11 @@ class ScanView extends Component {
     }
   }
   _onBarCodeRead(e) {
-    console.log(e.type + ":" + e.data)
+    // console.log(e.type + ":" + e.data)
     this.setState({showCamera: false});
     this.props.navigator.push({
       id: 'detail',
+      params: {data: e.data},
       // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
     });
   }
