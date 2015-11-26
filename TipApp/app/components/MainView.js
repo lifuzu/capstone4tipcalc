@@ -12,30 +12,22 @@ var {
 var ScrollableTabView = require('react-native-scrollable-tab-view');
 var TabBar = require('./FacebookTabBar');
 var deviceWidth = Dimensions.get('window').width;
+var SearchView = require('./SearchView');
+var OrderView = require('./OrderView');
 
 var MainView = React.createClass({
-  getDefaultProps() {
-    return {
-      tabBarPosition: 'bottom',
-      // edgeHitWidth: 30,
-      // springTension: 50,
-      // springFriction: 10
-    }
-  },
+
   render() {
     return (
       <View style={styles.container}>
       <ScrollableTabView tabBarPosition="bottom" renderTabBar={() => <TabBar />}>
-        <ScrollView tabLabel="ion|ios-paper" style={styles.tabView}>
-          <View style={styles.card}>
-            <Text>News</Text>
-          </View>
-        </ScrollView>
-        <ScrollView tabLabel="ion|person-stalker" style={styles.tabView}>
-          <View style={styles.card}>
-            <Text>Friends</Text>
-          </View>
-        </ScrollView>
+        <View tabLabel="ion|ios-paper" style={styles.tabView}>
+          <SearchView/>
+        </View>
+
+        <View tabLabel="ion|person-stalker" style={styles.tabView}>
+          <OrderView/>
+        </View>
         <ScrollView tabLabel="ion|ios-chatboxes" style={styles.tabView}>
           <View style={styles.card}>
             <Text>Messenger</Text>
