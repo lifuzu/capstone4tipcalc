@@ -27,4 +27,6 @@ var CustomSceneConfig = Object.assign({}, BaseConfig, {
   }
 });
 
-module.exports = CustomSceneConfig;
+module.exports = {
+  CustomSceneConfig: CustomSceneConfig
+};
