@@ -17,7 +17,7 @@ var variables = require('../variables');
 var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
 
-class OrderListView extends Component {
+class ItemDetailView extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -43,21 +43,22 @@ class OrderListView extends Component {
     return (
       <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
         {navigator_placeholder}
-        <TouchableOpacity
-            onPress={this._gotoNext.bind(this)}>
-          <Text>{this.props.params.data}</Text>
-        </TouchableOpacity>
         {image_display}
         <Text>{this.state.item.title}</Text>
         <Text>{this.state.item.content}</Text>
+        <TouchableOpacity
+            onPress={this._onSubmit.bind(this)}>
+          <Text>OK</Text>
+        </TouchableOpacity>
       </ScrollView>
     );
   }
-  _gotoNext() {
+  _onSubmit() {
     // this.props.navigator.push({
     //   id: 'scan',
     //   // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
     // });
+    console.log(this.state.item);
   }
   componentDidMount() {
     // itemsActions.erase();
@@ -88,7 +89,7 @@ var NavigationBarRouteMapper = {
     );
   },
   RightButton(route, navigator, index, nextState) {
-    return (
+    return null;/*(
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
           onPress={() => navigator.parentNavigator.push({id: 'unknown'})}>
         <Icon
@@ -97,7 +98,7 @@ var NavigationBarRouteMapper = {
           color='#887700'
           style={{width: 40, height: 40}} />
       </TouchableOpacity>
-    );
+    );*/
   },
   Title(route, navigator, index, nextState) {
     return (
@@ -123,4 +124,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = OrderListView;
+module.exports = ItemDetailView;
