@@ -186,3 +186,17 @@ http://lab.weimed.com:8090/wp-json/posts?type=fdm-menu-item
 List the reviews:
 http://lab.weimed.com:8090/wp-json/posts?type=grfwp-review
 
+
+#https://wordpress.org/support/topic/featured-image-not-available-by-jetpack-rest-api
+function custom_rest_api_allowed_public_metadata( $allowed_meta_keys )
+{
+    // only run for REST API requests
+    if ( ! defined( 'REST_API_REQUEST' ) || ! REST_API_REQUEST )
+        return $allowed_meta_keys;
+
+    $allowed_meta_keys[] = 'dfiFeatured';
+
+    return $allowed_meta_keys;
+}
+
+add_filter( 'rest_api_allowed_public_metadata', 'custom_rest_api_allowed_public_metadata' );

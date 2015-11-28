@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+  ScrollView,
   StyleSheet,
   Component,
   Image,
@@ -12,6 +13,7 @@ var {
 } = React;
 
 var { Icon, } = require('react-native-icons');
+var variables = require('../variables');
 var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
 
@@ -37,14 +39,18 @@ class OrderListView extends Component {
   _renderScene(route, navigator) {
     var image_display = this.state.item && this.state.item.featured_image ?
       <Image source={{uri: this.state.item.featured_image.source}} style={[styles.image, {overflow: 'visible'}]} /> : null;
+    var navigator_placeholder = <View style={{height: variables.NAV_HEIGHT}}></View>;
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
+        {navigator_placeholder}
         <TouchableOpacity
             onPress={this._gotoNext.bind(this)}>
           <Text>{this.props.params.data}</Text>
         </TouchableOpacity>
         {image_display}
-      </View>
+        <Text>{this.state.item.title}</Text>
+        <Text>{this.state.item.content}</Text>
+      </ScrollView>
     );
   }
   _gotoNext() {

@@ -52,7 +52,7 @@ var MainView = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
+    marginTop: 20,
   },
   tabView: {
     width: deviceWidth,
