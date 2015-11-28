@@ -12,7 +12,7 @@ var actions = reflux.createActions({
   // 'logout'
 });
 
-var base_url = config.Settings.BASE_URL;
+var base_url = config.Settings.BASE_URL + "/api";
 var register_path = base_url + "/user/register/";
 
 actions.register.listen(function(options) {

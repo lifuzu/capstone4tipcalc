@@ -92,7 +92,7 @@ var NavigationBarRouteMapper = {
     );
   },
   RightButton(route, navigator, index, nextState) {
-    return (
+    return null;/*(
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
           onPress={() => navigator.parentNavigator.push({id: 'detail', params: {data: 'menu-item/chicken-fried-steak/'}})}>
         <Icon
@@ -100,7 +100,7 @@ var NavigationBarRouteMapper = {
           size={40}
           color='#887700'
           style={{width: 40, height: 40}} />
-      </TouchableOpacity>);
+      </TouchableOpacity>);*/
   },
   Title(route, navigator, index, nextState) {
     return (

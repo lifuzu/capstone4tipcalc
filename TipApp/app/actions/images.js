@@ -9,7 +9,7 @@ var actions = reflux.createActions({
   'upload': {children: ['completed', 'failed']},
 });
 
-var base_url = config.Settings.BASE_URL;
+var base_url = config.Settings.BASE_URL + "/api";
 
 actions.upload.listen(function(options) {
   var self = this;

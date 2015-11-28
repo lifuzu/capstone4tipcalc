@@ -4,6 +4,7 @@ var React = require('react-native');
 var {
   StyleSheet,
   Component,
+  Image,
   View,
   Text,
   Navigator,
@@ -11,8 +12,16 @@ var {
 } = React;
 
 var { Icon, } = require('react-native-icons');
+var itemsActions = require('../actions/items');
+var itemsStores = require('../stores/items');
 
 class OrderListView extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      item: {},
+    }
+  }
   render() {
     // console.log(this.props.params);
     return (
@@ -26,20 +35,36 @@ class OrderListView extends Component {
     );
   }
   _renderScene(route, navigator) {
+    var image_display = this.state.item && this.state.item.featured_image ?
+      <Image source={{uri: this.state.item.featured_image.source}} style={[styles.image, {overflow: 'visible'}]} /> : null;
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <TouchableOpacity
             onPress={this._gotoNext.bind(this)}>
           <Text>{this.props.params.data}</Text>
         </TouchableOpacity>
+        {image_display}
       </View>
     );
   }
   _gotoNext() {
-    this.props.navigator.push({
-      id: 'scan',
-      // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-    });
+    // this.props.navigator.push({
+    //   id: 'scan',
+    //   // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+    // });
+  }
+  componentDidMount() {
+    // itemsActions.erase();
+    this.unsubscribe = itemsStores.listen(this.onFoundItem.bind(this));
+    itemsActions.find({itemId: this.props.params.data});
+  }
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+  onFoundItem(res) {
+    console.log("Inside ItemDetail");
+    // console.log(res);
+    this.setState({item: res});
   }
 }
 
@@ -78,5 +103,18 @@ var NavigationBarRouteMapper = {
     );
   }
 };
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  image: {
+    width: 180,
+    height: 180,
+  },
+});
 
 module.exports = OrderListView;
