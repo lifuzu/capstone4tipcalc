@@ -171,3 +171,18 @@ curl -X POST http://localhost:8888/wc-api/v2/products \
   }
 }'
 
+Update three functions in JSON API
+from json_api_init to json_api_init_
+from json_api_activation to json_api_activation_
+from json_api_deactivation to json_api_deactivation_
+to fix the naming conflicts with WP REST API
+
+To check the types of posts:
+http://lab.weimed.com:8090/wp-json/posts/types
+
+List the menu items:
+http://lab.weimed.com:8090/wp-json/posts?type=fdm-menu-item
+
+List the reviews:
+http://lab.weimed.com:8090/wp-json/posts?type=grfwp-review
+
