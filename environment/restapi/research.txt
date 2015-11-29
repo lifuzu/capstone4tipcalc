@@ -200,3 +200,18 @@ function custom_rest_api_allowed_public_metadata( $allowed_meta_keys )
 }
 
 add_filter( 'rest_api_allowed_public_metadata', 'custom_rest_api_allowed_public_metadata' );
+
+
+
+
+curl -vd "controller=user&method=generate_auth_cookie" "http://lab.weimed.com:8090/api/get_nonce/"
+
+{"status":"ok","controller":"user","method":"generate_auth_cookie","nonce":"cd21bd5493"}
+
+curl -vd "username=rlee&password=*******&nonce=cd21bd5493" "http://lab.weimed.com:8090/api/user/generate_auth_cookie/"
+
+
+{"status":"ok","cookie":"rlee|1450029012|cFyNYvWgvQHYEo6hD9YQ1J5gftUqdr88l2GCqV6T6tP|9306c13ddf68d94697f72886390c24258f6e0c2e2e9804180ac1c66f9b83d3e2","cookie_name":"wordpress_logged_in_c2dcd53d890b1d2e6372d398a407dd99","user":{"id":1,"username":"rlee","nicename":"rlee","email":"lifuzu@gmail.com","url":"","registered":"2015-11-21 22:08:20","displayname":"rlee","firstname":"","lastname":"","nickname":"rlee","description":"","capabilities":{"administrator":true},"avatar":null}}
+
+
+curl -b "wordpress_logged_in_c2dcd53d890b1d2e6372d398a407dd99=rlee|1450029012|cFyNYvWgvQHYEo6hD9YQ1J5gftUqdr88l2GCqV6T6tP|9306c13ddf68d94697f72886390c24258f6e0c2e2e9804180ac1c66f9b83d3e2" "http://lab.weimed.com:8090/wp-json/posts/24/meta"

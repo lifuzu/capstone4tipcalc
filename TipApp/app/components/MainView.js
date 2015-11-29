@@ -14,6 +14,7 @@ var TabBar = require('./FacebookTabBar');
 var deviceWidth = Dimensions.get('window').width;
 var SearchView = require('./SearchView');
 var OrderView = require('./OrderView');
+var SettingsView = require('./SettingsView');
 
 var MainView = React.createClass({
 
@@ -24,7 +25,6 @@ var MainView = React.createClass({
         <View tabLabel="ion|android-search" style={styles.tabView}>
           <SearchView/>
         </View>
-
         <View tabLabel="ion|disc" style={styles.tabView}>
           <OrderView/>
         </View>
@@ -38,11 +38,9 @@ var MainView = React.createClass({
             <Text>Notifications</Text>
           </View>
         </ScrollView>
-        <ScrollView tabLabel="ion|navicon-round" style={styles.tabView}>
-          <View style={styles.card}>
-            <Text>Other nav</Text>
-          </View>
-        </ScrollView>
+        <View tabLabel="ion|navicon-round" style={styles.tabView}>
+          <SettingsView/>
+        </View>
       </ScrollableTabView>
       </View>
     );
