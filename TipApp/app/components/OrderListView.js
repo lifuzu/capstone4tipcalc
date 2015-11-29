@@ -14,6 +14,7 @@ var {
 var { Icon, } = require('react-native-icons');
 var styles = require('../styles');
 var variables = require('../variables');
+var ItemCell = require('./ItemCell');
 var orderedItemsActions = require('../actions/ordered_items');
 var orderedItemsStore = require('../stores/ordered_items');
 
@@ -58,8 +59,8 @@ class OrderListView extends Component {
     var navigator_placeholder = <View style={{height: variables.NAV_HEIGHT}}></View>;
     return(
       <View style={[styles.container, stylesLocal.container]}>
-      {navigator_placeholder}
-        <ListView
+        {navigator_placeholder}
+        <ListView contentContainerStyle={stylesLocal.list}
           dataSource={this.state.dataSource}
           renderRow={this.renderItem}
           style={styles.listView}/>
@@ -67,14 +68,14 @@ class OrderListView extends Component {
     );
   }
   renderItem(item){
-    return (
-      <Text>{item.title} - {item.count}</Text>
+    return(
+      <ItemCell
+        item={item}/>
     );
-    // return(
-    //   <QuoteCell
-    //     onSelect={() => this.selectQuote(quote)}
-    //     quote={quote}/>
-    // );
+    //  onSelection={this.selectionItem.bind(this)}
+  }
+  selectionItem(item) {
+    console.log(item);
   }
   componentDidMount() {
     // orderedItemsActions.del({itemId: 'menu-item/chicken-fried-steak/'});
@@ -145,6 +146,11 @@ var stylesLocal = StyleSheet.create({
   },
   listView:{
     backgroundColor: '#F6F6EF',
+  },
+  list: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   },
 });
 
