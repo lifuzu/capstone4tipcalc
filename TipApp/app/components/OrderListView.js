@@ -68,7 +68,7 @@ class OrderListView extends Component {
   }
   renderItem(item){
     return (
-      <Text>{item.title}</Text>
+      <Text>{item.title} - {item.count}</Text>
     );
     // return(
     //   <QuoteCell
@@ -79,6 +79,7 @@ class OrderListView extends Component {
   componentDidMount() {
     // orderedItemsActions.del({itemId: 'menu-item/chicken-fried-steak/'});
     // orderedItemsActions.del({itemId: 'menu-item/fried-chicken/'});
+    // orderedItemsActions.erase();
 
     this.unsubscribe = orderedItemsStore.listen(this.onListDone.bind(this));
     if (!this.state.loaded) orderedItemsActions.list();
