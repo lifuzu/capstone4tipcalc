@@ -12,6 +12,7 @@ var {
   TouchableOpacity,
 } = React;
 
+var Button = require('react-native-button');
 var { Icon, } = require('react-native-icons');
 var variables = require('../variables');
 var itemsActions = require('../actions/items');
@@ -47,10 +48,12 @@ class ItemDetailView extends Component {
         {image_display}
         <Text>{this.state.item.title}</Text>
         <Text>{this.state.item.content}</Text>
-        <TouchableOpacity
-            onPress={this._onSubmit.bind(this)}>
-          <Text>OK</Text>
-        </TouchableOpacity>
+        <Button
+          style={{fontSize: 20, color: 'green'}}
+          styleDisabled={{color: 'red'}}
+          onPress={this._onSubmit.bind(this)}>
+          Confirm!
+        </Button>
       </ScrollView>
     );
   }
