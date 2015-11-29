@@ -20,16 +20,17 @@ var ItemCell = React.createClass({
     return {
     };
   },
+  // <Image source={{uri: this.props.item.featured_image.source}} style={[stylesLocal.image, {alignItems: "center", resizeMode: 'contain'}]} />
   render: function() {
     return (
       <View>
         <TouchableHighlight onPress={this.props.onSelection}>
           <View style={[stylesLocal.item, {alignItems: "center"}]}>
             <Image source={{uri: this.props.item.featured_image.source}} style={[stylesLocal.image, {alignItems: "center", resizeMode: 'contain'}]} />
-            <Text>{this.props.item.title}</Text>
-            <Text>x{this.props.item.count}</Text>
           </View>
         </TouchableHighlight>
+        <Text style={{marginLeft: 5}}>{this.props.item.title}</Text>
+        <Text style={{marginLeft: 5}}>x{this.props.item.count}</Text>
       </View>
     );
   }
@@ -43,6 +44,7 @@ var stylesLocal = StyleSheet.create({
     height: variables.SCREEN_WIDTH / 2 - 20
   },
   image: {
+    backgroundColor: 'transparent',
     width: variables.SCREEN_WIDTH / 2 - 20,
     height: variables.SCREEN_WIDTH / 2 - 20,
   },

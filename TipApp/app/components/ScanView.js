@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+  Platform,
   StyleSheet,
   Component,
   View,
@@ -17,8 +18,8 @@ class ScanView extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      showCamera: true,
-      cameraType: Camera.constants.Type.back
+      showCamera: Platform.OS === 'ios' ? true : false,
+      cameraType: Camera && Camera.constants ? Camera.constants.Type.back : null
     }
   }
   render() {
@@ -94,7 +95,7 @@ var NavigationBarRouteMapper = {
   RightButton(route, navigator, index, nextState) {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-          onPress={() => navigator.parentNavigator.push({id: 'detail', params: {data: 'menu-item/chicken-fried-steak/'}})}>
+          onPress={() => navigator.parentNavigator.push({id: 'detail', params: {data: 'menu-item/fried-chicken/'}})}>
         <Icon
           name='ion|ios-plus'
           size={40}
