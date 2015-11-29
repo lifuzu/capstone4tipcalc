@@ -94,7 +94,7 @@ var NavigationBarRouteMapper = {
   RightButton(route, navigator, index, nextState) {
     return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-          onPress={() => navigator.parentNavigator.push({id: 'detail', params: {data: 'menu-item/fried-chicken/'}})}>
+          onPress={() => navigator.parentNavigator.push({id: 'detail', params: {data: 'menu-item/chicken-fried-steak/'}})}>
         <Icon
           name='ion|ios-plus'
           size={40}

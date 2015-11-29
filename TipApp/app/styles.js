@@ -1,9 +1,9 @@
 'use strict';
 
-const React = require('react-native')
-const { StyleSheet } = React;
+var React = require('react-native')
+var { StyleSheet } = React;
 
-const styles = StyleSheet.create({
+var styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',

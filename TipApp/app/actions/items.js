@@ -60,7 +60,7 @@ function list_items(options, completed, failed) {
               // console.log(added_data);
               added_items.push(added_data);
               if (added_items.length === responseJSON.length) {
-                console.log(added_items);
+                // console.log(added_items);
                 completed(added_items);
               }
             });

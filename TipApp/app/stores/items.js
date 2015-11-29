@@ -9,11 +9,11 @@ var store = reflux.createStore({
   listenables: [actions],
 
   onFind: function() {
-    console.log("Registering ...");
+    console.log("Finding ...");
   },
 
   onFindCompleted: function(result) {
-    console.log("Find completed - " + result);
+    // console.log("Find completed - " + result);
     this.trigger(result);
   },
 

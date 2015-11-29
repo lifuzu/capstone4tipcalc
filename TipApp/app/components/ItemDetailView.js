@@ -16,6 +16,7 @@ var { Icon, } = require('react-native-icons');
 var variables = require('../variables');
 var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
+var orderedItemsActions = require('../actions/ordered_items');
 
 class ItemDetailView extends Component {
   constructor(props) {
@@ -58,7 +59,8 @@ class ItemDetailView extends Component {
     //   id: 'scan',
     //   // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
     // });
-    console.log(this.state.item);
+    // console.log(this.state.item);
+    orderedItemsActions.add({item: this.state.item});
   }
   componentDidMount() {
     // itemsActions.erase();
