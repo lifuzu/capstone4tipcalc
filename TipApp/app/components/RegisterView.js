@@ -71,10 +71,7 @@ class RegisterView extends Component {
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableHighlight>
           <View style={styles.signup}>
-            <Text style={styles.greyFont}>"Have an account already?"<Text style={styles.whiteFont} onPress={this.onSignin.bind(this)}>  Sign In</Text></Text>
-          </View>
-          <View style={styles.signup}>
-            <Text style={styles.greyFont}>"Forgot password?"<Text style={styles.whiteFont} onPress={this.onResetPassword.bind(this)}>  Reset</Text></Text>
+            <Text style={styles.greyFont}>"Already a user?"<Text style={styles.whiteFont} onPress={this.onSignin.bind(this)}>  Sign In</Text></Text>
           </View>
         </View>
       </View>
@@ -103,7 +100,6 @@ class RegisterView extends Component {
   onSignin() {
     this.props.navigator.push({id: 'signin',});
   }
-  onResetPassword() {}
 }
 
 var NavigationBarRouteMapper = {

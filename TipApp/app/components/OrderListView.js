@@ -14,7 +14,7 @@ var {
 
 var { Icon, } = require('react-native-icons');
 var styles = require('../styles');
-var variables = require('../variables');
+var NAV_HEIGHT = require('../variables')('NAV_HEIGHT');
 var ItemCell = require('./ItemCell');
 var orderedItemsActions = require('../actions/ordered_items');
 var orderedItemsStore = require('../stores/ordered_items');
@@ -56,8 +56,7 @@ class OrderListView extends Component {
   }
   renderListView(){
     // console.log(this.state.dataSource);
-    // orderedItemsActions.list();
-    var navigator_placeholder = <View style={{height: variables.NAV_HEIGHT}}></View>;
+    var navigator_placeholder = <View style={{height: NAV_HEIGHT}}></View>;
     return(
       <ScrollView>
         {navigator_placeholder}

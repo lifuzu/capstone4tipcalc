@@ -13,7 +13,7 @@ var {
 var { Icon, } = require('react-native-icons');
 
 var styles = require("../styles");
-var variables = require("../variables");
+var SCREEN_WIDTH = require("../variables")('SCREEN_WIDTH');
 
 var ItemCell = React.createClass({
   getInitialState: function() {
@@ -40,13 +40,13 @@ var stylesLocal = StyleSheet.create({
   item: {
     backgroundColor: '#CCC',
     margin: 5,
-    width: variables.SCREEN_WIDTH / 2 - 20,
-    height: variables.SCREEN_WIDTH / 2 - 20
+    width: SCREEN_WIDTH / 2 - 20,
+    height: SCREEN_WIDTH / 2 - 20
   },
   image: {
     backgroundColor: 'transparent',
-    width: variables.SCREEN_WIDTH / 2 - 20,
-    height: variables.SCREEN_WIDTH / 2 - 20,
+    width: SCREEN_WIDTH / 2 - 20,
+    height: SCREEN_WIDTH / 2 - 20,
   },
 });
 

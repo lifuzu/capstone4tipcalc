@@ -42,17 +42,26 @@ class LoginView extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>
-          Please signin:
+          Please sign in:
         </Text>
         <View>
-          <TextInput
+          <TextInput ref="username"
             placeholder="Username"
+            keyboardType="default"
             onChange={(event) => this.setState({username: event.nativeEvent.text})}
+            enablesReturnKeyAutomatically={true}
+            returnKeyType='next'
+            onSubmitEditing={() => this.refs.password.focus()}
             style={styles.formInput}
             value={this.state.username} />
-          <TextInput
+          <TextInput ref="password"
             placeholder="Password"
             secureTextEntry={true}
+            autoCorrect={false}
+            keyboardType="default"
+            enablesReturnKeyAutomatically={true}
+            returnKeyType='done'
+            onSubmitEditing={this.onSubmitPressed.bind(this)}
             onChange={(event) => this.setState({password: event.nativeEvent.text})}
             style={styles.formInput}
             value={this.state.password} />
@@ -63,7 +72,10 @@ class LoginView extends Component {
             <Text style={styles.buttonText}>Logout</Text>
           </TouchableHighlight>
           <View style={styles.signup}>
-            <Text style={styles.greyFont}>"Don't have an account?"<Text style={styles.whiteFont} onPress={this.onSignup.bind(this)}>  Sign Up</Text></Text>
+            <Text style={styles.greyFont}>"Not a user?"<Text style={styles.whiteFont} onPress={this.onSignup.bind(this)}>  Sign Up</Text></Text>
+          </View>
+          <View style={styles.signup}>
+            <Text style={styles.greyFont}>"Forgot password?"<Text style={styles.whiteFont} onPress={this.onResetPassword.bind(this)}>  Reset</Text></Text>
           </View>
           <Text>{this.state.status}</Text>
         </View>
@@ -95,6 +107,7 @@ class LoginView extends Component {
   onSignup() {
     this.props.navigator.push({id: 'signup',});
   }
+  onResetPassword() {}
 }
 
 var NavigationBarRouteMapper = {

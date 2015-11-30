@@ -14,7 +14,7 @@ var {
 
 var Button = require('react-native-button');
 var { Icon, } = require('react-native-icons');
-var variables = require('../variables');
+var NAV_HEIGHT = require('../variables')('NAV_HEIGHT');
 var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
 var orderedItemsActions = require('../actions/ordered_items');
@@ -32,6 +32,7 @@ class ItemDetailView extends Component {
       <Navigator
         renderScene={this._renderScene.bind(this)}
         navigator={this.props.navigator}
+        initialRoute={{onConfirm: this._onSubmit.bind(this)}}
         navigationBar={
           <Navigator.NavigationBar style={{backgroundColor: '#246dd5'}}
             routeMapper={NavigationBarRouteMapper} />
@@ -41,7 +42,7 @@ class ItemDetailView extends Component {
   _renderScene(route, navigator) {
     var image_display = this.state.item && this.state.item.featured_image ?
       <Image source={{uri: this.state.item.featured_image.source}} style={[styles.image, {overflow: 'visible'}]} /> : null;
-    var navigator_placeholder = <View style={{height: variables.NAV_HEIGHT}}></View>;
+    var navigator_placeholder = <View style={{height: NAV_HEIGHT}}></View>;
     return (
       <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
         {navigator_placeholder}
@@ -58,12 +59,10 @@ class ItemDetailView extends Component {
     );
   }
   _onSubmit() {
-    // this.props.navigator.push({
-    //   id: 'scan',
-    //   // sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-    // });
+    // console.log("in _onSubmit");
     // console.log(this.state.item);
     orderedItemsActions.add({item: this.state.item});
+    this.props.navigator.popToTop();
   }
   componentDidMount() {
     // itemsActions.erase();
@@ -74,7 +73,7 @@ class ItemDetailView extends Component {
     this.unsubscribe();
   }
   onFoundItem(res) {
-    console.log("Inside ItemDetail");
+    // console.log("Inside ItemDetail");
     // console.log(res);
     this.setState({item: res});
   }
@@ -94,16 +93,16 @@ var NavigationBarRouteMapper = {
     );
   },
   RightButton(route, navigator, index, nextState) {
-    return null;/*(
+    return (
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-          onPress={() => navigator.parentNavigator.push({id: 'unknown'})}>
+          onPress={() => route.onConfirm() }>
         <Icon
           name='ion|ios-checkmark'
           size={40}
           color='#887700'
           style={{width: 40, height: 40}} />
       </TouchableOpacity>
-    );*/
+    );
   },
   Title(route, navigator, index, nextState) {
     return (
