@@ -64,7 +64,7 @@ function add_item(options, completed, failed) {
     } else {
       var _count = results[0].count + 1;
       db.ordered_items.update({qrcode: options.item.qrcode}, {count: _count}, function(updated_table){
-        console.log(updated_table);
+        // console.log(updated_table);
         db.ordered_items.get_all(function(results){
           // console.log(results);
           completed(lodash.values(results.rows));
@@ -88,7 +88,7 @@ function del_item(options, completed, failed) {
       } else {
         var _count = results[0].count - 1;
         db.ordered_items.update({qrcode: options.itemId}, {count: _count}, function(updated_table){
-          console.log(updated_table);
+          // console.log(updated_table);
           completed(removed_data);
         });
       }
@@ -101,7 +101,7 @@ function del_item(options, completed, failed) {
 // Erase all ordered items from the local storage
 function erase_items(options, completed, failed) {
   db.ordered_items.erase_db(function(removed_data){
-    console.log(removed_data);
+    // console.log(removed_data);
     completed(removed_data);
   });
 }
