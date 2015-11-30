@@ -14,13 +14,17 @@ var {
   TouchableOpacity,
 } = React;
 
+var usersActions = require('../actions/users');
+var usersStores = require('../stores/users');
+
 class LoginView extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       username: "",
-      password: ""
+      password: "",
+      status: ""
     };
   }
   render() {
@@ -55,14 +59,39 @@ class LoginView extends Component {
           <TouchableHighlight onPress={(this.onSubmitPressed.bind(this))} style={styles.button}>
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableHighlight>
+          <TouchableHighlight onPress={(this.onLogout.bind(this))} style={styles.button}>
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableHighlight>
           <View style={styles.signup}>
             <Text style={styles.greyFont}>"Don't have an account?"<Text style={styles.whiteFont} onPress={this.onSignup.bind(this)}>  Sign Up</Text></Text>
           </View>
+          <Text>{this.state.status}</Text>
         </View>
       </View>
     );
   }
-  onSubmitPressed() {}
+  componentDidMount() {
+    this.unsubscribe = usersStores.listen(this.onUserStatus.bind(this));
+  }
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+  onUserStatus(status) {
+    console.log(status);
+    // TODO: Display a dialog here to indicate done, then back to normal process
+    this.setState({status: status.action + ' is ' + status.return + '!'});
+  }
+  onSubmitPressed() {
+    var options = {
+      username: this.state.username,
+      password: this.state.password,
+    }
+    // console.log(options);
+    usersActions.login(options);
+  }
+  onLogout() {
+    usersActions.logout();
+  }
   onSignup() {
     this.props.navigator.push({id: 'signup',});
   }

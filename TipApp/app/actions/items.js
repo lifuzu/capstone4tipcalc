@@ -74,7 +74,7 @@ function list_items(options, completed, failed) {
     })
 }
 
-// Erase all items from thelocal storage
+// Erase all items from the local storage
 function erase_items(options, completed, failed) {
   db.items.erase_db(function(removed_data){
     console.log(removed_data);

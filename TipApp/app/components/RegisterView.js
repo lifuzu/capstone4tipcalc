@@ -87,7 +87,6 @@ class RegisterView extends Component {
     this.unsubscribe();
   }
   onUserRegisterDone(res) {
-    // console.log("Inside FormScreen");
     console.log(res);
     // TODO: Display a dialog here to indicate done, then back to normal process
   }
