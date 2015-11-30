@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react-native')
-var { StyleSheet } = React;
+var { StyleSheet, PixelRatio } = React;
 
 var styles = StyleSheet.create({
   container: {
@@ -25,6 +25,17 @@ var styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 65,
     backgroundColor: 'red'
+  },
+  // https://github.com/taskrabbit/ReactNativeSampleApp/blob/master/App/Lib/CSSVarConfig.js
+  listLine: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    height: 1 / PixelRatio.get(), // thinnest possible line
+    marginLeft: 10,
+  },
+  listFullLine: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    height: 1 / PixelRatio.get(), // thinnest possible line
+    marginLeft: 0,
   }
 })
 
