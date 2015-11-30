@@ -3,6 +3,7 @@
 var React = require('react-native');
 var {
   ListView,
+  ScrollView,
   StyleSheet,
   Component,
   View,
@@ -58,13 +59,13 @@ class OrderListView extends Component {
     // orderedItemsActions.list();
     var navigator_placeholder = <View style={{height: variables.NAV_HEIGHT}}></View>;
     return(
-      <View style={[styles.container, stylesLocal.container]}>
+      <ScrollView>
         {navigator_placeholder}
         <ListView contentContainerStyle={stylesLocal.list}
           dataSource={this.state.dataSource}
           renderRow={this.renderItem}
           style={styles.listView}/>
-      </View>
+      </ScrollView>
     );
   }
   renderItem(item){
@@ -148,7 +149,7 @@ var stylesLocal = StyleSheet.create({
     backgroundColor: '#F6F6EF',
   },
   list: {
-    justifyContent: 'center',
+    // justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap'
   },
