@@ -14,6 +14,9 @@ var {
   TouchableOpacity,
 } = React;
 
+var usersActions = require('../actions/users');
+var usersStores = require('../stores/users');
+
 class RegisterView extends Component {
 
   constructor(props) {
@@ -21,7 +24,8 @@ class RegisterView extends Component {
     this.state = {
       username: "",
       password: "",
-      email_address: ""
+      email_address: "",
+      display_name: ""
     };
   }
   render() {
@@ -58,6 +62,11 @@ class RegisterView extends Component {
             onChange={(event) => this.setState({email_address: event.nativeEvent.text})}
             style={styles.formInput}
             value={this.state.email_address} />
+          <TextInput
+            placeholder="Display Name"
+            onChange={(event) => this.setState({display_name: event.nativeEvent.text})}
+            style={styles.formInput}
+            value={this.state.display_name} />
           <TouchableHighlight onPress={(this.onSubmitPressed.bind(this))} style={styles.button}>
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableHighlight>
@@ -71,7 +80,27 @@ class RegisterView extends Component {
       </View>
     );
   }
-  onSubmitPressed() {}
+  componentDidMount() {
+    this.unsubscribe = usersStores.listen(this.onUserRegisterDone.bind(this));
+  }
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+  onUserRegisterDone(res) {
+    // console.log("Inside FormScreen");
+    console.log(res);
+    // TODO: Display a dialog here to indicate done, then back to normal process
+  }
+  onSubmitPressed() {
+    var options = {
+      username: this.state.username,
+      email: this.state.email_address,
+      user_pass: this.state.password,
+      display_name: this.state.display_name,
+    }
+    console.log(options);
+    usersActions.register(options);
+  }
   onSignin() {
     this.props.navigator.push({id: 'signin',});
   }
