@@ -14,10 +14,12 @@ var {
 
 var routes = require('../routes');
 var scene = require('../scene');
+var yelpActions = require('../actions/yelp');
 
 var PageOne = React.createClass({
   _handlePress() {
-    this.props.navigator.push({id: 2,});
+    // this.props.navigator.push({id: 2,});
+    yelpActions.search({term: 'food'});
   },
 
   render() {

@@ -32,7 +32,6 @@ var _constant = Object.assign({}, {
 
 var constant = function(/*string*/ key) /*string*/ {
   invariant(_constant[key], 'invalid variable ' + key);
-
   return _constant[key];
 };
 
