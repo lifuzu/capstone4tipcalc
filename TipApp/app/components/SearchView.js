@@ -15,10 +15,14 @@ var {
 var routes = require('../routes');
 var scene = require('../scene');
 var yelpActions = require('../actions/yelp');
+var geolocation = require('../mixins/geolocation');
 
 var PageOne = React.createClass({
+  mixins: [geolocation],
   _handlePress() {
-    // this.props.navigator.push({id: 2,});
+    this.props.navigator.push({id: 2,});
+  },
+  _handleSearch() {
     yelpActions.search({term: 'food'});
   },
 
@@ -31,6 +35,19 @@ var PageOne = React.createClass({
             <Text style={styles.welcome}>Go to page two</Text>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity onPress={this._handleSearch}>
+          <View style={{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: 'black'}}>
+            <Text style={styles.welcome}>Search</Text>
+          </View>
+        </TouchableOpacity>
+        <Text>
+          <Text style={styles.title}>Initial position: </Text>
+          {JSON.stringify(this.state.initialPosition)}
+        </Text>
+        <Text>
+          <Text style={styles.title}>Current position: </Text>
+          {JSON.stringify(this.state.lastPosition)}
+        </Text>
        </View>
     )
   },
