@@ -12,7 +12,6 @@ var {
 } = React;
 
 var { Icon, } = require('react-native-icons');
-var precomputeStyle = require('precomputeStyle');
 var deviceWidth = Dimensions.get('window').width;
 
 var styles = StyleSheet.create({

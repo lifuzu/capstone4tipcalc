@@ -6,6 +6,7 @@ react-native bundle --platform android --dev false --entry-file index.android.js
   --bundle-output android/app/src/main/assets/index.android.bundle \
   --assets-dest android/app/src/main/res/
 
+$ react-native bundle --minify
 
 To resolve install 4+ on nvm and also system wide by running the following commands
 ```
@@ -14,3 +15,24 @@ sudo npm install -g n
 sudo n stable
 sudo ln -sf /usr/local/n/versions/node//bin/node /usr/bin/node
 ```
+
+ios/TipApp.xcodeproj/project.pbxproj
+    62886D3E1BCCC2B8006107CE /* Build configuration list for PBXNativeTarget "TipApp_UITests" */ = {
+      isa = XCConfigurationList;
+      buildConfigurations = (
+        62886D321BCCC2B8006107CE /* Debug */,
+        62886D331BCCC2B8006107CE /* Release */,
+      );
+      defaultConfigurationIsVisible = 0;
+      defaultConfigurationName = Release;
+    };
+
+ios/TipApp.xcodeproj/xcshareddata/xcschemes/TipApp.xcscheme
+debugServiceExtension = "internal"
+
+android/settings.gradle:
+include ':react-native-icons'
+project(':react-native-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-icons/android')
+
+android/app/build.gradle:
+compile project(':react-native-icons')
