@@ -52334,7 +52334,7 @@ React.createElement(Text,{style:{color:'white',fontSize:32}},'Fast Order')));}}]
 
 module.exports = SplashScreen;
 });
-__d('TipApp/app/components/MainView.js',["react-native/Libraries/react-native/react-native.js","react-native-scrollable-tab-view/index.js","TipApp/app/components/FacebookTabBar.js","TipApp/app/components/SearchView.js","TipApp/app/components/OrderView.js","TipApp/app/components/SettingsView.js"],function(global, require, module, exports) {  var 
+__d('TipApp/app/components/MainView.js',["react-native/Libraries/react-native/react-native.js","react-native-scrollable-tab-view/index.js","TipApp/app/components/FacebookTabBar.js","TipApp/app/components/OrderView.js","TipApp/app/components/SettingsView.js","TipApp/app/components/SearchView.js"],function(global, require, module, exports) {  var 
 React=require('react-native/Libraries/react-native/react-native.js');var 
 
 
@@ -52823,9 +52823,14 @@ var SearchListView=require('TipApp/app/components/SearchListView.js');
 var Search=React.createClass({displayName:'Search',
 mixins:[geolocation],
 _handleSearch:function(){
+if(this.state.initialPosition !== 'unknown'){
 var coords=this.state.initialPosition.coords;
 var loc=coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
-yelpActions.search({term:'food',ll:loc});},
+yelpActions.search({term:'food',ll:loc});}else 
+{
+var loc="37.788022,-122.399797";
+yelpActions.search({term:'food',ll:loc});}},
+
 
 
 render:function(){

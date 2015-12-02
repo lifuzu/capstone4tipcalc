@@ -22,9 +22,14 @@ var SearchListView = require('./SearchListView');
 var Search = React.createClass({
   mixins: [geolocation],
   _handleSearch() {
-    var coords = this.state.initialPosition.coords;
-    var loc = coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
-    yelpActions.search({term: 'food', ll: loc});
+    if (this.state.initialPosition !== 'unknown') {
+      var coords = this.state.initialPosition.coords;
+      var loc = coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
+      yelpActions.search({term: 'food', ll: loc});
+    } else {
+      var loc = "37.788022,-122.399797";
+      yelpActions.search({term: 'food', ll: loc});
+    }
   },
 
   render() {
