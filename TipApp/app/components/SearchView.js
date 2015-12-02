@@ -64,25 +64,6 @@ var Search = React.createClass({
         //   {JSON.stringify(this.state.lastPosition)}
         // </Text>
 
-var SearchList = React.createClass({
-  _handlePress() {
-    this.props.navigator.pop();
-  },
-
-  render() {
-    return (
-      <View style={[styles.container, {backgroundColor: 'purple'}]}>
-        <Text style={styles.welcome}>This is page two!</Text>
-        <TouchableOpacity onPress={this._handlePress}>
-          <View style={{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: 'black'}}>
-            <Text style={styles.welcome}>Go back</Text>
-          </View>
-        </TouchableOpacity>
-       </View>
-    )
-  },
-});
-
 var SearchView = React.createClass({
   _renderScene(route, navigator) {
     if (route.id === 'search') {
