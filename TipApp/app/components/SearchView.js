@@ -15,13 +15,12 @@ var {
 var routes = require('../routes');
 var scene = require('../scene');
 var yelpActions = require('../actions/yelp');
+var yelpStore   = require('../stores/yelp');
 var geolocation = require('../mixins/geolocation');
+var SearchListView = require('./SearchListView');
 
-var PageOne = React.createClass({
+var Search = React.createClass({
   mixins: [geolocation],
-  _handlePress() {
-    this.props.navigator.push({id: 2,});
-  },
   _handleSearch() {
     var coords = this.state.initialPosition.coords;
     var loc = coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
@@ -32,11 +31,6 @@ var PageOne = React.createClass({
     return (
       <View style={[styles.container, {backgroundColor: 'green'}]}>
         <Text style={styles.welcome}>Greetings!</Text>
-        <TouchableOpacity onPress={this._handlePress}>
-          <View style={{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: 'black'}}>
-            <Text style={styles.welcome}>Go to page two</Text>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity onPress={this._handleSearch}>
           <View style={{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: 'black'}}>
             <Text style={styles.welcome}>Search</Text>
@@ -44,6 +38,15 @@ var PageOne = React.createClass({
         </TouchableOpacity>
       </View>
     )
+  },
+  componentDidMount() {
+    this.unsubscribe = yelpStore.listen(this.onSearchDone.bind(this));
+  },
+  componentWillUnmount() {
+    this.unsubscribe();
+  },
+  onSearchDone(records) {
+    this.props.navigator.push({id: 'list', items: records.businesses});
   },
 });
 
@@ -56,7 +59,7 @@ var PageOne = React.createClass({
         //   {JSON.stringify(this.state.lastPosition)}
         // </Text>
 
-var PageTwo = React.createClass({
+var SearchList = React.createClass({
   _handlePress() {
     this.props.navigator.pop();
   },
@@ -77,10 +80,14 @@ var PageTwo = React.createClass({
 
 var SearchView = React.createClass({
   _renderScene(route, navigator) {
-    if (route.id === 1) {
-      return <PageOne navigator={navigator} />
-    } else if (route.id === 2) {
-      return <PageTwo navigator={navigator} />
+    if (route.id === 'search') {
+      return <Search navigator={navigator} />
+    } else if (route.id === 'list') {
+      if (route.items !== null) {
+        return <SearchListView navigator={navigator} items={route.items}/>
+      } else {
+        return <SearchListView navigator={navigator} />
+      }
     }
   },
 
@@ -93,7 +100,7 @@ var SearchView = React.createClass({
   render() {
     return (
       <Navigator
-        initialRoute = {{id: 1, }}
+        initialRoute = {{id: 'search', }}
         renderScene  = { this._renderScene }
         configureScene = {this._configureScene}/>
     );
