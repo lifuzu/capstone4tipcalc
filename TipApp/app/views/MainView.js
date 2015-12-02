@@ -15,33 +15,32 @@ var deviceWidth = Dimensions.get('window').width;
 var SearchView = require('./SearchView');
 var OrderView = require('./OrderView');
 var SettingsView = require('./SettingsView');
+var InformationView = require('./InformationView');
 
 var MainView = React.createClass({
 
   render() {
     return (
       <View style={styles.container}>
-      <ScrollableTabView tabBarPosition="bottom" renderTabBar={() => <TabBar />}>
-        <View tabLabel="ion|android-search" style={styles.tabView}>
-          <SearchView/>
-        </View>
-        <View tabLabel="ion|disc" style={styles.tabView}>
-          <OrderView/>
-        </View>
-        <ScrollView tabLabel="ion|share" style={styles.tabView}>
-          <View style={styles.card}>
-            <Text>Share</Text>
+        <ScrollableTabView tabBarPosition="bottom" initialPage={3} renderTabBar={() => <TabBar />}>
+          <View tabLabel="ion|android-search" style={styles.tabView}>
+            <SearchView/>
           </View>
-        </ScrollView>
-        <ScrollView tabLabel="ion|ios-chatboxes" style={styles.tabView}>
-          <View style={styles.card}>
-            <Text>Notifications</Text>
+          <View tabLabel="ion|disc" style={styles.tabView}>
+            <OrderView/>
           </View>
-        </ScrollView>
-        <View tabLabel="ion|navicon-round" style={styles.tabView}>
-          <SettingsView/>
-        </View>
-      </ScrollableTabView>
+          <ScrollView tabLabel="ion|share" style={styles.tabView}>
+            <View style={styles.card}>
+              <Text>Share</Text>
+            </View>
+          </ScrollView>
+          <View tabLabel="ion|ios-world" style={styles.tabView}>
+            <InformationView/>
+          </View>
+          <View tabLabel="ion|navicon-round" style={styles.tabView}>
+            <SettingsView/>
+          </View>
+        </ScrollableTabView>
       </View>
     );
   }
