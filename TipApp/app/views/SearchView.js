@@ -5,6 +5,7 @@
 var React = require('react-native');
 var {
   Component,
+  Platform,
   Navigator,
   StyleSheet,
   Text,
@@ -17,7 +18,7 @@ var scene = require('../scene');
 var yelpActions = require('../actions/yelp');
 var yelpStore   = require('../stores/yelp');
 var geolocation = require('../mixins/geolocation');
-var netinfo = require('../mixins/netinfo');
+var netinfo = Platform.OS === 'ios' ? require('../mixins/netinfo') : {};
 var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
 
