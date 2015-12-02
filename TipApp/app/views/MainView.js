@@ -10,7 +10,7 @@ var {
 } = React;
 
 var ScrollableTabView = require('react-native-scrollable-tab-view');
-var TabBar = require('./FacebookTabBar');
+var TabBar = require('./components/FacebookTabBar');
 var deviceWidth = Dimensions.get('window').width;
 var SearchView = require('./SearchView');
 var OrderView = require('./OrderView');

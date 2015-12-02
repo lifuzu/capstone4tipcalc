@@ -12,8 +12,8 @@ var {
 } = React;
 var { Icon, } = require('react-native-icons');
 
-var styles = require("../styles");
-var SCREEN_WIDTH = require("../variables")('SCREEN_WIDTH');
+var styles = require("../../styles");
+var SCREEN_WIDTH = require("../../variables")('SCREEN_WIDTH');
 
 var ItemCell = React.createClass({
   getInitialState: function() {

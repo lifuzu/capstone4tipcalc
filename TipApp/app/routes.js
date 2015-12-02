@@ -8,13 +8,13 @@ var {
   View,
 } = React;
 
-var SplashScreen = require('./components/SplashScreen');
-var MainView     = require('./components/MainView');
-var FormScreen   = require('./components/FormScreen');
-var LoginPage    = require('./components/LoginPage');
-var PersonPage   = require('./components/PersonPage');
-var MainPage     = require('./components/MainPage');
-var NoNavigatorPage = require('./components/NoNavigatorPage');
+var SplashScreen = require('./views/SplashScreen');
+var MainView     = require('./views/MainView');
+var FormScreen   = require('./views/FormScreen');
+var LoginPage    = require('./views/legacies/LoginPage');
+var PersonPage   = require('./views/legacies/PersonPage');
+var MainPage     = require('./views/legacies/MainPage');
+var NoNavigatorPage = require('./views/NoNavigatorPage');
 
 class Routes {
 

@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+  Image,
   ListView,
   ScrollView,
   StyleSheet,
@@ -15,11 +16,9 @@ var {
 var { Icon, } = require('react-native-icons');
 var styles = require('../styles');
 var NAV_HEIGHT = require('../variables')('NAV_HEIGHT');
-var ItemCell = require('./ItemCell');
-var orderedItemsActions = require('../actions/ordered_items');
-var orderedItemsStore = require('../stores/ordered_items');
+var ItemCell = require('./components/ItemCell');
 
-class OrderListView extends Component {
+class SearchListView extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -69,30 +68,23 @@ class OrderListView extends Component {
   }
   renderItem(item){
     return(
-      <ItemCell
-        item={item}/>
+      <View>
+        <Text>{item.name}</Text>
+        <Image source={{uri: item.image_url}} style={[stylesLocal.image, {alignItems: "center", resizeMode: 'contain'}]} />
+      </View>
     );
+    // return(
+    //   <ItemCell
+    //     item={item}/>
+    // );
     //  onSelection={this.selectionItem.bind(this)}
   }
   selectionItem(item) {
     console.log(item);
   }
   componentDidMount() {
-    // orderedItemsActions.del({itemId: 'menu-item/chicken-fried-steak/'});
-    // orderedItemsActions.del({itemId: 'menu-item/fried-chicken/'});
-    // orderedItemsActions.erase();
-
-    this.unsubscribe = orderedItemsStore.listen(this.onListDone.bind(this));
-    if (!this.state.loaded) orderedItemsActions.list();
-  }
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-  onListDone(records) {
-    // console.log("onListDone");
-    // console.log(records);
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(records),
+      dataSource: this.state.dataSource.cloneWithRows(this.props.items),
       loaded: true
     });
   }
@@ -100,18 +92,19 @@ class OrderListView extends Component {
 
 var NavigationBarRouteMapper = {
   LeftButton(route, navigator, index, nextState) {
-    return null;
-    // return (
-    //   <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-    //       onPress={() => navigator.parentNavigator.pop()}>
-    //     <Text style={{color: 'white', margin: 10,}}>
-    //       Back
-    //     </Text>
-    //   </TouchableOpacity>
-    // );
+    return (
+      <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
+          onPress={() => navigator.parentNavigator.pop()}>
+        <Icon
+          name='ion|ios-arrow-back'
+          size={40}
+          color='#887700'
+          style={{width: 40, height: 40}} />
+      </TouchableOpacity>
+    );
   },
   RightButton(route, navigator, index, nextState) {
-    return (
+    return null;/*(
       <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
           onPress={() => navigator.parentNavigator.push({id: 'scan'})}>
         <Icon
@@ -120,12 +113,12 @@ var NavigationBarRouteMapper = {
           color='#887700'
           style={{width: 40, height: 40}} />
       </TouchableOpacity>
-    );
+    );*/
   },
   Title(route, navigator, index, nextState) {
     return (
       <Text style={{color: 'white', margin: 10, fontSize: 16}}>
-        Ordered List
+        Search List
       </Text>
     );
   }
@@ -147,11 +140,11 @@ var stylesLocal = StyleSheet.create({
   listView:{
     backgroundColor: '#F6F6EF',
   },
-  list: {
-    // justifyContent: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap'
+  image: {
+    backgroundColor: 'transparent',
+    width: 100,
+    height: 100,
   },
 });
 
-module.exports = OrderListView;
+module.exports = SearchListView;
