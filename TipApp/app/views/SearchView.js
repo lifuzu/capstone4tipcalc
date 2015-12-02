@@ -18,10 +18,11 @@ var yelpActions = require('../actions/yelp');
 var yelpStore   = require('../stores/yelp');
 var geolocation = require('../mixins/geolocation');
 var netinfo = require('../mixins/netinfo');
+var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
 
 var Search = React.createClass({
-  mixins: [geolocation, netinfo],
+  mixins: [geolocation, netinfo, userinfo],
   _handleSearch() {
     if (this.state.initialPosition !== 'unknown') {
       var coords = this.state.initialPosition.coords;
@@ -45,6 +46,7 @@ var Search = React.createClass({
         <Text>{JSON.stringify(this.state.reachabilityHistory)}</Text>
         <Text>{this.state.reachability}</Text>
         <Text>{this.state.isConnected ? 'Online' : 'Offline'}</Text>
+        <Text>{this.state.isLogin ? 'Login' : 'Logout'}</Text>
       </View>
     )
   },

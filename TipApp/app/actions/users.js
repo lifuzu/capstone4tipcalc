@@ -10,7 +10,7 @@ var actions = reflux.createActions({
   'register': {children: ['completed', 'failed']},
   'login'   : {children: ['completed', 'failed']},
   'logout'  : {children: ['completed', 'failed']},
-  // 'status'  : {children: ['completed', 'failed']},
+  'status'  : {children: ['completed', 'failed']},
 });
 
 var base_url = config.Settings.BASE_URL + "/api";
@@ -30,6 +30,12 @@ actions.logout.listen(function(options) {
   var self = this;
   var options = {};
   erase_users(options, self.completed, self.failed);
+});
+
+actions.status.listen(function() {
+  var self = this;
+  var options = {};
+  detect_user(options, self.completed, self.failed);
 });
 
 // Register a new user with username, user_pass, email, and display_name
@@ -135,6 +141,14 @@ function write_user(options, completed, failed) {
       console.log(added_data);
       completed(added_data);
     });
+  });
+}
+
+// Detect user login, or not
+function detect_user(options, completed, failed) {
+  db.users.get_all(function(result){
+    console.log(result);
+    completed(result);
   });
 }
 

@@ -47,7 +47,20 @@ var store = reflux.createStore({
   onLogoutFailed: function(result) {
     console.log("Logout failed - " + result);
     this.trigger({action: 'logout', return: 'failed', result: result});
-  }
+  },
+
+  onStatus: function() {
+    console.log("Detecting status...");
+  },
+
+  onStatusCompleted: function(result) {
+    console.log("Detecting status completed - " + result);
+    if (result.length === 0) {
+      this.trigger({action: 'status', return: 'logout', result: result});
+    } else {
+      this.trigger({action: 'status', return: 'login', result: result});
+    }
+  },
 });
 
 module.exports = store;
