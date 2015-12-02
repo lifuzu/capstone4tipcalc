@@ -17,10 +17,11 @@ var scene = require('../scene');
 var yelpActions = require('../actions/yelp');
 var yelpStore   = require('../stores/yelp');
 var geolocation = require('../mixins/geolocation');
+var netinfo = require('../mixins/netinfo');
 var SearchListView = require('./SearchListView');
 
 var Search = React.createClass({
-  mixins: [geolocation],
+  mixins: [geolocation, netinfo],
   _handleSearch() {
     if (this.state.initialPosition !== 'unknown') {
       var coords = this.state.initialPosition.coords;
@@ -41,6 +42,9 @@ var Search = React.createClass({
             <Text style={styles.welcome}>Search</Text>
           </View>
         </TouchableOpacity>
+        <Text>{JSON.stringify(this.state.reachabilityHistory)}</Text>
+        <Text>{this.state.reachability}</Text>
+        <Text>{this.state.isConnected ? 'Online' : 'Offline'}</Text>
       </View>
     )
   },
