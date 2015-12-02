@@ -28,16 +28,18 @@ actions.search.listen(function(options) {
 // Search items, cache into local storage
 // Input term (in `options`) optionally, if not, search everything according to YELP search api
 function search_items(options, completed, failed) {
-
+  console.log(options);
   var parameters = {
     term: options.term,
     // ll: "37.788022,-122.399797",
-    ll: "37.3248450,-121.9707580"
+    ll: options.ll,
   };
   yelp.search(merge(_options, parameters), (data) => {
-    console.log(data);
+    // console.log(data);
+    completed(data);
   }, (err) => {
     console.error(err);
+    failed(err);
   });
   // var search_items_path = search_uri + "?term=" + options.term + "&ll=37.788022,-122.399797";
   // fetch(search_items_path, {
