@@ -5,3 +5,12 @@ Install on Android device:
 react-native bundle --platform android --dev false --entry-file index.android.js \
   --bundle-output android/app/src/main/assets/index.android.bundle \
   --assets-dest android/app/src/main/res/
+
+
+To resolve install 4+ on nvm and also system wide by running the following commands
+```
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+sudo ln -sf /usr/local/n/versions/node//bin/node /usr/bin/node
+```

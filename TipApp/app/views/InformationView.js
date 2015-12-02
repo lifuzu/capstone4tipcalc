@@ -15,7 +15,7 @@ var {
 var routes = require('../routes');
 var scene  = require('../scene');
 var SimpleList   = require('./components/SimpleList');
-var RegisterView = require('./RegisterView');
+var ConversationView = require('./ConversationView');
 
 var Information = React.createClass({
   getInitialState: function() {
@@ -44,7 +44,7 @@ var Information = React.createClass({
   },
 
   _gotoConversation: function() {
-    this.props.navigator.push({id: 'signup'});
+    this.props.navigator.push({id: 'conversation'});
   },
 
   render: function() {
@@ -61,8 +61,8 @@ var InformationView = React.createClass({
   _renderScene(route, navigator) {
     if (route.id === 'information') {
       return <Information navigator={navigator}/>
-    } else if (route.id === 'signup') {
-      return <RegisterView navigator={navigator} />
+    } else if (route.id === 'conversation') {
+      return <ConversationView navigator={navigator} />
     }
   },
 
