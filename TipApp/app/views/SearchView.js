@@ -68,16 +68,6 @@ var Search = React.createClass({
             color='#887700'
             style={[styles.button, {width: 60, height: 40, marginTop: 10}]} />
         </Button>
-        <StarRating
-          maxStars={5}
-          rating={3.5}
-          disabled={true}
-          starSize={30}
-          selectedStar={this.onStarRatingPress} />
-        <Button onPress={Toast.showShortBottom.bind(null, "this is a message")}
-          style={[styles.button, {marginTop: 10}]}>
-          showShortBottom
-        </Button>
       </View>
     )
   },
@@ -85,6 +75,16 @@ var Search = React.createClass({
         // <Text>{this.state.reachability}</Text>
         // <Text>{this.state.isConnected ? 'Online' : 'Offline'}</Text>
         // <Text>{this.state.isLogin ? 'Login' : 'Logout'}</Text>
+        // <StarRating
+        //   maxStars={5}
+        //   rating={3.5}
+        //   disabled={true}
+        //   starSize={30}
+        //   selectedStar={this.onStarRatingPress} />
+        // <Button onPress={Toast.showShortBottom.bind(null, "this is a message")}
+        //   style={[styles.button, {marginTop: 10}]}>
+        //   showShortBottom
+        // </Button>
   componentDidMount() {
     this.unsubscribe = yelpStore.listen(this.onSearchDone);
   },
