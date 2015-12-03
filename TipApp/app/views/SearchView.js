@@ -25,6 +25,7 @@ var geolocation = require('../mixins/geolocation');
 var netinfo = Platform.OS === 'ios' ? require('../mixins/netinfo') : {};
 var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
+var StarRating = require('react-native-star-rating');
 
 var Search = React.createClass({
   mixins: [geolocation, netinfo, userinfo],
@@ -42,6 +43,9 @@ var Search = React.createClass({
       var loc = "37.788022,-122.399797";
       yelpActions.search({term: this.state.text, ll: loc});
     }
+  },
+  onStarRatingPress: function (value) {
+    console.log('Rated ' + value + ' stars!');
   },
 // <View style={{paddingVertical: 4, paddingHorizontal: 5, backgroundColor: 'grey'}}>
   render() {
@@ -63,6 +67,12 @@ var Search = React.createClass({
             color='#887700'
             style={[styles.button, {width: 60, height: 40, marginTop: 10}]} />
         </Button>
+        <StarRating
+          maxStars={5}
+          rating={3.5}
+          disabled={true}
+          starSize={30}
+          selectedStar={this.onStarRatingPress} />
       </View>
     )
   },
