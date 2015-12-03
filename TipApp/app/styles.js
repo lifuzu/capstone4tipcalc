@@ -19,7 +19,8 @@ var styles = StyleSheet.create({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: 'black'
+    backgroundColor: '#4d90fe',
+    borderRadius: 8,
   },
   backButton: {
     paddingVertical: 10,

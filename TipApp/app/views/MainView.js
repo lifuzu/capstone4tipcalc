@@ -22,7 +22,7 @@ var MainView = React.createClass({
   render() {
     return (
       <View style={styles.container}>
-        <ScrollableTabView tabBarPosition="bottom" initialPage={3} renderTabBar={() => <TabBar />}>
+        <ScrollableTabView tabBarPosition="bottom" initialPage={0} renderTabBar={() => <TabBar />}>
           <View tabLabel="ion|android-search" style={styles.tabView}>
             <SearchView/>
           </View>

@@ -31,12 +31,12 @@ class RegisterView extends Component {
   render() {
     return (
       <Navigator
-          renderScene={this._renderScene.bind(this)}
-          navigator={this.props.navigator}
-          navigationBar={
-            <Navigator.NavigationBar style={{backgroundColor: '#246dd5', alignItems: 'center'}}
-                routeMapper={NavigationBarRouteMapper} />
-          } />
+        renderScene={this._renderScene.bind(this)}
+        navigator={this.props.navigator}
+        navigationBar={
+          <Navigator.NavigationBar style={{backgroundColor: '#246dd5', alignItems: 'center'}}
+              routeMapper={NavigationBarRouteMapper} />
+        } />
     );
   }
   _renderScene(route, navigator) {
@@ -98,7 +98,7 @@ class RegisterView extends Component {
     usersActions.register(options);
   }
   onSignin() {
-    this.props.navigator.push({id: 'signin',});
+    this.props.navigator.replace({id: 'signin'});
   }
 }
 
@@ -122,7 +122,7 @@ var NavigationBarRouteMapper = {
 
 var styles = StyleSheet.create({
   container: {
-    padding: 30,
+    padding: 10,
     marginTop: 65,
     alignItems: "stretch"
   },
@@ -139,15 +139,15 @@ var styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     borderWidth: 1,
-    borderColor: "#555555",
+    borderColor: '#4d90fe',
     borderRadius: 8,
-    color: "#555555"
+    color: '#4d90fe'
   },
   button: {
     height: 36,
     flex: 1,
-    backgroundColor: "#555555",
-    borderColor: "#555555",
+    backgroundColor: '#4d90fe',
+    borderColor: '#4d90fe',
     borderWidth: 1,
     borderRadius: 8,
     marginTop: 10,
