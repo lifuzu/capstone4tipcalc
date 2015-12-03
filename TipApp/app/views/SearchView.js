@@ -19,6 +19,7 @@ var scene  = require('../scene');
 var styles = require('../styles');
 var { Icon, } = require('react-native-icons');
 var Button = require('react-native-button');
+var Toast = require('react-native-toast');
 var yelpActions = require('../actions/yelp');
 var yelpStore   = require('../stores/yelp');
 var geolocation = require('../mixins/geolocation');
@@ -55,7 +56,7 @@ var Search = React.createClass({
           style={{height: 40, borderColor: 'gray', borderWidth: 1, padding: 5}}
           onChangeText={(text) => this.setState({text})}
           autoFocus={true}
-          clearButtonMode={true}
+          clearButtonMode={"while-editing"}
           enablesReturnKeyAutomatically={true}
           returnKeyType={"go"}
           placeholder={"Please input here!"}
@@ -73,6 +74,10 @@ var Search = React.createClass({
           disabled={true}
           starSize={30}
           selectedStar={this.onStarRatingPress} />
+        <Button onPress={Toast.showShortBottom.bind(null, "this is a message")}
+          style={[styles.button, {marginTop: 10}]}>
+          showShortBottom
+        </Button>
       </View>
     )
   },
