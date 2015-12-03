@@ -52,7 +52,7 @@ var Search = React.createClass({
     )
   },
   componentDidMount() {
-    this.unsubscribe = yelpStore.listen(this.onSearchDone.bind(this));
+    this.unsubscribe = yelpStore.listen(this.onSearchDone);
   },
   componentWillUnmount() {
     this.unsubscribe();

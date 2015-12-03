@@ -36,3 +36,12 @@ project(':react-native-icons').projectDir = new File(rootProject.projectDir, '..
 
 android/app/build.gradle:
 compile project(':react-native-icons')
+
+Recrawled this watch 2 times, most recently because:
+/Users/rlee/Workspace/capstone/TipApp: kFSEventStreamEventFlagUserDropped
+To resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+```
+watchman get-config .
+watchman version
+```
