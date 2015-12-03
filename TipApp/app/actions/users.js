@@ -138,7 +138,7 @@ function get_auth_cookie(options, completed, failed) {
 function write_user(options, completed, failed) {
   db.users.erase_db(function(removed_data){
     db.users.add(options, function(added_data){
-      console.log(added_data);
+      // console.log(added_data);
       completed(added_data);
     });
   });
@@ -147,7 +147,7 @@ function write_user(options, completed, failed) {
 // Detect user login, or not
 function detect_user(options, completed, failed) {
   db.users.get_all(function(result){
-    console.log(result);
+    // console.log(result);
     completed(result);
   });
 }

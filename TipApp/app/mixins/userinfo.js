@@ -23,7 +23,7 @@ var Userinfo = {
     this.unsubscribe();
   },
   onUserStatus: function(status) {
-    console.log(status);
+    // console.log(status);
     if (status.return === 'login') {
       this.setState({isLogin: true});
     } else {

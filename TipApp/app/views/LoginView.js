@@ -89,7 +89,7 @@ class LoginView extends Component {
     this.unsubscribe();
   }
   onUserStatus(status) {
-    console.log(status);
+    // console.log(status);
     // TODO: Display a dialog here to indicate done, then back to normal process
     this.setState({status: status.action + ' is ' + status.return + '!'});
   }
