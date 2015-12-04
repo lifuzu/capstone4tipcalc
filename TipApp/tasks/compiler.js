@@ -91,9 +91,11 @@ Compiler.prototype.buildIos = function() {
   var to_run = 'xcodebuild';
   to_run += "  GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS " + env + "'"
   to_run += " -project " + this.platformDirectory + "/TipApp.xcodeproj";
+  // to_run += " -target TipApp";
   to_run += " -scheme \"" + scheme + "\"";
   to_run += " -sdk " + this.iosSdk;
   to_run += " -configuration " + this.configuration;
+  to_run += " -derivedDataPath " + this.buildDirectory;
   to_run += " OBJROOT=" + this.buildDirectory;
   to_run += " SYMROOT=" + this.buildDirectory;
   to_run += " ONLY_ACTIVE_ARCH=NO";
@@ -102,7 +104,7 @@ Compiler.prototype.buildIos = function() {
 };
 
 Compiler.prototype.build = function() {
-  this.run('mkdir -p ' + this.buildDirectory);
+  this.run('mkdir -p ' + path.dirname(this.compiledApp));
   
   if (this.environment !== 'test') {
     this.buildJavascript();
