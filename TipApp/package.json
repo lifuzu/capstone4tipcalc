@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node_modules/react-native/packager/packager.sh"
+    "start": "node_modules/react-native/packager/packager.sh",
+    "build:test": "TARGET=test node tasks/build.js",
+    "build:staging": "TARGET=staging node tasks/build.js",
+    "install:staging": "PHONE=true TARGET=staging node tasks/build.js"
   },
   "dependencies": {
     "chance": "^0.8.0",
