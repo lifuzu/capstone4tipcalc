@@ -102,6 +102,7 @@ Compiler.prototype.buildIos = function() {
   to_run += " OBJROOT=" + this.buildDirectory;
   to_run += " SYMROOT=" + this.buildDirectory;
   to_run += " ONLY_ACTIVE_ARCH=NO";
+  to_run += " 'CODE_SIGN_RESOURCE_RULES_PATH=${SDKROOT}/ResourceRules.plist'"
   to_run += " | xcpretty -c && exit ${PIPESTATUS[0]}";
   this.run(to_run)
 };
@@ -131,9 +132,13 @@ Compiler.prototype.zip = function() {
 Compiler.prototype.ipaIos = function() {
   var parent_dir = path.dirname(this.compiledApp);
   var pwd = this.rootDirectory;
+  // TODO: Abstract to TOP level
+  var DEVELOPER_NAME = "iPhone Developer: Fuzu Li (NGHHECB225)"
+  var PROVISIONING_PROFILE = "~/Library/MobileDevice/Provisioning Profiles/TipApp_Ad_Hoc.mobileprovision"
   var to_run = "cd " + parent_dir;
   to_run += " && xcrun -sdk " + this.iosSdk + " PackageApplication -v " + this.compiledApp;
   to_run += " -o " + this.zippedApp.replace('.zip', '.ipa');
+  to_run += "-sign " + DEVELOPER_NAME + " -embed " + PROVISIONING_PROFILE
   to_run += " && cd " + pwd;
   this.run(to_run);
 };

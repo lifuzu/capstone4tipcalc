@@ -2,35 +2,47 @@ language: objective-c
 osx_image: xcode7.1
 xcode_sdk: iphoneos9.1
 env:
+  matrix:
   - APP_DIR=TipApp
+  - APP_NAME="TipApp"
+  - 'DEVELOPER_NAME="iPhone Developer: Fuzu Li (NGHHECB225)"'
+  - PROFILE_NAME="TipApp_Ad_Hoc"
+  global:
+  - secure: Su7Jt+teU8/87oSjwHFc1PCVMVBrz9TkZMReY4+K725UcMI4LPFaesrkgxJZAAV8V+L1xDQgtOY4mOBiJLN8kQqyYBXONkRiGBnm8JO8oVtuw2f8y3YJWiienaB9U3w1eM+N1LvJf/wwqBPGrb/bk8Y506leI8rQ1Xx2yFUS7eydykh1fdosguj8XDgcTGy+R7uhYH1b43tCJC7m7W+gEeJnAE7lbAu1scS5BQUgPVua4ntB6+ohqkoy1eN7V+ME0DkAg7r5/9uri5SoM/itdLV9OumAx46dwiSkwkYbL30I/cArNiSA+EfQMtN1l19PDZgYlJblcIcVogPT3T8Jbjtu/7Hu8aGVr5Levgnk5MGS0wuGrq980//YdyzlZ4rjt4RbNIALoQvVUOThW1cOlzu2bMSoZoYUGBlR8+lhhIpRD1ZPCwox0LWSmUDXgynfub0u1RCPPvOLRurzTxz6Q96N4wagBhvMrbovjxaLeSDnk4vqyUHtg555y+mvRiydP15wmmQtd/qz0l2EeTPMb+1VRwBDWy6pEChPy825sFQ2H7qKB1NSUTGI6oyTHdniysamcxHTjjeFHn40XNKsXpImCyJ/4AznDFcrzPogv5FR5+LyYccWGcRlhFys8jGk6fP/szvyS1WhOFKhI8yr4vJQqXnZ1zjJMAdp4op5eWE=
+  - secure: mo7UGnelYW/bfWdyTo+pBMXNZuD3PIiBkNWwNZdbA1cdT8lYVW7KC9hFBYW81XRfoNrEOdFikI/1zc4EgM+0c7ptGIMIcKG30iF2l+5mEWvLaU+4zPdsSBatAiLtBW6R0DuJ1x4N3undd7cR4/v25XPjUQ7NEC5eySguNMfZfRVqWl9QdfdEauiHHIAE/mL9xpt4vS9jy0eZvErsg/7hDvHfedXGy5VU+n8i1aDj+IdY2NgiH1r3+ATI7nZRcc+KOunJl2APAPG8wENlDydZbXley1X47zwuu3YF6GfzXCGpPqRQLhIKhLMqAWWtKTRq1YVj/R4VffXj3Ywzf2kxvmiVpqj56B9EHKHIWE5/qe5k6TO6i2FI2Pb3BG7F4Sj2jQC5YaKczDupaBy9mvD5VFLxHn76PZAoBQ78K6PiaRtUFz8Myx1CDDFtsf34w8lTxceYVCwdF73vNYYkJkcsluxc8IBhkaG006MFgXCvNt6+cAnIOYENPjfs2gh8w2zhfSMHGVK50fryzNNeWkf+PS3M2JoySd80XPZ5fuT1UT6eDVo1tNGsFPMZbho6E8lRcbEJXArA6IVV1eYvx8GOhWlQkgMuqY3/lbv8rbw7+29gKUJZcHLtqyyXyCDrDautrjzXeiVudTm81V6wgQ82A+G9RuxLi1NHT3sGD2WU3S8=
 cache:
   directories:
-    - $APP_DIR/node_modules
-    - $APP_DIR/ios/Pods
-    - ~/.nvm
+  - $APP_DIR/node_modules
+  - $APP_DIR/ios/Pods
+  - ~/.nvm
 before_install:
-  - which nvm || curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
-  - export NVM_DIR=~/.nvm
-  - source ~/.nvm/nvm.sh --install
-  - nvm install 4.0
-  - brew update
-  - brew reinstall xctool
-  - brew reinstall watchman
-  - gem install xcpretty
-  # - gem install dpl
-  # - gem install shenzhen
-  - npm install -g react-native-cli
-  - npm install -g ios-deploy
-  - npm install -g testfairy-uploader
-  - xcode-select -print-path
-  - xcodebuild -version
-  - xcodebuild -showsdks
+- which nvm || curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh
+  | bash
+- export NVM_DIR=~/.nvm
+- source ~/.nvm/nvm.sh --install
+- nvm install 4.0
+- brew update
+- brew reinstall xctool
+- brew reinstall watchman
+- gem install xcpretty
+- npm install -g react-native-cli
+- npm install -g ios-deploy
+- npm install -g testfairy-uploader
+- xcode-select -print-path
+- xcodebuild -version
+- xcodebuild -showsdks
 before_script:
-  - cd $APP_DIR && npm install && npm run build:staging
+- cd $APP_DIR && openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
+- cd $APP_DIR && openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out tasks/certs/dist.cer
+- cd $APP_DIR && openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out tasks/certs/dist.p12
+- cd $APP_DIR && ./tasks/add-key.sh
+- cd $APP_DIR && ./tasks/update-bundle.sh
 script:
-  - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" testbuild/staging_ios/TipApp_ios.ipa
-#script:
-#  - cd $APP_DIR && dpl --provider=testfairy --api-key=deploy.api-key --app-file="" --symbols-file=""
-#deploy:
-#  api-key:
-#    secure: W8Nm3ZA7UT0dX3CHuNvQlIwCj7VwrgBMQ+hMlL+JXv929n64cmlBZEp9Aj8ZswAEvGBb/ctum7KEyqBPn4HP9ybosXGU4mGCrflbwMn+x1ga1hHgiYh5NALvaZQbDzKWEoVOjbSLdxEgVr95i+cf3/oVz07HZKiY9uspLAqX9iFU88qO/g/qAfRiXKFrhGSFKq8K7eSmIjqo8GLnnOtGSMLpWXObxpnzlQGRaNj1QkHOI9I3HN79Lgg9wYLhZ9JcdUKK/Ji5npwV+Hc1KZ9TNOFBQBfeQvL6aT+hzdG1D4muHYFQpIvvehUvf/gWGRwhgCv2XL/qsdM+pgJsGmGDEs1EIT3e6hQWE+cmycRoOuhMIjY22LOs5K0vKafNO9JC60OIknP1WE8pAXgqkI4OisJidxEMQFt61dfCSwUsPwlu27+iM8svZenZgIXOgQZyuGaC3f024XjAkK843xC1kZ3FwsHQUgrYwaV9gTNQHpazYrU8WaCGyaMr+mARzjalC7jgF9tOkg0aq41awDo7sJC/CPt4scmW05MZ9dlyIDJgsJCwWnT5YudpZ2QZeIjws5A/UESLvC9U3HAxsSuZ6K3kMtHAGrHFbHT3mdx2b1oVbMrHmgDdMLxW7INCH4G9fCrSBukk9Nd1y44yX4UQWnBm57Az82tc/RgMbSacWoY=
+- cd $APP_DIR && npm install && npm run build:staging
+# after_success:
+# - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"
+#   testbuild/staging_ios/TipApp_ios.ipa
+# after_success:
+# - ./scripts/sign-and-upload.sh
+after_script:
+- ./scripts/remove-key.sh

@@ -50,3 +50,11 @@ $ gem install travis
 $ travis encrypt --add deploy.api-key
 
 xcrun -sdk iphoneos PackageApplication -v testbuild/staging_ios/build/Release-iphoneos/TipApp.app -o `pwd`/testbuild/staging_ios/TipApp_ios.ipa
+
+travis encrypt "KEY_PASSWORD={password}" --add
+
+openssl aes-256-cbc -k "foo" -in scripts/profile/TravisExample_Ad_Hoc.mobileprovision -out scripts/profile/TravisExample_Ad_Hoc.mobileprovision.enc -a
+openssl aes-256-cbc -k "foo" -in scripts/certs/dist.cer -out scripts/certs/dist.cer.enc -a
+openssl aes-256-cbc -k "foo" -in scripts/certs/dist.p12 -out scripts/certs/dist.p12.enc -a
+
+travis encrypt "ENCRYPTION_SECRET=foo" --add
