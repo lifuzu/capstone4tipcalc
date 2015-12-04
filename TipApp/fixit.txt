@@ -59,3 +59,6 @@ openssl aes-256-cbc -k "foo" -in scripts/certs/dist.cer -out scripts/certs/dist.
 openssl aes-256-cbc -k "foo" -in scripts/certs/dist.p12 -out scripts/certs/dist.p12.enc -a
 
 travis encrypt "ENCRYPTION_SECRET=foo" --add
+
+
+$ xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="iPhone Distribution: Fuzu Li (7RAR9E88NY)" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'

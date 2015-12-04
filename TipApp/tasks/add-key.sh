@@ -21,4 +21,5 @@ security import ./tasks/certs/dist.p12 -k ~/Library/Keychains/ios-build.keychain
 
 # Put the provisioning profile in place
 mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-cp "./tasks/profile/$PROFILE_NAME.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/
+uuid=`grep UUID -A1 -a "./tasks/profile/$PROFILE_NAME.mobileprovision"| grep -io "[-A-Z0-9]\{36\}"`
+cp "./tasks/profile/$PROFILE_NAME.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
