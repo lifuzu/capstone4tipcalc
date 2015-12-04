@@ -45,3 +45,6 @@ https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
 watchman get-config .
 watchman version
 ```
+
+$ gem install travis
+$ travis encrypt --add deploy.api-key

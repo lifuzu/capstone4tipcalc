@@ -1,17 +1,13 @@
-# Hepburn
 language: objective-c
 osx_image: xcode7
 xcode_sdk: iphonesimulator9.0
-
 env:
   - APP_DIR=TipApp
-
 cache:
   directories:
     - $APP_DIR/node_modules
     - $APP_DIR/ios/Pods
     - ~/.nvm
-
 before_install:
   - which nvm || curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
   - export NVM_DIR=~/.nvm
@@ -21,13 +17,11 @@ before_install:
   - brew reinstall xctool
   - brew reinstall watchman
   - gem install xcpretty
-  # - gem install cocoapods
-  # - pod install --project-directory=ios
-
+  - gem install dpl
 before_script:
   - cd $APP_DIR && npm install && npm run build:test
-
-# TODO: Support Appium for testing
-# https://github.com/taskrabbit/ReactNativeSampleApp/tree/master/test
-#script:
-#  - npm test
+script:
+  - cd $APP_DIR && dpl --provider=testfairy --api-key=deploy.api-key --app-file="" --symbols-file=""
+deploy:
+  api-key:
+    secure: W8Nm3ZA7UT0dX3CHuNvQlIwCj7VwrgBMQ+hMlL+JXv929n64cmlBZEp9Aj8ZswAEvGBb/ctum7KEyqBPn4HP9ybosXGU4mGCrflbwMn+x1ga1hHgiYh5NALvaZQbDzKWEoVOjbSLdxEgVr95i+cf3/oVz07HZKiY9uspLAqX9iFU88qO/g/qAfRiXKFrhGSFKq8K7eSmIjqo8GLnnOtGSMLpWXObxpnzlQGRaNj1QkHOI9I3HN79Lgg9wYLhZ9JcdUKK/Ji5npwV+Hc1KZ9TNOFBQBfeQvL6aT+hzdG1D4muHYFQpIvvehUvf/gWGRwhgCv2XL/qsdM+pgJsGmGDEs1EIT3e6hQWE+cmycRoOuhMIjY22LOs5K0vKafNO9JC60OIknP1WE8pAXgqkI4OisJidxEMQFt61dfCSwUsPwlu27+iM8svZenZgIXOgQZyuGaC3f024XjAkK843xC1kZ3FwsHQUgrYwaV9gTNQHpazYrU8WaCGyaMr+mARzjalC7jgF9tOkg0aq41awDo7sJC/CPt4scmW05MZ9dlyIDJgsJCwWnT5YudpZ2QZeIjws5A/UESLvC9U3HAxsSuZ6K3kMtHAGrHFbHT3mdx2b1oVbMrHmgDdMLxW7INCH4G9fCrSBukk9Nd1y44yX4UQWnBm57Az82tc/RgMbSacWoY=
