@@ -19,7 +19,7 @@ before_install:
   - gem install xcpretty
   - gem install dpl
 before_script:
-  - cd $APP_DIR && npm install && xcode-select -print-path && xcodebuild -version && xcodebuild -showsdks && npm run build:test
+  - cd $APP_DIR && npm install && npm install -g react-native-cli && xcode-select -print-path && xcodebuild -version && xcodebuild -showsdks && npm run build:test
 #script:
 #  - cd $APP_DIR && dpl --provider=testfairy --api-key=deploy.api-key --app-file="" --symbols-file=""
 deploy:
