@@ -36,7 +36,7 @@ Compiler.prototype.calculateDirectories = function() {
       this.iosSdk = "iphonesimulator";
       break;
     case 'staging':
-      this.configuration = "Staging";
+      this.configuration = "Release";
       this.iosSdk = "iphoneos";
       break;
     default:
@@ -69,7 +69,10 @@ Compiler.prototype.cleanDirectory = function() {
 Compiler.prototype.buildJavascript = function() {
   var pwd = this.rootDirectory;
   var to_run = 'cd ' + pwd;
-  to_run += " && react-native bundle --minify"
+  to_run += " && react-native bundle --minify";
+  to_run += " --platform ios";
+  to_run += " --entry-file index.ios.js";
+  to_run += " --bundle-output ios/main.jsbundle"
   this.run(to_run);
 };
 
@@ -82,7 +85,7 @@ Compiler.prototype.buildIos = function() {
       break;
     case 'staging':
       env = "STAGING_ENVIRONMENT=1";
-      scheme = "TipApp Staging";
+      scheme = "TipApp";
       break;
     default:
       throw("UNKNOWN ENVIRONMENT: " + this.environment);
@@ -123,6 +126,20 @@ Compiler.prototype.zipIos = function() {
 
 Compiler.prototype.zip = function() {
   this.zipIos();
+};
+
+Compiler.prototype.ipaIos = function() {
+  var parent_dir = path.dirname(this.compiledApp);
+  var pwd = this.rootDirectory;
+  var to_run = "cd " + parent_dir;
+  to_run += " && xcrun -sdk " + this.iosSdk + " PackageApplication -v " + this.compiledApp;
+  to_run += " -o " + this.zippedApp.replace('.zip', '.ipa');
+  to_run += " && cd " + pwd;
+  this.run(to_run);
+};
+
+Compiler.prototype.ipa = function() {
+  this.ipaIos();
 };
 
 Compiler.prototype.phoneInstall = function() {

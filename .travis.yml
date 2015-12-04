@@ -18,8 +18,13 @@ before_install:
   - brew reinstall watchman
   - gem install xcpretty
   - gem install dpl
+  - npm install -g react-native-cli
+  - npm install -g ios-deploy
+  - xcode-select -print-path
+  - xcodebuild -version
+  - xcodebuild -showsdks
 before_script:
-  - cd $APP_DIR && npm install && npm install -g react-native-cli && xcode-select -print-path && xcodebuild -version && xcodebuild -showsdks && npm run build:test
+  - cd $APP_DIR && npm install && npm run build:staging
 #script:
 #  - cd $APP_DIR && dpl --provider=testfairy --api-key=deploy.api-key --app-file="" --symbols-file=""
 #deploy:

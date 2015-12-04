@@ -48,3 +48,5 @@ watchman version
 
 $ gem install travis
 $ travis encrypt --add deploy.api-key
+
+xcrun -sdk iphoneos PackageApplication -v testbuild/staging_ios/build/Release-iphoneos/TipApp.app -o `pwd`/testbuild/staging_ios/TipApp_ios.ipa
