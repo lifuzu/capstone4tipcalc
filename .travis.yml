@@ -20,13 +20,12 @@ before_install:
   - brew update
   - brew reinstall xctool
   - brew reinstall watchman
-  - npm install
   - gem install xcpretty
-  - gem install cocoapods
-  - pod install --project-directory=ios
+  # - gem install cocoapods
+  # - pod install --project-directory=ios
 
 before_script:
-  - cd $APP_DIR && npm run build:test
+  - cd $APP_DIR && npm install && npm run build:test
 
 # TODO: Support Appium for testing
 # https://github.com/taskrabbit/ReactNativeSampleApp/tree/master/test
