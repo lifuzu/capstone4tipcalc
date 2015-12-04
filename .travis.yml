@@ -42,7 +42,7 @@ before_script:
 script:
 - cd $APP_DIR
 - npm install
-- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 - cd -
 # after_success:
 # - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"
