@@ -17,14 +17,18 @@ before_install:
   - brew reinstall xctool
   - brew reinstall watchman
   - gem install xcpretty
-  - gem install dpl
+  # - gem install dpl
+  # - gem install shenzhen
   - npm install -g react-native-cli
   - npm install -g ios-deploy
+  - npm install -g testfairy-uploader
   - xcode-select -print-path
   - xcodebuild -version
   - xcodebuild -showsdks
 before_script:
   - cd $APP_DIR && npm install && npm run build:staging
+script:
+  - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" testbuild/staging_ios/TipApp_ios.ipa
 #script:
 #  - cd $APP_DIR && dpl --provider=testfairy --api-key=deploy.api-key --app-file="" --symbols-file=""
 #deploy:
