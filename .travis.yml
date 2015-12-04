@@ -3,10 +3,13 @@ language: objective-c
 osx_image: xcode7
 xcode_sdk: iphonesimulator9.0
 
+env:
+  - APP_DIR=TipApp
+
 cache:
   directories:
-    - node_modules
-    - ios/Pods
+    - $APP_DIR/node_modules
+    - $APP_DIR/ios/Pods
     - ~/.nvm
 
 before_install:
@@ -23,7 +26,7 @@ before_install:
   - pod install --project-directory=ios
 
 before_script:
-  - npm run build:test
+  - cd $APP_DIR && npm run build:test
 
 # TODO: Support Appium for testing
 # https://github.com/taskrabbit/ReactNativeSampleApp/tree/master/test
