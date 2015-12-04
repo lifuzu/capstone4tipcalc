@@ -37,17 +37,21 @@ before_script:
 - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out tasks/certs/dist.cer
 - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out tasks/certs/dist.p12
 - ./tasks/add-key.sh
-- ./tasks/update-bundle.sh
+# - ./tasks/update-bundle.sh
 - cd -
 script:
 - cd $APP_DIR
 - npm install
 - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+- cd -
 # after_success:
 # - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"
 #   testbuild/staging_ios/TipApp_ios.ipa
-# after_success:
-# - ./scripts/sign-and-upload.sh
+after_success:
+- cd $APP_DIR
+- ./tasks/sign-and-upload.sh
+- cd -
 after_script:
 - cd $APP_DIR
 - ./scripts/remove-key.sh
+- cd -
