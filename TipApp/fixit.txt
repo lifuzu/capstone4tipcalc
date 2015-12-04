@@ -51,6 +51,7 @@ $ travis encrypt --add deploy.api-key
 
 xcrun -sdk iphoneos PackageApplication -v testbuild/staging_ios/build/Release-iphoneos/TipApp.app -o `pwd`/testbuild/staging_ios/TipApp_ios.ipa
 
+# reference: https://www.objc.io/issues/6-build-tools/travis-ci/
 travis encrypt "KEY_PASSWORD={password}" --add
 
 openssl aes-256-cbc -k "foo" -in scripts/profile/TravisExample_Ad_Hoc.mobileprovision -out scripts/profile/TravisExample_Ad_Hoc.mobileprovision.enc -a
