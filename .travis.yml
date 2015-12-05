@@ -34,7 +34,6 @@ before_install:
 - xcode-select -print-path
 - xcodebuild -version
 - xcodebuild -showsdks
-- ./tasks/android-sdk.macosx.sh ~/android.sdk
 before_script:
 - cd $APP_DIR
 - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
@@ -42,6 +41,7 @@ before_script:
 - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out tasks/certs/dist.p12
 - ./tasks/add-key.sh
 # - ./tasks/update-bundle.sh
+- ./tasks/android-sdk.macosx.sh ~/android.sdk
 - cd -
 script:
 - cd $APP_DIR
