@@ -33,4 +33,4 @@ echo y | android update sdk --filter android-21,android-22,android-23 --no-ui
 #echo y | android update sdk --filter extra-android-m2repository,extra-android-support --no-ui
 
 # Clean up system
-rm -rf /tmp/* /var/tmp/*
+rm -rf /tmp/$PKG_PACKAGE
