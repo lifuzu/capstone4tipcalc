@@ -69,3 +69,5 @@ $ xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configurati
     #                     "--resource-rules=$destApp/ResourceRules.plist");
     my @codesign_args = ("/usr/bin/codesign", "--force", "--preserve-metadata=identifier,entitlements",
                          "--sign", $opt{sign});
+
+dpl --provider=testfairy --api-key=20033978c7355cf77822363c6c310202f2d5937e --app-file="out/Sample.apk" --keystore-file="out/keystore" --storepass=<storepass> --alias=<alias>
