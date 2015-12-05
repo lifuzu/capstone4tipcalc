@@ -7,8 +7,10 @@ env:
   global:
   - APP_NAME="TipApp"
   - DEVELOPER_NAME="iPhone Developer: Fuzu Li (NGHHECB225)"
+  - CERTIFICATE="iPhone Distribution: Fuzu Li (7RAR9E88NY)"
   - PROFILE_NAME="TipApp_Ad_Hoc"
-  - SDKROOT="`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
+  # - SDKROOT="`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
+  - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk"
   - secure: Su7Jt+teU8/87oSjwHFc1PCVMVBrz9TkZMReY4+K725UcMI4LPFaesrkgxJZAAV8V+L1xDQgtOY4mOBiJLN8kQqyYBXONkRiGBnm8JO8oVtuw2f8y3YJWiienaB9U3w1eM+N1LvJf/wwqBPGrb/bk8Y506leI8rQ1Xx2yFUS7eydykh1fdosguj8XDgcTGy+R7uhYH1b43tCJC7m7W+gEeJnAE7lbAu1scS5BQUgPVua4ntB6+ohqkoy1eN7V+ME0DkAg7r5/9uri5SoM/itdLV9OumAx46dwiSkwkYbL30I/cArNiSA+EfQMtN1l19PDZgYlJblcIcVogPT3T8Jbjtu/7Hu8aGVr5Levgnk5MGS0wuGrq980//YdyzlZ4rjt4RbNIALoQvVUOThW1cOlzu2bMSoZoYUGBlR8+lhhIpRD1ZPCwox0LWSmUDXgynfub0u1RCPPvOLRurzTxz6Q96N4wagBhvMrbovjxaLeSDnk4vqyUHtg555y+mvRiydP15wmmQtd/qz0l2EeTPMb+1VRwBDWy6pEChPy825sFQ2H7qKB1NSUTGI6oyTHdniysamcxHTjjeFHn40XNKsXpImCyJ/4AznDFcrzPogv5FR5+LyYccWGcRlhFys8jGk6fP/szvyS1WhOFKhI8yr4vJQqXnZ1zjJMAdp4op5eWE=
   - secure: mo7UGnelYW/bfWdyTo+pBMXNZuD3PIiBkNWwNZdbA1cdT8lYVW7KC9hFBYW81XRfoNrEOdFikI/1zc4EgM+0c7ptGIMIcKG30iF2l+5mEWvLaU+4zPdsSBatAiLtBW6R0DuJ1x4N3undd7cR4/v25XPjUQ7NEC5eySguNMfZfRVqWl9QdfdEauiHHIAE/mL9xpt4vS9jy0eZvErsg/7hDvHfedXGy5VU+n8i1aDj+IdY2NgiH1r3+ATI7nZRcc+KOunJl2APAPG8wENlDydZbXley1X47zwuu3YF6GfzXCGpPqRQLhIKhLMqAWWtKTRq1YVj/R4VffXj3Ywzf2kxvmiVpqj56B9EHKHIWE5/qe5k6TO6i2FI2Pb3BG7F4Sj2jQC5YaKczDupaBy9mvD5VFLxHn76PZAoBQ78K6PiaRtUFz8Myx1CDDFtsf34w8lTxceYVCwdF73vNYYkJkcsluxc8IBhkaG006MFgXCvNt6+cAnIOYENPjfs2gh8w2zhfSMHGVK50fryzNNeWkf+PS3M2JoySd80XPZ5fuT1UT6eDVo1tNGsFPMZbho6E8lRcbEJXArA6IVV1eYvx8GOhWlQkgMuqY3/lbv8rbw7+29gKUJZcHLtqyyXyCDrDautrjzXeiVudTm81V6wgQ82A+G9RuxLi1NHT3sGD2WU3S8=
 cache:
@@ -44,7 +46,7 @@ script:
 - cd $APP_DIR
 - npm install
 # - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
-- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="iPhone Distribution: Fuzu Li (7RAR9E88NY)" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
+- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
 - cd -
 # after_success:
 # - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"
