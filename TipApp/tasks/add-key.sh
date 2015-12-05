@@ -23,3 +23,6 @@ security import ./tasks/certs/dist.p12 -k ~/Library/Keychains/ios-build.keychain
 mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
 uuid=`grep UUID -A1 -a "./tasks/profile/$PROFILE_NAME.mobileprovision"| grep -io "[-A-Z0-9]\{36\}"`
 cp "./tasks/profile/$PROFILE_NAME.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
+
+ls ~/Library/Keychains/ios-build.keychain
+ls ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
