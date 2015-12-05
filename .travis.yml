@@ -53,10 +53,10 @@ script:
 # after_success:
 # - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"
 #   testbuild/staging_ios/TipApp_ios.ipa
-# after_success:
-# - cd $APP_DIR
-# - ./tasks/sign-and-upload.sh
-# - cd -
+after_success:
+- cd $APP_DIR
+- ./tasks/sign-and-upload.sh
+- cd -
 after_script:
 - cd $APP_DIR
 - ./tasks/remove-key.sh
