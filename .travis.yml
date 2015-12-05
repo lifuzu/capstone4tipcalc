@@ -49,6 +49,9 @@ script:
 # - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
 #- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE="b76bce3c-2de5-4857-b5cb-0741eb2047b6"'
 - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6'
+- cd android
+- ./gradlew build
+- cd -
 - cd -
 # after_success:
 # - cd $APP_DIR && testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e"

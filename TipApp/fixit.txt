@@ -71,3 +71,15 @@ $ xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configurati
                          "--sign", $opt{sign});
 
 dpl --provider=testfairy --api-key=20033978c7355cf77822363c6c310202f2d5937e --app-file="out/Sample.apk" --keystore-file="out/keystore" --storepass=<storepass> --alias=<alias>
+
+# reference: http://developer.android.com/tools/publishing/app-signing.html
+
+$ keytool -genkey -v -keystore my-release-key.keystore
+-alias alias_name -keyalg RSA -keysize 2048 -validity 10000
+
+$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1
+-keystore my-release-key.keystore my_application.apk alias_name
+
+$ jarsigner -verify -verbose -certs my_application.apk
+
+$ zipalign -v 4 your_project_name-unaligned.apk your_project_name.apk

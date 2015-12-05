@@ -15,5 +15,8 @@ CERTIFICATE="iPhone Distribution: Fuzu Li (7RAR9E88NY)"
 
 xcrun -log -sdk iphoneos PackageApplication -v "$OUTPUTDIR/$APP_NAME.app" -o "$OUTPUTDIR/$APP_NAME.ipa" -sign "$CERTIFICATE" -embed "$PROVISIONING_PROFILE"
 
-# # upload to testfairy
+# upload ios to testfairy
 testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" "$OUTPUTDIR/${APP_NAME}.ipa"
+
+# upload android release to testfairy
+testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" --keystore="tasks/certs/release-key.keystore" --storepass=tipapp --alias=tipapp "android/app/build/outputs/apk/app-release.apk"
