@@ -42,6 +42,7 @@ before_script:
 - ./tasks/add-key.sh
 # - ./tasks/update-bundle.sh
 - ./tasks/android-sdk.macosx.sh ~/android.sdk
+- ./tasks/fixups/run.sh
 - popd
 script:
 - pushd $APP_DIR
