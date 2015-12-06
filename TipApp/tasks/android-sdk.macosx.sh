@@ -30,7 +30,7 @@ echo y | android update sdk --filter android-21,android-22,android-23 --no-ui
 # Install Android Addon - specific version(s)
 #echo y | android update sdk --filter addon-google_apis-google-19 --no-ui
 # Install Android Extra - specific version(s)
-#echo y | android update sdk --filter extra-android-m2repository,extra-android-support --no-ui
+echo y | android update sdk --filter extra-android-m2repository,extra-android-support --no-ui
 
 # Clean up system
 rm -rf /tmp/$PKG_PACKAGE
