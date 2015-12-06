@@ -45,6 +45,12 @@
 		62565E781C0FB7FE00ABF3BF /* Material-Design-Iconic-Font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 62565E631C0FB7FE00ABF3BF /* Material-Design-Iconic-Font.ttf */; };
 		62565E791C0FB7FE00ABF3BF /* zocial-regular-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 62565E641C0FB7FE00ABF3BF /* zocial-regular-webfont.ttf */; };
 		62565E811C101DF800ABF3BF /* libRCTToast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62565E801C101DEB00ABF3BF /* libRCTToast.a */; };
+		62999EF81C149E4F0019DF18 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF31C149E4F0019DF18 /* AVFoundation.framework */; };
+		62999EF91C149E4F0019DF18 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF41C149E4F0019DF18 /* CoreMedia.framework */; };
+		62999EFA1C149E4F0019DF18 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF51C149E4F0019DF18 /* CoreMotion.framework */; };
+		62999EFB1C149E4F0019DF18 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF61C149E4F0019DF18 /* OpenGLES.framework */; };
+		62999EFC1C149E4F0019DF18 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF71C149E4F0019DF18 /* SystemConfiguration.framework */; };
+		62999F001C149FD30019DF18 /* libTestFairy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EFE1C149FD30019DF18 /* libTestFairy.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
 
@@ -193,6 +199,13 @@
 		62565E631C0FB7FE00ABF3BF /* Material-Design-Iconic-Font.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Material-Design-Iconic-Font.ttf"; path = "../node_modules/react-native-icons/ios/ReactNativeIcons/Libraries/FontAwesomeKit/Material-Design-Iconic-Font.ttf"; sourceTree = "<group>"; };
 		62565E641C0FB7FE00ABF3BF /* zocial-regular-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "zocial-regular-webfont.ttf"; path = "../node_modules/react-native-icons/ios/ReactNativeIcons/Libraries/FontAwesomeKit/zocial-regular-webfont.ttf"; sourceTree = "<group>"; };
 		62565E7B1C101DEB00ABF3BF /* RCTToast.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTToast.xcodeproj; path = "../node_modules/react-native-toast/ios/RCTToast.xcodeproj"; sourceTree = "<group>"; };
+		62999EF31C149E4F0019DF18 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		62999EF41C149E4F0019DF18 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		62999EF51C149E4F0019DF18 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		62999EF61C149E4F0019DF18 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		62999EF71C149E4F0019DF18 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		62999EFE1C149FD30019DF18 /* libTestFairy.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTestFairy.a; path = TestFairy/libTestFairy.a; sourceTree = "<group>"; };
+		62999EFF1C149FD30019DF18 /* TestFairy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestFairy.h; path = TestFairy/TestFairy.h; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -209,6 +222,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62999EF81C149E4F0019DF18 /* AVFoundation.framework in Frameworks */,
+				62999EF91C149E4F0019DF18 /* CoreMedia.framework in Frameworks */,
+				62999EFA1C149E4F0019DF18 /* CoreMotion.framework in Frameworks */,
+				62999EFB1C149E4F0019DF18 /* OpenGLES.framework in Frameworks */,
+				62999EFC1C149E4F0019DF18 /* SystemConfiguration.framework in Frameworks */,
 				62565E811C101DF800ABF3BF /* libRCTToast.a in Frameworks */,
 				62565E391C0FB75200ABF3BF /* libReactNativeIcons.a in Frameworks */,
 				62565E321C0FB6F200ABF3BF /* libRCTCamera.a in Frameworks */,
@@ -217,6 +235,7 @@
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
 				133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */,
+				62999F001C149FD30019DF18 /* libTestFairy.a in Frameworks */,
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
@@ -375,6 +394,27 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		62999EF21C149D5F0019DF18 /* TestFairy */ = {
+			isa = PBXGroup;
+			children = (
+				62999EFE1C149FD30019DF18 /* libTestFairy.a */,
+				62999EFF1C149FD30019DF18 /* TestFairy.h */,
+			);
+			name = TestFairy;
+			sourceTree = "<group>";
+		};
+		62999EFD1C149FB70019DF18 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				62999EF31C149E4F0019DF18 /* AVFoundation.framework */,
+				62999EF41C149E4F0019DF18 /* CoreMedia.framework */,
+				62999EF51C149E4F0019DF18 /* CoreMotion.framework */,
+				62999EF61C149E4F0019DF18 /* OpenGLES.framework */,
+				62999EF71C149E4F0019DF18 /* SystemConfiguration.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -414,11 +454,13 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				62999EFD1C149FB70019DF18 /* Frameworks */,
 				62565E7A1C0FB80600ABF3BF /* Fonts */,
 				13B07FAE1A68108700A75B9A /* TipApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* TipAppTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
+				62999EF21C149D5F0019DF18 /* TestFairy */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -801,6 +843,10 @@
 				);
 				INFOPLIST_FILE = TipApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TestFairy",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = TipApp;
 			};
@@ -817,6 +863,10 @@
 				);
 				INFOPLIST_FILE = TipApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TestFairy",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = TipApp;
 			};

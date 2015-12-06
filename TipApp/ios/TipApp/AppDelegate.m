@@ -10,12 +10,15 @@
 #import "AppDelegate.h"
 
 #import "RCTRootView.h"
+#import "TestFairy.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSURL *jsCodeLocation;
+
+  [TestFairy begin:@"7cdd994811e7a6f965934ed25c036119a1902f68"];
 
   /**
    * Loading JavaScript code - uncomment the one you want.
