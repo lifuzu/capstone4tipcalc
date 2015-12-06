@@ -7,6 +7,7 @@ var {
   StyleSheet,
   Component,
   Dimensions,
+  Platform,
   View,
   Text,
   TextInput,
@@ -26,14 +27,15 @@ var ConversationView = React.createClass({
     ];
   },
   handleSend(message = {}, rowID = null) {
-    // Send message.text to your server
+    // TODO: Send message.text to your server
+    // this._GiftedMessenger.setMessageStatus('Sent', rowID);
   },
   handleReceive() {
     this._GiftedMessenger.appendMessage({
-      text: 'Received message', 
-      name: 'Friend', 
-      image: {uri: 'https://facebook.github.io/react/img/logo_og.png'}, 
-      position: 'left', 
+      text: 'Received message',
+      name: 'Developer',
+      image: {uri: 'https://facebook.github.io/react/img/logo_og.png'},
+      position: 'left',
       date: new Date(),
     });
   },
@@ -56,6 +58,7 @@ var ConversationView = React.createClass({
         initialMessages={this.getInitialMessages()}
         handleSend={this.handleSend}
         maxHeight={Dimensions.get('window').height - 64 - 30} // 64 for the navBar
+        // maxHeight={Dimensions.get('window').height - navBarHeight - statusBarHeight}
 
         styles={{
           bubbleLeft: {
@@ -66,7 +69,8 @@ var ConversationView = React.createClass({
             backgroundColor: '#007aff',
             marginLeft: 70,
           },
-        }}/>
+        }}
+        inverted={true} />
     );
   },
 });
@@ -96,5 +100,9 @@ var NavigationBarRouteMapper = {
   }
 };
 
+var navBarHeight = (Platform.OS === 'android' ? 56 : 64);
+// warning: height of android statusbar depends of the resolution of the device
+// http://stackoverflow.com/questions/3407256/height-of-status-bar-in-android
+var statusBarHeight = (Platform.OS === 'android' ? 25 : 0);
 
 module.exports = ConversationView;

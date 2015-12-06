@@ -34,7 +34,7 @@ var Information = React.createClass({
         subtitle: "Welcome to conversation!",
         actionType: null,
         nextIcon: true,
-        onSelection: this._gotoConversation,
+        onSelection: this._createConversation,
       }/*,{
         title: "Friends",
         actionType: null,
@@ -43,7 +43,7 @@ var Information = React.createClass({
     };
   },
 
-  _gotoConversation: function() {
+  _createConversation: function() {
     this.props.navigator.push({id: 'conversation'});
   },
 
