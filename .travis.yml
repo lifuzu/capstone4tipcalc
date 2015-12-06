@@ -9,10 +9,11 @@ env:
   - DEVELOPER_NAME="iPhone Developer: Fuzu Li (NGHHECB225)"
   - CERTIFICATE="iPhone Distribution: Fuzu Li (7RAR9E88NY)"
   - PROFILE_NAME="TipApp_Ad_Hoc"
-  # - SDKROOT="`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
-  #- SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk"
   - secure: Su7Jt+teU8/87oSjwHFc1PCVMVBrz9TkZMReY4+K725UcMI4LPFaesrkgxJZAAV8V+L1xDQgtOY4mOBiJLN8kQqyYBXONkRiGBnm8JO8oVtuw2f8y3YJWiienaB9U3w1eM+N1LvJf/wwqBPGrb/bk8Y506leI8rQ1Xx2yFUS7eydykh1fdosguj8XDgcTGy+R7uhYH1b43tCJC7m7W+gEeJnAE7lbAu1scS5BQUgPVua4ntB6+ohqkoy1eN7V+ME0DkAg7r5/9uri5SoM/itdLV9OumAx46dwiSkwkYbL30I/cArNiSA+EfQMtN1l19PDZgYlJblcIcVogPT3T8Jbjtu/7Hu8aGVr5Levgnk5MGS0wuGrq980//YdyzlZ4rjt4RbNIALoQvVUOThW1cOlzu2bMSoZoYUGBlR8+lhhIpRD1ZPCwox0LWSmUDXgynfub0u1RCPPvOLRurzTxz6Q96N4wagBhvMrbovjxaLeSDnk4vqyUHtg555y+mvRiydP15wmmQtd/qz0l2EeTPMb+1VRwBDWy6pEChPy825sFQ2H7qKB1NSUTGI6oyTHdniysamcxHTjjeFHn40XNKsXpImCyJ/4AznDFcrzPogv5FR5+LyYccWGcRlhFys8jGk6fP/szvyS1WhOFKhI8yr4vJQqXnZ1zjJMAdp4op5eWE=
   - secure: mo7UGnelYW/bfWdyTo+pBMXNZuD3PIiBkNWwNZdbA1cdT8lYVW7KC9hFBYW81XRfoNrEOdFikI/1zc4EgM+0c7ptGIMIcKG30iF2l+5mEWvLaU+4zPdsSBatAiLtBW6R0DuJ1x4N3undd7cR4/v25XPjUQ7NEC5eySguNMfZfRVqWl9QdfdEauiHHIAE/mL9xpt4vS9jy0eZvErsg/7hDvHfedXGy5VU+n8i1aDj+IdY2NgiH1r3+ATI7nZRcc+KOunJl2APAPG8wENlDydZbXley1X47zwuu3YF6GfzXCGpPqRQLhIKhLMqAWWtKTRq1YVj/R4VffXj3Ywzf2kxvmiVpqj56B9EHKHIWE5/qe5k6TO6i2FI2Pb3BG7F4Sj2jQC5YaKczDupaBy9mvD5VFLxHn76PZAoBQ78K6PiaRtUFz8Myx1CDDFtsf34w8lTxceYVCwdF73vNYYkJkcsluxc8IBhkaG006MFgXCvNt6+cAnIOYENPjfs2gh8w2zhfSMHGVK50fryzNNeWkf+PS3M2JoySd80XPZ5fuT1UT6eDVo1tNGsFPMZbho6E8lRcbEJXArA6IVV1eYvx8GOhWlQkgMuqY3/lbv8rbw7+29gKUJZcHLtqyyXyCDrDautrjzXeiVudTm81V6wgQ82A+G9RuxLi1NHT3sGD2WU3S8=
+  - secure: b1niTSWtxleNyjvB6YvUigcfftPFWj63LbPi2BDVzM0CawOYDABfZd4J0Xj5Sylh9ZmE8BVOqThrQyyFfSKO9+JfYY+Zg5AtN4COi7VL2jWjrsJ62BElwDsy63d1gn0PXrvfj2Mt6Nn6UxFdUOY5547aGAsg7BB5ZzVdE34IHo6eYtzFOeh12aTGF/VeWXrkvAdjOr6Irf7/Q2a1G6b14/ZBa0Dkq7d8HuzQ3f6XrD8ZEQsJb1ha6VAq4057QZBpNmfK9Ofpl6LVMkhoNg4797RzFGv8MdJ9rDocz3w3AOcdD1u1l/jHg2pVyx7F1fHAXbqjeTFGSDlq4VNQbW8F94FprA1g+z2p1EK8Jhzu0M7ICM6yMrBYVDpS8M7ibSQFGOuW2GdG0vqN7Hib/eJLnkHGeiLhdT9dyoiyuf+LKe0AjW8JXibl10BstwIglfPgaRt7KXgzoDSKvf6K23xkYoZiCsvjr78tQsd1IsoGNXG8mspv3/WdAuLBFes5gQjN1Q4WGfxK0/1e63m4qKsP6NXKQovfuHk4SFD8Ac8mQiYjzFRQq804W5EJqOHMHkN8EasWhMIV1wz+KiZSnwMYFq9B6Fj8MSSYSHSB5ZY7zU6worynOo9Oud00MLqoXKCKHluHW6Rocf1GS0Hj0KxekIJb5vOmNt5AhpxjWnUPzNA=
+  - secure: eB7wd+Jt/x/f8aUs63KgEGFkx3d39lcVVC4MSd/CF8ZeGbaU364v/c3KMkmh+nK6yf/X1njP0E9lwEzRSakoUug4UJZs+8mE1aTzq88sy543bNb3HLMCSDbT57NlpEaCNMlgcd09PYvAXPYf95utkk70mH6FdAjRJvMUekDa7HVUvmr9y9hHD/KgVZsAdRoCw/oBKn2ah5P9nHP8aUnNGC6rzFFpC8xgju1K72bwpZrYW2sK47mXbTgTZSiQMARYSp7Kol32lFvo4H1cd/gMtUDfY0D18CJbi1outnNvP0oMtUYbfIEdX3rpNsfJVIhswetaLBCxzd8n5AEs2t5YIInkYiIxjy+67gfI2tDAARgj6cqsQ2EQIK+uclRQCwWtkOv7hCgcoigDhj1qw8wolvSQJ2GCdGOSlmDsmeE/qQmhLnwRxbIr+NE2WVfvq9F9hkrnydmYZGCZFcWgr4F9+riImBuVIcxrZRMpsiWcyQ5oCShtQxuHjWbRyv0a7CzRnLGpfwlhm0zk1R9uF0VWwMZLhU3mEao9HSQEC2vLGfgEzQFz2AR9UgZJm510odbU1iH6dzMZemY6HI2ThhtLfNqtN9xmh9Gb2ZlgNGLmWxnZKmLLl9NSVdhRw+OQa8l+LTAXcD4k1uKXeYIeEMK/t4dw7S1s+yueSqApYMOyW7k=
+  - secure: q5lb++qzDRGiTMGf0dcRRAFte6QbW+AdJ2CidEM7bazJsm4T718lBTro5TCLTot3FIohwBQzHGPk8N+x05XDD3a6gt1bcJl4QPQo6WqZrRJw+qcO8Mag3OO/KeB7DugC9NkKV3Ed6rShiB7fnHkd9z8+Burxnku+of5hiTjvlbLDWV+pB/MrrMGTUv4SHlgm+HCsK/6NRXw7y3fOwE6guYv5iH6HWW83NhaD4k8R3LII+mKSIZv8TdMAByztdAv/herVt1VFc6o4GNnJWiWGW+fktE8hSGdxcdVwSoRGYydTp0CwMRndAfUrVQSSJEWtLfBHtUsV5xiJK+SF+jeDd8tjEcjNupXwug2Zhm8/trdmDSDwU6CG8ASjZVZ8/OYrtfYZEIXp8U9BVqpuXzKfIFzAwXKmb4E/5qu92/OAyf391QtCT4mowKIJW8V5H0BYio2b5mnRZeCKZAz3bSxRWqMRP5yOzhh7M88jy06Ju6SV21SklpnmitdnCG57LSDIYWKtMcpHWNeiy8e3D//pooDYT88/+xoYwWMebGkMgvaltqXTMhcRbMq/92O+eR6LDBQFBFyNBJSWemQDXj5IyFvEaGxLW8vMI3mMgqYUI0S6lGkwWlXX/eLAQpuzYYuFjaTjAOuTqNBJBtKcM5/zkrO1fh/56Cx6WfE0wU674e4=
 cache:
   directories:
   - $APP_DIR/node_modules
@@ -36,21 +37,22 @@ before_install:
 - xcodebuild -showsdks
 before_script:
 - pushd $APP_DIR
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out tasks/certs/dist.cer
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out tasks/certs/dist.p12
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc
+  -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out
+  tasks/certs/dist.cer
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out
+  tasks/certs/dist.p12
 - ./tasks/add-key.sh
-# - ./tasks/update-bundle.sh
 - ./tasks/android-sdk.macosx.sh ~/android.sdk
 - popd
 script:
 - pushd $APP_DIR
 - npm install
-# - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
-# - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
-#- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE="b76bce3c-2de5-4857-b5cb-0741eb2047b6"'
 - export SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk"
-- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
+- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration
+  Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE"
+  'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
 - unset SDKROOT
 - pushd android
 - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build

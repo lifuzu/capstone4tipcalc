@@ -83,3 +83,5 @@ $ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1
 $ jarsigner -verify -verbose -certs my_application.apk
 
 $ zipalign -v 4 your_project_name-unaligned.apk your_project_name.apk
+
+"`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
