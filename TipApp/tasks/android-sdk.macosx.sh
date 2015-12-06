@@ -20,9 +20,9 @@ ln -s $PKG_INSTALL_PATH/$PKG_VERSION $PKG_INSTALL_PATH/$PKG_ALIAS
 export PATH=$PATH:$PKG_INSTALL_PATH/$PKG_ALIAS/tools
 
 # Install Android tools - latest versioon
-echo y | android update sdk --filter tools --no-ui
+#echo y | android update sdk --filter tools --no-ui
 # Install Android build-tools - specific version
-echo y | android update sdk --filter build-tools-23.0.1 --no-ui
+echo y | android update sdk --all --filter build-tools-23.0.1 --no-ui
 # Install Android platform-tools - latest version
 echo y | android update sdk --filter platform-tools --no-ui
 # Install Android Platforms - specific version(s)
