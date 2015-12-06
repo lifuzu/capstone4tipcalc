@@ -85,3 +85,12 @@ $ jarsigner -verify -verbose -certs my_application.apk
 $ zipalign -v 4 your_project_name-unaligned.apk your_project_name.apk
 
 "`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
+
+gem cocoapod --version
+brew --version
+xctool -version
+xcodebuild -version -sdk
+
+travis encrypt "KEYSTORE_PASSWORD=foo" --add
+travis encrypt "KEY_ALIAS=foo" --add
+travis encrypt "ALIAS_PASSWORD=foo" --add
