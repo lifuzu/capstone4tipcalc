@@ -37,12 +37,9 @@ before_install:
 - xcodebuild -showsdks
 before_script:
 - pushd $APP_DIR
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc
-  -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out
-  tasks/certs/dist.cer
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out
-  tasks/certs/dist.p12
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.cer.enc -d -a -out tasks/certs/dist.cer
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out tasks/certs/dist.p12
 - ./tasks/add-key.sh
 - ./tasks/android-sdk.macosx.sh ~/android.sdk
 - popd
@@ -50,9 +47,7 @@ script:
 - pushd $APP_DIR
 - npm install
 - export SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk"
-- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration
-  Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE"
-  'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
+- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
 - unset SDKROOT
 - pushd android
 - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
