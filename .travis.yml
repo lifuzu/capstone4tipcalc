@@ -42,7 +42,6 @@ before_script:
 - ./tasks/add-key.sh
 # - ./tasks/update-bundle.sh
 - ./tasks/android-sdk.macosx.sh ~/android.sdk
-- ./tasks/fixups/run.sh
 - popd
 script:
 - pushd $APP_DIR
@@ -50,7 +49,9 @@ script:
 # - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
 # - xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
 #- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE="b76bce3c-2de5-4857-b5cb-0741eb2047b6"'
-- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6'
+- export SDKROOT="`xcodebuild -sdk -version | grep iphoneos9.1 -A3 | grep Path: | cut -d ' ' -f 2`"
+- xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="$CERTIFICATE" 'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
+- unset SDKROOT
 - pushd android
 - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
 - popd
