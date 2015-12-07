@@ -94,3 +94,8 @@ xcodebuild -version -sdk
 travis encrypt "KEYSTORE_PASSWORD=foo" --add
 travis encrypt "KEY_ALIAS=foo" --add
 travis encrypt "ALIAS_PASSWORD=foo" --add
+
+# https://gist.github.com/phynet/38afad2170907d2c1ccd
+ipa info TipApp.ipa
+# https://github.com/phonegap/ios-deploy
+ios-deploy --bundle TipApp.ipa
