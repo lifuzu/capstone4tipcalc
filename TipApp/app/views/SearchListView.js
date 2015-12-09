@@ -16,7 +16,7 @@ var {
 var { Icon, } = require('react-native-icons');
 var styles = require('../styles');
 var NAV_HEIGHT = require('../variables')('NAV_HEIGHT');
-var ItemCell = require('./components/ItemCell');
+var StarRating = require('react-native-star-rating');
 
 class SearchListView extends Component {
   constructor(props) {
@@ -67,12 +67,30 @@ class SearchListView extends Component {
     );
   }
   renderItem(item){
+    console.log(item);
     return(
-      <View>
-        <Text>{item.name}</Text>
-        <Image source={{uri: item.image_url}} style={[stylesLocal.image, {alignItems: "center", resizeMode: 'contain'}]} />
+      <View style={stylesLocal.container}>
+        <Image
+          source={{uri: item.image_url}}
+          style={stylesLocal.image} />
+        <View style={stylesLocal.rightContainer}>
+          <Text style={stylesLocal.title}>{item.name}</Text>
+          <View style={stylesLocal.subtitle}>
+            <StarRating
+              maxStars={5}
+              rating={item.rating}
+              disabled={true}
+              starSize={30} />
+          </View>
+        </View>
       </View>
     );
+    // selectedStar={self.onStarRatingPress.bind(this)}
+    // <Text style={stylesLocal.subtitle}>{item.rating}</Text>
+      // <View>
+      //   <Text>{item.name}</Text>
+      //   <Image source={{uri: item.image_url}} style={[stylesLocal.image, {alignItems: "center", resizeMode: 'contain'}]} />
+      // </View>
     // return(
     //   <ItemCell
     //     item={item}/>
@@ -81,6 +99,9 @@ class SearchListView extends Component {
   }
   selectionItem(item) {
     console.log(item);
+  }
+  onStarRatingPress(value) {
+    console.log('Rated ' + value + ' stars!');
   }
   componentDidMount() {
     this.setState({
@@ -125,10 +146,10 @@ var NavigationBarRouteMapper = {
 };
 
 var stylesLocal = StyleSheet.create({
-  container: {
-    backgroundColor: '#F5FCFF',
-    paddingTop: 16
-  },
+  // container: {
+  //   backgroundColor: '#F5FCFF',
+  //   paddingTop: 16
+  // },
   loadingText: {
     fontSize: 25,
     textAlign: 'center',
@@ -144,6 +165,30 @@ var stylesLocal = StyleSheet.create({
     backgroundColor: 'transparent',
     width: 100,
     height: 100,
+  },
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+    borderTopWidth: 1
+  },
+  rightContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 8,
+    textAlign: 'left',
+  },
+  subtitle: {
+    textAlign: 'left',
+    width: 150
+  },
+  thumbnail: {
+    width: 53,
+    height: 81,
   },
 });
 
