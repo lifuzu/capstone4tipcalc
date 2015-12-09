@@ -23,6 +23,8 @@ var _constant = Object.assign({}, {
   gray10: '#EBECEC',
   gray5:  '#F5F6F6',
 
+  background: '#f5f5f5',
+
   blue50: '#23B4D2',
 
   // http://iosfonts.com/

@@ -26,6 +26,7 @@ var geolocation = require('../mixins/geolocation');
 var netinfo = Platform.OS === 'ios' ? require('../mixins/netinfo') : {};
 var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
+var SearchItemView = require('./SearchItemView');
 
 var Search = React.createClass({
   mixins: [geolocation, netinfo, userinfo],
@@ -105,6 +106,8 @@ var SearchView = React.createClass({
       } else {
         return <SearchListView navigator={navigator} />
       }
+    } else if (route.id === 'item') {
+      return <SearchItemView navigator={navigator} item={route.item}/>
     }
   },
 

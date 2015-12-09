@@ -25,13 +25,14 @@ class SearchListView extends Component {
       dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2}),
       loaded: false,
     }
+    this._renderScene = this._renderScene.bind(this);
     this.renderItem = this.renderItem.bind(this);
     this.onSelectionItem = this.onSelectionItem.bind(this);
   }
   render() {
     return (
       <Navigator
-        renderScene={this._renderScene.bind(this)}
+        renderScene={(route,navigator) => this._renderScene(route, navigator)}
         navigator={this.props.navigator}
         navigationBar={
           <Navigator.NavigationBar style={{backgroundColor: '#246dd5'}}
@@ -102,8 +103,9 @@ class SearchListView extends Component {
     //  onSelection={this.selectionItem.bind(this)}
   }
   onSelectionItem(rowID: number) {
-    console.log(rowID);
-    console.log(this.state.dataSource._dataBlob.s1[rowID]);
+    // console.log(rowID);
+    var item = this.state.dataSource._dataBlob.s1[rowID];
+    this.props.navigator.push({id: 'item', item: item, name: item.name});
 
   }
   onStarRatingPress(value) {
