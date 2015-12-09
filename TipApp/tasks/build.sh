@@ -12,7 +12,7 @@ fi
 APP_NAME="TipApp"
 
 # Building without signature
-# xctool -project $APP_NAME.xcodeproj \
+# xctool -project ios/$APP_NAME.xcodeproj \
 #        -scheme $APP_NAME \
 #        -sdk iphoneos \
 #        -configuration Release \
@@ -26,7 +26,7 @@ APP_NAME="TipApp"
 # Building with signature
 export CERTIFICATE="iPhone Distribution: Fuzu Li (7RAR9E88NY)"
 export SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk"
-xctool -project $APP_NAME.xcodeproj \
+xctool -project ios/$APP_NAME.xcodeproj \
        -scheme $APP_NAME \
        -sdk iphoneos \
        -configuration Release \

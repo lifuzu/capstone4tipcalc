@@ -49,7 +49,7 @@ before_script:
 script:
 - pushd $APP_DIR
 - npm install
-- ./tasks/increment-version.sh
+- pushd ios && ../tasks/increment-version.sh && popd
 - ./tasks/build.sh
 - pushd android
 - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
