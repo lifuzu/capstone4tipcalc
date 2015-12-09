@@ -13,7 +13,8 @@ PROVISIONING_PROFILE="$PWD/tasks/profile/TipApp_Ad_Hoc.mobileprovision"
 OUTPUTDIR="$PWD/build/Release-iphoneos"
 CERTIFICATE="iPhone Distribution: Fuzu Li (7RAR9E88NY)"
 
-xcrun -log -sdk iphoneos PackageApplication -v "$OUTPUTDIR/$APP_NAME.app" -o "$OUTPUTDIR/$APP_NAME.ipa" -sign "$CERTIFICATE" -embed "$PROVISIONING_PROFILE"
+xcrun -log -sdk iphoneos PackageApplication -v "$OUTPUTDIR/$APP_NAME.app" -o "$OUTPUTDIR/$APP_NAME.ipa"
+# -sign "$CERTIFICATE" -embed "$PROVISIONING_PROFILE"
 
 # upload ios to testfairy
 testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" "$OUTPUTDIR/${APP_NAME}.ipa"

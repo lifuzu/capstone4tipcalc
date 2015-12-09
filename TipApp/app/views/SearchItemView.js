@@ -181,7 +181,7 @@ var stylesLocal = StyleSheet.create({
     borderColor: '#ccc',
   },
   stars: {
-    textAlign: 'center',
+    // textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',
   },
