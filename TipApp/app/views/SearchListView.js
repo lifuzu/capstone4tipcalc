@@ -25,6 +25,8 @@ class SearchListView extends Component {
       dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2}),
       loaded: false,
     }
+    this.renderItem = this.renderItem.bind(this);
+    this.onSelectionItem = this.onSelectionItem.bind(this);
   }
   render() {
     return (
@@ -66,9 +68,10 @@ class SearchListView extends Component {
       </ScrollView>
     );
   }
-  renderItem(item){
+  renderItem(item: string, sectionID: number, rowID: number){
     console.log(item);
     return(
+      <TouchableOpacity onPress={() => this.onSelectionItem(rowID)}>
       <View style={stylesLocal.container}>
         <Image
           source={{uri: item.image_url}}
@@ -84,6 +87,7 @@ class SearchListView extends Component {
           </View>
         </View>
       </View>
+      </TouchableOpacity>
     );
     // selectedStar={self.onStarRatingPress.bind(this)}
     // <Text style={stylesLocal.subtitle}>{item.rating}</Text>
@@ -97,8 +101,10 @@ class SearchListView extends Component {
     // );
     //  onSelection={this.selectionItem.bind(this)}
   }
-  selectionItem(item) {
-    console.log(item);
+  onSelectionItem(rowID: number) {
+    console.log(rowID);
+    console.log(this.state.dataSource._dataBlob.s1[rowID]);
+
   }
   onStarRatingPress(value) {
     console.log('Rated ' + value + ' stars!');

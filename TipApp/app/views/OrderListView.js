@@ -26,6 +26,8 @@ class OrderListView extends Component {
       dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2}),
       loaded: false,
     }
+    this.renderItem = this.renderItem.bind(this)
+    this.selectionItem = this.selectionItem.bind(this)
   }
   render() {
     return (
@@ -67,15 +69,15 @@ class OrderListView extends Component {
       </ScrollView>
     );
   }
-  renderItem(item){
+  renderItem(item: string, sectionID: number, rowID: number){
     return(
       <ItemCell
+        onSelection={this.selectionItem.bind(this, item)}
         item={item}/>
     );
-    //  onSelection={this.selectionItem.bind(this)}
   }
-  selectionItem(item) {
-    console.log(item);
+  selectionItem(item: string) {
+    console.log(item)
   }
   componentDidMount() {
     // orderedItemsActions.del({itemId: 'menu-item/chicken-fried-steak/'});
