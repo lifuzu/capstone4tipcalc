@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ## Record the upgraded build number
-VERSION=`agvtool what-marketing-version | grep Found | cut -d ' ' -f 4 | tr -d '"'`
-BUILD=`agvtool what-version | grep -E '\d+' | cut -d ' ' -f 5`
+VERSION="$( cd ios && agvtool what-marketing-version | grep Found | head -1 | cut -d ' ' -f 4 | tr -d '"' )"
+BUILD="$( cd ios && agvtool what-version | grep -E '\d+' | cut -d ' ' -f 5 )"
 
 # Config git user
 git config --global user.email "lifuzu@yahoo.com"
@@ -15,7 +15,7 @@ git remote add origin https://lifuzu:"${GH_TOKEN}"@github.com/lifuzu/capstone4ti
 
 #[ -z "$1" ] && ( echo 'Please input a comment.'; exit 1;)
 # Add all changes which should be checked in soon
-git add .
+git add ios/*
 # Commit the change with the comment
 git commit -m "Upgrade to version $VERSION($BUILD)."
 # Push the change
