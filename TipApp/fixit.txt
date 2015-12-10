@@ -54,12 +54,14 @@ xcrun -sdk iphoneos PackageApplication -v testbuild/staging_ios/build/Release-ip
 # reference: https://www.objc.io/issues/6-build-tools/travis-ci/
 travis encrypt "KEY_PASSWORD={password}" --add
 
-openssl aes-256-cbc -k "foo" -in scripts/profile/TravisExample_Ad_Hoc.mobileprovision -out scripts/profile/TravisExample_Ad_Hoc.mobileprovision.enc -a
-openssl aes-256-cbc -k "foo" -in scripts/certs/dist.cer -out scripts/certs/dist.cer.enc -a
-openssl aes-256-cbc -k "foo" -in scripts/certs/dist.p12 -out scripts/certs/dist.p12.enc -a
+openssl aes-256-cbc -k "foo" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision -out tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc -a
+openssl aes-256-cbc -k "foo" -in tasks/certs/dist.cer -out tasks/certs/dist.cer.enc -a
+openssl aes-256-cbc -k "foo" -in tasks/certs/dist.p12 -out tasks/certs/dist.p12.enc -a
 
 travis encrypt "ENCRYPTION_SECRET=foo" --add
 
+openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/profile/TipApp_Ad_Hoc.mobileprovision.enc
+  -d -a -out tasks/profile/TipApp_Ad_Hoc.mobileprovision
 
 $ xctool -project ios/TipApp.xcodeproj -scheme TipApp -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO clean build CODE_SIGN_IDENTITY="iPhone Distribution: Fuzu Li (7RAR9E88NY)" 'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist PROVISIONING_PROFILE="54ee791d-37dd-4558-a8a3-5045fa5616c4"'
 
