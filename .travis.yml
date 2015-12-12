@@ -59,7 +59,7 @@ script:
 after_success:
 - pushd $APP_DIR
 - ./tasks/sign-and-upload.sh
-- ./tasks/commit-all-changes.sh
+# - ./tasks/commit-all-changes.sh
 - popd
 after_script:
 - pushd $APP_DIR

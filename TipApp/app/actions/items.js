@@ -82,7 +82,7 @@ function erase_items(options, completed, failed) {
   });
 }
 
-// Find item, from thelocal storage, if not found, call list_items to sync with the remote server
+// Find item, from the local storage, if not found, call list_items to sync with the remote server
 // Input itemId (in `options`)
 function find_item(options, completed, failed) {
   db.items.get({qrcode: options.itemId}, function(results){
