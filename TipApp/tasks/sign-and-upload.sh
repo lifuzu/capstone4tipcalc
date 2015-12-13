@@ -23,8 +23,8 @@ testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" \
                    "$OUTPUTDIR/${APP_NAME}.ipa"
 
 # Uploading android release to testfairy
-testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" \
-                   --keystore="$PWD/tasks/certs/release-key.keystore" \
-                   --storepass="$KEYSTORE_PASSWORD" \
-                   --alias="$KEY_ALIAS" \
-                   "$PWD/android/app/build/outputs/apk/app-release.apk"
+# testfairy-uploader --api-key "20033978c7355cf77822363c6c310202f2d5937e" \
+#                    --keystore="$PWD/tasks/certs/release-key.keystore" \
+#                    --storepass="$KEYSTORE_PASSWORD" \
+#                    --alias="$KEY_ALIAS" \
+#                    "$PWD/android/app/build/outputs/apk/app-release.apk"
