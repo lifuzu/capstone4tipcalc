@@ -78,6 +78,7 @@ class OrderListView extends Component {
   }
   selectionItem(item: string) {
     console.log(item)
+    this.props.navigator.push({id: 'detail', params: {item: item}});
   }
   componentDidMount() {
     // orderedItemsActions.del({itemId: 'menu-item/chicken-fried-steak/'});

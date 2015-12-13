@@ -18,6 +18,7 @@ var NAV_HEIGHT = require('../variables')('NAV_HEIGHT');
 var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
 var orderedItemsActions = require('../actions/ordered_items');
+var FilledButton = require('./components/FilledButton');
 
 class ItemDetailView extends Component {
   constructor(props) {
@@ -42,21 +43,28 @@ class ItemDetailView extends Component {
   _renderScene(route, navigator) {
     var image_display = this.state.item && this.state.item.featured_image ?
       <Image source={{uri: this.state.item.featured_image.source}} style={[styles.image, {overflow: 'visible'}]} /> : null;
-    var navigator_placeholder = <View style={{height: NAV_HEIGHT}}></View>;
+    var navigator_placeholder = <View style={{height: NAV_HEIGHT + 5 }}></View>;
     return (
       <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
         {navigator_placeholder}
         {image_display}
         <Text>{this.state.item.title}</Text>
         <Text>{this.state.item.content}</Text>
-        <Button
-          style={{fontSize: 20, color: 'green'}}
-          styleDisabled={{color: 'red'}}
-          onPress={this._onSubmit.bind(this)}>
-          Confirm!
-        </Button>
+
+        <FilledButton
+          style={{marginTop:5, backgroundColor:'#0ea378'}}
+          highlightedColor='#007655'
+          title={"Share"}
+          titleStyle={{color:'white'}}
+          onPress={() => console.log(this.state.item)} />
       </ScrollView>
     );
+        // <Button
+        //   style={{fontSize: 20, color: 'green'}}
+        //   styleDisabled={{color: 'red'}}
+        //   onPress={this._onSubmit.bind(this)}>
+        //   Confirm!
+        // </Button>
   }
   _onSubmit() {
     // console.log("in _onSubmit");
@@ -67,7 +75,11 @@ class ItemDetailView extends Component {
   componentDidMount() {
     // itemsActions.erase();
     this.unsubscribe = itemsStores.listen(this.onFoundItem.bind(this));
-    itemsActions.find({itemId: this.props.params.data});
+    if (this.props.params && this.props.params.data) {
+      itemsActions.find({itemId: this.props.params.data});
+    } else if (this.props.params && this.props.params.item) {
+      this.setState({item: this.props.params.item});
+    }
   }
   componentWillUnmount() {
     this.unsubscribe();

@@ -77,11 +77,11 @@ class LoginView extends Component {
           <View style={styles.signup}>
             <Text style={styles.greyFont}>"Forgot password?"<Text style={styles.whiteFont} onPress={this.onResetPassword.bind(this)}>  Reset</Text></Text>
           </View>
-          <Text>{this.state.status}</Text>
         </View>
       </View>
     );
   }
+  // <Text>{this.state.status}</Text>
   componentDidMount() {
     this.unsubscribe = usersStores.listen(this.onUserStatus.bind(this));
   }
