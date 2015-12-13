@@ -29,11 +29,6 @@ var MainView = React.createClass({
           <View tabLabel="ion|disc" style={styles.tabView}>
             <OrderView/>
           </View>
-          <ScrollView tabLabel="ion|share" style={styles.tabView}>
-            <View style={styles.card}>
-              <Text>Share</Text>
-            </View>
-          </ScrollView>
           <View tabLabel="ion|ios-world" style={styles.tabView}>
             <InformationView/>
           </View>
@@ -44,6 +39,11 @@ var MainView = React.createClass({
       </View>
     );
   }
+          // <ScrollView tabLabel="ion|share" style={styles.tabView}>
+          //   <View style={styles.card}>
+          //     <Text>Share</Text>
+          //   </View>
+          // </ScrollView>
 });
 
 var styles = StyleSheet.create({
