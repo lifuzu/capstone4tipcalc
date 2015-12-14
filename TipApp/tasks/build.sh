@@ -34,7 +34,7 @@ xctool -project ios/$APP_NAME.xcodeproj \
        SYMROOT=$PWD/build \
        ONLY_ACTIVE_ARCH=NO \
        CODE_SIGN_IDENTITY="$CERTIFICATE" \
-       'PROVISIONING_PROFILE=b76bce3c-2de5-4857-b5cb-0741eb2047b6' \
+       'PROVISIONING_PROFILE=bda6cdc9-c917-40e8-a9b0-27d0ebb870cc' \
        'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist' \
        clean build
 unset SDKROOT
