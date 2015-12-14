@@ -19,6 +19,7 @@ var itemsActions = require('../actions/items');
 var itemsStores = require('../stores/items');
 var orderedItemsActions = require('../actions/ordered_items');
 var FilledButton = require('./components/FilledButton');
+var Share = require('react-native-share');
 
 class ItemDetailView extends Component {
   constructor(props) {
@@ -56,7 +57,7 @@ class ItemDetailView extends Component {
           highlightedColor='#007655'
           title={"Share"}
           titleStyle={{color:'white'}}
-          onPress={() => console.log(this.state.item)} />
+          onPress={() => this._onShare()} />
       </ScrollView>
     );
         // <Button
@@ -65,6 +66,13 @@ class ItemDetailView extends Component {
         //   onPress={this._onSubmit.bind(this)}>
         //   Confirm!
         // </Button>
+  }
+  _onShare() {
+    Share.open({
+      share_text: this.state.item.title,
+      share_URL:  this.state.item.link,
+      title:      this.state.item.title
+    });
   }
   _onSubmit() {
     // console.log("in _onSubmit");

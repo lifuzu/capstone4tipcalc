@@ -503,10 +503,9 @@ return inspect;})();
 var OBJECT_COLUMN_NAME='(index)';
 var LOG_LEVELS={
 trace:0,
-log:1,
-info:2,
-warn:3,
-error:4};
+info:1,
+warn:2,
+error:3};
 
 
 function setupConsole(global){
@@ -550,7 +549,7 @@ rows.push(row);}}}
 
 
 if(rows.length === 0){
-global.nativeLoggingHook('',LOG_LEVELS.log);
+global.nativeLoggingHook('',LOG_LEVELS.info);
 return;}
 
 
@@ -596,13 +595,13 @@ table.push(joinRow(stringRows[i]));}
 
 
 
-global.nativeLoggingHook('\n' + table.join('\n'),LOG_LEVELS.log);}
+global.nativeLoggingHook('\n' + table.join('\n'),LOG_LEVELS.info);}
 
 
 global.console = {
 error:getNativeLogFunction(LOG_LEVELS.error),
 info:getNativeLogFunction(LOG_LEVELS.info),
-log:getNativeLogFunction(LOG_LEVELS.log),
+log:getNativeLogFunction(LOG_LEVELS.info),
 warn:getNativeLogFunction(LOG_LEVELS.warn),
 trace:getNativeLogFunction(LOG_LEVELS.trace),
 table:consoleTablePolyfill};
@@ -917,6 +916,7 @@ __d('react-native/Libraries/react-native/react-native.js',function(global, requi
 var ReactNative=Object.assign(Object.create(require('React')),{
 
 ActivityIndicatorIOS:require('ActivityIndicatorIOS'),
+ART:require('ReactNativeART'),
 DatePickerIOS:require('DatePickerIOS'),
 DrawerLayoutAndroid:require('DrawerLayoutAndroid'),
 Image:require('Image'),
@@ -940,6 +940,7 @@ Text:require('Text'),
 TextInput:require('TextInput'),
 ToastAndroid:require('ToastAndroid'),
 ToolbarAndroid:require('ToolbarAndroid'),
+Touchable:require('Touchable'),
 TouchableHighlight:require('TouchableHighlight'),
 TouchableNativeFeedback:require('TouchableNativeFeedback'),
 TouchableOpacity:require('TouchableOpacity'),
@@ -961,6 +962,7 @@ CameraRoll:require('CameraRoll'),
 Dimensions:require('Dimensions'),
 Easing:require('Easing'),
 ImagePickerIOS:require('ImagePickerIOS'),
+IntentAndroid:require('IntentAndroid'),
 InteractionManager:require('InteractionManager'),
 LayoutAnimation:require('LayoutAnimation'),
 LinkingIOS:require('LinkingIOS'),
@@ -1176,7 +1178,10 @@ __d('ReactNativeDefaultInjection',function(global, require, module, exports) {  
 
 
 
+
+
 require('InitializeJavaScriptAppEngine');
+
 var EventPluginHub=require('EventPluginHub');
 var EventPluginUtils=require('EventPluginUtils');
 var IOSDefaultEventPluginOrder=require('IOSDefaultEventPluginOrder');
@@ -1301,12 +1306,10 @@ if(typeof window === 'undefined'){
 window = GLOBAL;}
 
 
-function handleError(e,isFatal){
-try{
-require('ExceptionsManager').handleException(e,isFatal);}
-catch(ee) {
-console.log('Failed to print error: ',ee.message);}}
+function setUpConsole(){
 
+var ExceptionsManager=require('ExceptionsManager');
+ExceptionsManager.installConsoleErrorReporter();}
 
 
 
@@ -1341,19 +1344,17 @@ Object.defineProperty(scope,backupName,_extends({},descriptor,{value:scope[name]
 Object.defineProperty(scope,name,_extends({},descriptor,{value:newValue}));}
 
 
-function setUpRedBoxErrorHandler(){
+function setUpErrorHandler(){
+function handleError(e,isFatal){
+try{
+require('ExceptionsManager').handleException(e,isFatal);}
+catch(ee) {
+console.log('Failed to print error: ',ee.message);}}
+
+
+
 var ErrorUtils=require('ErrorUtils');
 ErrorUtils.setGlobalHandler(handleError);}
-
-
-function setUpRedBoxConsoleErrorHandler(){
-
-var ExceptionsManager=require('ExceptionsManager');
-var Platform=require('Platform');
-
-if(__DEV__ && Platform.OS === 'ios'){
-ExceptionsManager.installConsoleErrorReporter();}}
-
 
 
 function setUpFlowChecker(){
@@ -1428,8 +1429,6 @@ polyfillGlobal('WebSocket',require('WebSocket'));}
 
 
 function setUpProfile(){
-console.profile = console.profile || GLOBAL.nativeTraceBeginSection || function(){};
-console.profileEnd = console.profileEnd || GLOBAL.nativeTraceEndSection || function(){};
 if(__DEV__){
 require('BridgeProfiling').swizzleReactPerf();}}
 
@@ -1449,18 +1448,27 @@ Number.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || Math.pow(2,53) - 1;
 Number.MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -(Math.pow(2,53) - 1);}
 
 
+function setUpDevTools(){
+
+if(__DEV__ && !window.document && require('Platform').OS === 'ios'){
+var setupDevtools=require('setupDevtools');
+setupDevtools();}}
+
+
+
 setUpProcessEnv();
-setUpRedBoxErrorHandler();
+setUpConsole();
 setUpTimers();
 setUpAlert();
 setUpPromise();
+setUpErrorHandler();
 setUpXHR();
-setUpRedBoxConsoleErrorHandler();
 setUpGeolocation();
 setUpWebSockets();
 setUpProfile();
 setUpFlowChecker();
 setUpNumber();
+setUpDevTools();
 
 
 
@@ -2159,12 +2167,13 @@ var sourceMapPromise;
 
 var exceptionID=0;
 
-function reportException(e,isFatal,stack){
+
+
+
+function reportException(e,isFatal){
 var currentExceptionID=++exceptionID;
 if(RCTExceptionsManager){
-if(!stack){
-stack = parseErrorStack(e);}
-
+var stack=parseErrorStack(e);
 if(isFatal){
 RCTExceptionsManager.reportFatalException(e.message,stack,currentExceptionID);}else 
 {
@@ -2185,6 +2194,9 @@ console.warn('Unable to load source map: ' + error.message);});}}}
 
 
 
+
+
+
 function handleException(e,isFatal){
 
 
@@ -2193,19 +2205,9 @@ function handleException(e,isFatal){
 if(!e.message){
 e = new Error(e);}
 
-var stack=parseErrorStack(e);
-var msg=
-'Error: ' + e.message + 
-'\n stack: \n' + stackToString(stack) + 
-'\n URL: ' + e.sourceURL + 
-'\n line: ' + e.line + 
-'\n message: ' + e.message;
-if(console.errorOriginal){
-console.errorOriginal(msg);}else 
-{
-console.error(msg);}
 
-reportException(e,isFatal,stack);}
+(console._errorOriginal || console.error)(e.message);
+reportException(e,isFatal);}
 
 
 
@@ -2213,19 +2215,20 @@ reportException(e,isFatal,stack);}
 
 
 function installConsoleErrorReporter(){
-if(console.reportException){
+
+if(console._errorOriginal){
 return;}
 
-console.reportException = reportException;
-console.errorOriginal = console.error.bind(console);
+console._errorOriginal = console.error.bind(console);
 console.error = function reactConsoleError(){
-
-
-
-console.errorOriginal.apply(null,arguments);
+console._errorOriginal.apply(null,arguments);
 if(!console.reportErrorsAsExceptions){
 return;}
 
+
+if(arguments[0] && arguments[0].stack){
+reportException(arguments[0],false);}else 
+{
 var str=Array.prototype.map.call(arguments,stringifySafe).join(', ');
 if(str.slice(0,10) === '"Warning: '){
 
@@ -2235,32 +2238,12 @@ return;}
 
 var error=new Error('console.error: ' + str);
 error.framesToPop = 1;
-reportException(error,false);};
+reportException(error,false);}};
+
 
 if(console.reportErrorsAsExceptions === undefined){
 console.reportErrorsAsExceptions = true;}}
 
-
-
-function stackToString(stack){
-var maxLength=Math.max.apply(null,stack.map(function(frame){return frame.methodName.length;}));
-return stack.map(function(frame){return stackFrameToString(frame,maxLength);}).join('\n');}
-
-
-function stackFrameToString(stackFrame,maxLength){
-var fileNameParts=stackFrame.file.split('/');
-var fileName=fileNameParts[fileNameParts.length - 1];
-
-if(fileName.length > 18){
-fileName = fileName.substr(0,17) + '\u2026';}
-
-
-var spaces=fillSpaces(maxLength - stackFrame.methodName.length);
-return '  ' + stackFrame.methodName + spaces + '  ' + fileName + ':' + stackFrame.lineNumber;}
-
-
-function fillSpaces(n){
-return new Array(n + 1).join(' ');}
 
 
 module.exports = {handleException:handleException,installConsoleErrorReporter:installConsoleErrorReporter};
@@ -2307,7 +2290,7 @@ __fbBatchedBridgeConfig.localModulesConfig);
 
 module.exports = BatchedBridge;
 });
-__d('MessageQueue',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();function _objectWithoutProperties(obj,keys){var target={};for(var i in obj) {if(keys.indexOf(i) >= 0)continue;if(!Object.prototype.hasOwnProperty.call(obj,i))continue;target[i] = obj[i];}return target;}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}
+__d('MessageQueue',function(global, require, module, exports) {  'use strict';var _slicedToArray=(function(){function sliceIterator(arr,i){var _arr=[];var _n=true;var _d=false;var _e=undefined;try{for(var _i=arr[Symbol.iterator](),_s;!(_n = (_s = _i.next()).done);_n = true) {_arr.push(_s.value);if(i && _arr.length === i)break;}}catch(err) {_d = true;_e = err;}finally {try{if(!_n && _i['return'])_i['return']();}finally {if(_d)throw _e;}}return _arr;}return function(arr,i){if(Array.isArray(arr)){return arr;}else if(Symbol.iterator in Object(arr)){return sliceIterator(arr,i);}else {throw new TypeError('Invalid attempt to destructure non-iterable instance');}};})();var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();function _objectWithoutProperties(obj,keys){var target={};for(var i in obj) {if(keys.indexOf(i) >= 0)continue;if(!Object.prototype.hasOwnProperty.call(obj,i))continue;target[i] = obj[i];}return target;}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}
 
 
 
@@ -2339,7 +2322,6 @@ var MIN_TIME_BETWEEN_FLUSHES_MS=5;
 var SPY_MODE=false;
 
 var MethodTypes=keyMirror({
-local:null,
 remote:null,
 remoteAsync:null});
 
@@ -2371,15 +2353,18 @@ this._lastFlush = 0;
 'flushedQueue'].
 forEach(function(fn){return _this[fn] = _this[fn].bind(_this);});
 
-this._genModules(remoteModules);
+var modulesConfig=this._genModulesConfig(remoteModules);
+this._genModules(modulesConfig);
 localModules && this._genLookupTables(
-localModules,this._moduleTable,this._methodTable);
+this._genModulesConfig(localModules),this._moduleTable,this._methodTable);
+
 
 this._debugInfo = {};
 this._remoteModuleTable = {};
 this._remoteMethodTable = {};
 this._genLookupTables(
-remoteModules,this._remoteModuleTable,this._remoteMethodTable);}_createClass(MessageQueue,[{key:'callFunctionReturnFlushedQueue',value:
+modulesConfig,this._remoteModuleTable,this._remoteMethodTable);}_createClass(MessageQueue,[{key:'callFunctionReturnFlushedQueue',value:
+
 
 
 
@@ -2485,60 +2470,108 @@ console.log('N->JS : <callback for ' + _module2 + '.' + method + '>(' + JSON.str
 this._callbacks[cbID & ~1] = null;
 this._callbacks[cbID | 1] = null;
 callback.apply(null,args);
-BridgeProfiling.profileEnd();}},{key:'_genLookupTables',value:
+BridgeProfiling.profileEnd();}},{key:'_genModulesConfig',value:
 
 
 
 
 
-function _genLookupTables(localModules,moduleTable,methodTable){
-var moduleNames=Object.keys(localModules);
+
+
+
+
+
+
+function _genModulesConfig(modules){
+if(Array.isArray(modules)){
+return modules;}else 
+{
+var moduleArray=[];
+var moduleNames=Object.keys(modules);
 for(var i=0,l=moduleNames.length;i < l;i++) {
 var moduleName=moduleNames[i];
-var methods=localModules[moduleName].methods || {};
-var moduleID=localModules[moduleName].moduleID;
-moduleTable[moduleID] = moduleName;
-methodTable[moduleID] = {};
+var moduleConfig=modules[moduleName];
+var _module3=[moduleName];
+if(moduleConfig.constants){
+_module3.push(moduleConfig.constants);}
 
-var methodNames=Object.keys(methods);
-for(var j=0,k=methodNames.length;j < k;j++) {
+var methodsConfig=moduleConfig.methods;
+if(methodsConfig){
+var methods=[];
+var asyncMethods=[];
+var methodNames=Object.keys(methodsConfig);
+for(var j=0,ll=methodNames.length;j < ll;j++) {
 var methodName=methodNames[j];
-var methodConfig=methods[methodName];
-methodTable[moduleID][methodConfig.methodID] = methodName;}}}},{key:'_genModules',value:
+var methodConfig=methodsConfig[methodName];
+methods[methodConfig.methodID] = methodName;
+if(methodConfig.type === MethodTypes.remoteAsync){
+asyncMethods.push(methodConfig.methodID);}}
+
+
+if(methods.length){
+_module3.push(methods);
+if(asyncMethods.length){
+_module3.push(asyncMethods);}}}
 
 
 
+moduleArray[moduleConfig.moduleID] = _module3;}
 
-function _genModules(remoteModules){
-var moduleNames=Object.keys(remoteModules);
-for(var i=0,l=moduleNames.length;i < l;i++) {
-var moduleName=moduleNames[i];
-var moduleConfig=remoteModules[moduleName];
-this.RemoteModules[moduleName] = this._genModule({},moduleConfig);}}},{key:'_genModule',value:
+return moduleArray;}}},{key:'_genLookupTables',value:
 
 
 
-function _genModule(module,moduleConfig){
-var methods=moduleConfig.methods || {};
-var methodNames=Object.keys(methods);
-for(var i=0,l=methodNames.length;i < l;i++) {
-var methodName=methodNames[i];
-var methodConfig=methods[methodName];
-module[methodName] = this._genMethod(
-moduleConfig.moduleID,
-methodConfig.methodID,
-methodConfig.type || MethodTypes.remote);}
+function _genLookupTables(modulesConfig,moduleTable,methodTable){
+modulesConfig.forEach(function(module,moduleID){
+if(!module){
+return;}
 
 
-Object.assign(module,moduleConfig.constants);
+var moduleName=undefined,methods=undefined;
+if(moduleHasConstants(module)){var _module4=_slicedToArray(
+module,3);moduleName = _module4[0];methods = _module4[2];}else 
+{var _module5=_slicedToArray(
+module,2);moduleName = _module5[0];methods = _module5[1];}
+
+
+moduleTable[moduleID] = moduleName;
+methodTable[moduleID] = Object.assign({},methods);});}},{key:'_genModules',value:
+
+
+
+function _genModules(remoteModules){var _this4=this;
+remoteModules.forEach(function(module,moduleID){
+if(!module){
+return;}
+
+
+var moduleName=undefined,constants=undefined,methods=undefined,asyncMethods=undefined;
+if(moduleHasConstants(module)){var _module6=_slicedToArray(
+module,4);moduleName = _module6[0];constants = _module6[1];methods = _module6[2];asyncMethods = _module6[3];}else 
+{var _module7=_slicedToArray(
+module,3);moduleName = _module7[0];methods = _module7[1];asyncMethods = _module7[2];}
+
+
+var moduleConfig={moduleID:moduleID,constants:constants,methods:methods,asyncMethods:asyncMethods};
+_this4.RemoteModules[moduleName] = _this4._genModule({},moduleConfig);});}},{key:'_genModule',value:
+
+
+
+function _genModule(module,moduleConfig){var _this5=this;var 
+moduleID=moduleConfig.moduleID;var constants=moduleConfig.constants;var _moduleConfig$methods=moduleConfig.methods;var methods=_moduleConfig$methods === undefined?[]:_moduleConfig$methods;var _moduleConfig$asyncMethods=moduleConfig.asyncMethods;var asyncMethods=_moduleConfig$asyncMethods === undefined?[]:_moduleConfig$asyncMethods;
+
+methods.forEach(function(methodName,methodID){
+var methodType=
+arrayContains(asyncMethods,methodID)?
+MethodTypes.remoteAsync:MethodTypes.remote;
+module[methodName] = _this5._genMethod(moduleID,methodID,methodType);});
+
+Object.assign(module,constants);
+
 return module;}},{key:'_genMethod',value:
 
 
 function _genMethod(module,method,type){
-if(type === MethodTypes.local){
-return null;}
-
-
 var fn=null;
 var self=this;
 if(type === MethodTypes.remoteAsync){
@@ -2573,6 +2606,14 @@ return fn;}}]);return MessageQueue;})();
 
 
 
+function moduleHasConstants(moduleArray){
+return !Array.isArray(moduleArray[1]);}
+
+
+function arrayContains(array,value){
+return array.indexOf(value) !== -1;}
+
+
 function createErrorFromErrorData(errorData){var 
 
 message=
@@ -2601,7 +2642,7 @@ __d('BridgeProfiling',function(global, require, module, exports) {  'use strict'
 var GLOBAL=GLOBAL || this;
 var TRACE_TAG_REACT_APPS=1 << 17;
 
-var _enabled=false;
+var _enabled;
 var _ReactPerf=null;
 function ReactPerf(){
 if(!_ReactPerf){
@@ -2621,13 +2662,13 @@ profile:function(profileName){
 if(_enabled){
 profileName = typeof profileName === 'function'?
 profileName():profileName;
-console.profile(TRACE_TAG_REACT_APPS,profileName);}},
+global.nativeTraceBeginSection(TRACE_TAG_REACT_APPS,profileName);}},
 
 
 
 profileEnd:function(){
 if(_enabled){
-console.profileEnd(TRACE_TAG_REACT_APPS);}},
+global.nativeTraceEndSection(TRACE_TAG_REACT_APPS);}},
 
 
 
@@ -2649,6 +2690,8 @@ swizzleReactPerf:function(){
 ReactPerf().injection.injectMeasure(BridgeProfiling.reactPerfMeasure);}};
 
 
+
+BridgeProfiling.setEnabled(global.__RCTProfileIsProfiling || false);
 
 module.exports = BridgeProfiling;
 });
@@ -7285,26 +7328,6 @@ return stack;}};
 
 module.exports = StackTraceParser;
 });
-__d('Platform',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-
-var Platform={
-OS:'ios'};
-
-
-module.exports = Platform;
-});
 __d('checkFlowAtRuntime',function(global, require, module, exports) {  'use strict';var _extends=Object.assign || function(target){for(var i=1;i < arguments.length;i++) {var source=arguments[i];for(var key in source) {if(Object.prototype.hasOwnProperty.call(source,key)){target[key] = source[key];}}}return target;};
 
 
@@ -8443,6 +8466,10 @@ throw new TypeError('Body not allowed for GET or HEAD requests');}
 this._initBody(body);}
 
 
+Request.prototype.clone = function(){
+return new Request(this);};
+
+
 function decode(body){
 var form=new FormData();
 body.trim().split('&').forEach(function(bytes){
@@ -8483,6 +8510,15 @@ this.ok = this.status >= 200 && this.status < 300;
 this.statusText = options.statusText;
 this.headers = options.headers instanceof Headers?options.headers:new Headers(options.headers);
 this.url = options.url || '';}
+
+
+Response.prototype.clone = function(){
+return new Response(this._bodyInit,{
+status:this.status,
+statusText:this.statusText,
+headers:new Headers(this.headers),
+url:this.url});};
+
 
 
 Body.call(Response.prototype);
@@ -8582,6 +8618,13 @@ var warning=require('warning');
 var subscriptions=[];
 
 var updatesEnabled=false;
+
+
+
+
+
+
+
 
 
 
@@ -8820,7 +8863,7 @@ event.reason = ev.reason;
 _this.onclose && _this.onclose(event);
 _this.dispatchEvent(event);
 _this._unregisterEvents();
-_this._closeWebSocket(id);}),
+_this.close();}),
 
 RCTDeviceEventEmitter.addListener('websocketFailed',function(ev){
 if(ev.id !== id){
@@ -8831,13 +8874,33 @@ event.message = ev.message;
 _this.onerror && _this.onerror(event);
 _this.dispatchEvent(event);
 _this._unregisterEvents();
-_this.readyState === _this.OPEN && _this._closeWebSocket(id);})];}}]);return WebSocket;})(WebSocketBase);
+_this.close();})];}}]);return WebSocket;})(WebSocketBase);
 
 
 
 
 
 module.exports = WebSocket;
+});
+__d('Platform',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+var Platform={
+OS:'ios'};
+
+
+module.exports = Platform;
 });
 __d('WebSocketBase',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();var _get=function get(object,property,receiver){if(object === null)object = Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc === undefined){var parent=Object.getPrototypeOf(object);if(parent === null){return undefined;}else {return get(parent,property,receiver);}}else if('value' in desc){return desc.value;}else {var getter=desc.get;if(getter === undefined){return undefined;}return getter.call(receiver);}};function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}function _inherits(subClass,superClass){if(typeof superClass !== 'function' && superClass !== null){throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__ = superClass;}
 
@@ -8885,24 +8948,26 @@ if(!protocols){
 protocols = [];}
 
 
+this.readyState = this.CONNECTING;
 this.connectToSocketImpl(url);}_createClass(WebSocketBase,[{key:'close',value:
 
 
 function close(){
-if(this.readyState === WebSocketBase.CLOSING || 
-this.readyState === WebSocketBase.CLOSED){
+if(this.readyState === this.CLOSING || 
+this.readyState === this.CLOSED){
 return;}
 
 
-if(this.readyState === WebSocketBase.CONNECTING){
+if(this.readyState === this.CONNECTING){
 this.cancelConnectionImpl();}
 
 
+this.readyState = this.CLOSING;
 this.closeConnectionImpl();}},{key:'send',value:
 
 
 function send(data){
-if(this.readyState === WebSocketBase.CONNECTING){
+if(this.readyState === this.CONNECTING){
 throw new Error('INVALID_STATE_ERR');}
 
 
@@ -8935,6 +9000,11 @@ function sendArrayBufferImpl(){
 throw new Error('Subclass must define sendArrayBufferImpl method');}}]);return WebSocketBase;})(EventTarget);
 
 
+
+WebSocketBase.CONNECTING = 0;
+WebSocketBase.OPEN = 1;
+WebSocketBase.CLOSING = 2;
+WebSocketBase.CLOSED = 3;
 
 module.exports = WebSocketBase;
 });
@@ -9012,6 +9082,9 @@ if(this instanceof EventTarget){
 
 
 Object.defineProperty(this,LISTENERS,{value:Object.create(null)});}else 
+
+if(arguments.length === 1 && Array.isArray(arguments[0])){
+return defineCustomEventTarget(EventTarget,arguments[0]);}else 
 
 if(arguments.length > 0){
 var types=Array(arguments.length);
@@ -9476,7 +9549,7 @@ Object.assign(this,eventInitDict);};
 
 module.exports = WebSocketEvent;
 });
-__d('RCTDebugComponentOwnership',function(global, require, module, exports) {  'use strict';
+__d('setupDevtools',function(global, require, module, exports) {  'use strict';
 
 
 
@@ -9489,48 +9562,102 @@ __d('RCTDebugComponentOwnership',function(global, require, module, exports) {  '
 
 
 
+function setupDevtools(){
+var messageListeners=[];
+var closeListeners=[];
+var ws=new window.WebSocket('ws://localhost:8097/devtools');
+
+var FOR_BACKEND={
+resolveRNStyle:require('flattenStyle'),
+wall:{
+listen:function(fn){
+messageListeners.push(fn);},
+
+onClose:function(fn){
+closeListeners.push(fn);},
+
+send:function(data){
+ws.send(JSON.stringify(data));}}};
+
+
+
+ws.onclose = function(){
+setTimeout(setupDevtools,200);
+closeListeners.forEach(function(fn){return fn();});};
+
+ws.onerror = function(error){
+setTimeout(setupDevtools,200);
+closeListeners.forEach(function(fn){return fn();});};
+
+ws.onopen = function(){
+tryToConnect();};
+
+
+function tryToConnect(){
+ws.send('attach:agent');
+var _interval=setInterval(function(){return ws.send('attach:agent');},500);
+ws.onmessage = function(evt){
+if(evt.data.indexOf('eval:') === 0){
+clearInterval(_interval);
+initialize(evt.data.slice('eval:'.length));}};}
 
 
 
 
-var DebugComponentOwnershipModule=require('NativeModules').DebugComponentOwnershipModule;
-var InspectorUtils=require('InspectorUtils');
-var ReactNativeTagHandles=require('ReactNativeTagHandles');
+function initialize(text){
+try{
 
-function componentToString(component){
-return component.getName?component.getName():'Unknown';}
+eval(text);}
+catch(e) {
+console.error('Failed to eval: ' + e.message);
+return;}
 
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject({
+CurrentOwner:require('ReactCurrentOwner'),
+InstanceHandles:require('ReactInstanceHandles'),
+Mount:require('ReactNativeMount'),
+Reconciler:require('ReactReconciler'),
+TextComponent:require('ReactNativeTextComponent')});
 
-function getRootTagForTag(tag){
-var rootNodeID=ReactNativeTagHandles.tagToRootNodeID[tag];
-if(!rootNodeID){
-return null;}
-
-var rootID=ReactNativeTagHandles.getNativeTopRootIDFromNodeID(rootNodeID);
-if(!rootID){
-return null;}
-
-return ReactNativeTagHandles.rootNodeIDToTag[rootID];}
+ws.onmessage = handleMessage;}
 
 
-module.exports = {
+function handleMessage(evt){
+
+
+var data;
+try{
+data = JSON.parse(evt.data);}
+catch(e) {
+return console.error('failed to parse json: ' + evt.data);}
+
+
+if(data.$close || data.$error){
+closeListeners.forEach(function(fn){return fn();});
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('shutdown');
+tryToConnect();
+return;}
+
+if(data.$open){
+return;}
+
+messageListeners.forEach(function(fn){
+try{
+fn(data);}
+catch(e) {
+
+
+
+console.log(data);
+throw e;}});}}
 
 
 
 
 
-
-
-
-getOwnerHierarchy:function(requestID,tag){
-var rootTag=getRootTagForTag(tag);
-var instance=InspectorUtils.findInstanceByNativeTag(rootTag,tag);
-var ownerHierarchy=instance?
-InspectorUtils.getOwnerHierarchy(instance).map(componentToString):
-null;
-DebugComponentOwnershipModule.receiveOwnershipHierarchy(requestID,tag,ownerHierarchy);}};
+module.exports = setupDevtools;
 });
-__d('InspectorUtils',function(global, require, module, exports) {  'use strict';
+__d('flattenStyle',function(global, require, module, exports) {  'use strict';
 
 
 
@@ -9542,59 +9669,124 @@ __d('InspectorUtils',function(global, require, module, exports) {  'use strict';
 
 
 
-var ReactInstanceHandles=require('ReactInstanceHandles');
-var ReactInstanceMap=require('ReactInstanceMap');
-var ReactNativeMount=require('ReactNativeMount');
-var ReactNativeTagHandles=require('ReactNativeTagHandles');
 
-function traverseOwnerTreeUp(hierarchy,instance){
-if(instance){
-hierarchy.unshift(instance);
-traverseOwnerTreeUp(hierarchy,instance._currentElement._owner);}}
+var StyleSheetRegistry=require('StyleSheetRegistry');
+var invariant=require('invariant');
 
 
 
-function findInstance(component,targetID){
-if(targetID === findRootNodeID(component)){
-return component;}
+function getStyle(style){
+if(typeof style === 'number'){
+return StyleSheetRegistry.getStyleByID(style);}
 
-if(component._renderedComponent){
-return findInstance(component._renderedComponent,targetID);}else 
-{
-for(var key in component._renderedChildren) {
-var child=component._renderedChildren[key];
-if(ReactInstanceHandles.isAncestorIDOf(findRootNodeID(child),targetID)){
-var instance=findInstance(child,targetID);
-if(instance){
-return instance;}}}}}
+return style;}
 
 
-
-
-
-
-function findRootNodeID(component){
-var internalInstance=ReactInstanceMap.get(component);
-return internalInstance?internalInstance._rootNodeID:component._rootNodeID;}
-
-
-function findInstanceByNativeTag(rootTag,nativeTag){
-var containerID=ReactNativeTagHandles.tagToRootNodeID[rootTag];
-var rootInstance=ReactNativeMount._instancesByContainerID[containerID];
-var targetID=ReactNativeTagHandles.tagToRootNodeID[nativeTag];
-if(!targetID){
+function flattenStyle(style){
+if(!style){
 return undefined;}
 
-return findInstance(rootInstance,targetID);}
+invariant(style !== true,'style may be false but not true');
+
+if(!Array.isArray(style)){
+return getStyle(style);}
 
 
-function getOwnerHierarchy(instance){
-var hierarchy=[];
-traverseOwnerTreeUp(hierarchy,instance);
-return hierarchy;}
+var result={};
+for(var i=0;i < style.length;++i) {
+var computedStyle=flattenStyle(style[i]);
+if(computedStyle){
+for(var key in computedStyle) {
+result[key] = computedStyle[key];
+
+if(__DEV__){
+var value=computedStyle[key];}}}}
 
 
-module.exports = {findInstanceByNativeTag:findInstanceByNativeTag,getOwnerHierarchy:getOwnerHierarchy};
+
+
+return result;}
+
+
+module.exports = flattenStyle;
+});
+__d('StyleSheetTypes',function(global, require, module, exports) {  'use strict';Object.defineProperty(exports,'__esModule',{value:true});
+});
+__d('StyleSheetRegistry',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}
+
+
+
+
+
+
+
+
+
+
+
+
+var styles={};
+var uniqueID=1;
+var emptyStyle={};var 
+
+StyleSheetRegistry=(function(){function StyleSheetRegistry(){_classCallCheck(this,StyleSheetRegistry);}_createClass(StyleSheetRegistry,null,[{key:'registerStyle',value:
+function registerStyle(style){
+var id=++uniqueID;
+if(__DEV__){
+Object.freeze(style);}
+
+styles[id] = style;
+return id;}},{key:'getStyleByID',value:
+
+
+function getStyleByID(id){
+if(!id){
+
+
+return emptyStyle;}
+
+
+var style=styles[id];
+if(!style){
+console.warn('Invalid style with id `' + id + '`. Skipping ...');
+return emptyStyle;}
+
+return style;}}]);return StyleSheetRegistry;})();
+
+
+
+module.exports = StyleSheetRegistry;
+});
+__d('ReactCurrentOwner',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var ReactCurrentOwner={
+
+
+
+
+
+current:null};
+
+
+
+module.exports = ReactCurrentOwner;
 });
 __d('ReactInstanceHandles',function(global, require, module, exports) {  'use strict';
 
@@ -9965,54 +10157,6 @@ injection:ReactRootIndexInjection};
 
 
 module.exports = ReactRootIndex;
-});
-__d('ReactInstanceMap',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var ReactInstanceMap={
-
-
-
-
-
-
-remove:function(key){
-key._reactInternalInstance = undefined;},
-
-
-get:function(key){
-return key._reactInternalInstance;},
-
-
-has:function(key){
-return key._reactInternalInstance !== undefined;},
-
-
-set:function(key,value){
-key._reactInternalInstance = value;}};
-
-
-
-
-module.exports = ReactInstanceMap;
 });
 __d('ReactNativeMount',function(global, require, module, exports) {  'use strict';
 
@@ -10517,37 +10661,6 @@ return isElement;};
 
 module.exports = ReactElement;
 });
-__d('ReactCurrentOwner',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var ReactCurrentOwner={
-
-
-
-
-
-current:null};
-
-
-
-module.exports = ReactCurrentOwner;
-});
 __d('ReactNativeTagHandles',function(global, require, module, exports) {  'use strict';
 
 
@@ -10990,6 +11103,54 @@ enqueueUpdate(internalInstance);}};
 
 
 module.exports = ReactUpdateQueue;
+});
+__d('ReactInstanceMap',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var ReactInstanceMap={
+
+
+
+
+
+
+remove:function(key){
+key._reactInternalInstance = undefined;},
+
+
+get:function(key){
+return key._reactInternalInstance;},
+
+
+has:function(key){
+return key._reactInternalInstance !== undefined;},
+
+
+set:function(key,value){
+key._reactInternalInstance = value;}};
+
+
+
+
+module.exports = ReactInstanceMap;
 });
 __d('emptyObject',function(global, require, module, exports) {  "use strict";
 
@@ -12435,6 +12596,206 @@ false,
 
 module.exports = findNodeHandle;
 });
+__d('ReactNativeTextComponent',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+var ReactNativeTagHandles=require('ReactNativeTagHandles');
+var RCTUIManager=require('NativeModules').UIManager;
+
+var assign=require('Object.assign');
+var invariant=require('invariant');
+
+var ReactNativeTextComponent=function(props){};
+
+
+
+assign(ReactNativeTextComponent.prototype,{
+
+construct:function(text){
+
+this._currentElement = text;
+this._stringText = '' + text;
+this._rootNodeID = null;},
+
+
+mountComponent:function(rootID,transaction,context){
+invariant(
+context.isInAParentText,
+'RawText "' + this._stringText + '" must be wrapped in an explicit ' + 
+'<Text> component.');
+
+this._rootNodeID = rootID;
+var tag=ReactNativeTagHandles.allocateTag();
+var nativeTopRootID=ReactNativeTagHandles.getNativeTopRootIDFromNodeID(rootID);
+RCTUIManager.createView(
+tag,
+'RCTRawText',
+nativeTopRootID?ReactNativeTagHandles.rootNodeIDToTag[nativeTopRootID]:null,
+{text:this._stringText});
+
+return {
+rootNodeID:rootID,
+tag:tag};},
+
+
+
+receiveComponent:function(nextText,transaction,context){
+if(nextText !== this._currentElement){
+this._currentElement = nextText;
+var nextStringText='' + nextText;
+if(nextStringText !== this._stringText){
+this._stringText = nextStringText;
+RCTUIManager.updateView(
+ReactNativeTagHandles.mostRecentMountedNodeHandleForRootNodeID(
+this._rootNodeID),
+
+'RCTRawText',
+{text:this._stringText});}}},
+
+
+
+
+
+unmountComponent:function(){
+this._currentElement = null;
+this._stringText = null;
+this._rootNodeID = null;}});
+
+
+
+
+module.exports = ReactNativeTextComponent;
+});
+__d('RCTDebugComponentOwnership',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var DebugComponentOwnershipModule=require('NativeModules').DebugComponentOwnershipModule;
+var InspectorUtils=require('InspectorUtils');
+var ReactNativeTagHandles=require('ReactNativeTagHandles');
+
+function componentToString(component){
+return component.getName?component.getName():'Unknown';}
+
+
+function getRootTagForTag(tag){
+var rootNodeID=ReactNativeTagHandles.tagToRootNodeID[tag];
+if(!rootNodeID){
+return null;}
+
+var rootID=ReactNativeTagHandles.getNativeTopRootIDFromNodeID(rootNodeID);
+if(!rootID){
+return null;}
+
+return ReactNativeTagHandles.rootNodeIDToTag[rootID];}
+
+
+module.exports = {
+
+
+
+
+
+
+
+
+getOwnerHierarchy:function(requestID,tag){
+var rootTag=getRootTagForTag(tag);
+var instance=InspectorUtils.findInstanceByNativeTag(rootTag,tag);
+var ownerHierarchy=instance?
+InspectorUtils.getOwnerHierarchy(instance).map(componentToString):
+null;
+DebugComponentOwnershipModule.receiveOwnershipHierarchy(requestID,tag,ownerHierarchy);}};
+});
+__d('InspectorUtils',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+var ReactInstanceHandles=require('ReactInstanceHandles');
+var ReactInstanceMap=require('ReactInstanceMap');
+var ReactNativeMount=require('ReactNativeMount');
+var ReactNativeTagHandles=require('ReactNativeTagHandles');
+
+function traverseOwnerTreeUp(hierarchy,instance){
+if(instance){
+hierarchy.unshift(instance);
+traverseOwnerTreeUp(hierarchy,instance._currentElement._owner);}}
+
+
+
+function findInstance(component,targetID){
+if(targetID === findRootNodeID(component)){
+return component;}
+
+if(component._renderedComponent){
+return findInstance(component._renderedComponent,targetID);}else 
+{
+for(var key in component._renderedChildren) {
+var child=component._renderedChildren[key];
+if(ReactInstanceHandles.isAncestorIDOf(findRootNodeID(child),targetID)){
+var instance=findInstance(child,targetID);
+if(instance){
+return instance;}}}}}
+
+
+
+
+
+
+function findRootNodeID(component){
+var internalInstance=ReactInstanceMap.get(component);
+return internalInstance?internalInstance._rootNodeID:component._rootNodeID;}
+
+
+function findInstanceByNativeTag(rootTag,nativeTag){
+var containerID=ReactNativeTagHandles.tagToRootNodeID[rootTag];
+var rootInstance=ReactNativeMount._instancesByContainerID[containerID];
+var targetID=ReactNativeTagHandles.tagToRootNodeID[nativeTag];
+if(!targetID){
+return undefined;}
+
+return findInstance(rootInstance,targetID);}
+
+
+function getOwnerHierarchy(instance){
+var hierarchy=[];
+traverseOwnerTreeUp(hierarchy,instance);
+return hierarchy;}
+
+
+module.exports = {findInstanceByNativeTag:findInstanceByNativeTag,getOwnerHierarchy:getOwnerHierarchy};
+});
 __d('PerformanceLogger',function(global, require, module, exports) {  'use strict';
 
 
@@ -12451,6 +12812,7 @@ __d('PerformanceLogger',function(global, require, module, exports) {  'use stric
 var performanceNow=require('performanceNow');
 
 var timespans={};
+var extras={};
 
 
 
@@ -12507,8 +12869,19 @@ timespans[key].totalTime =
 timespans[key].endTime - timespans[key].startTime;},
 
 
-clearTimespans:function(){
-timespans = {};},
+clear:function(){
+timespans = {};
+extras = {};},
+
+
+clearExceptTimespans:function(keys){
+timespans = Object.keys(timespans).reduce(function(previous,key){
+if(keys.indexOf(key) !== -1){
+previous[key] = timespans[key];}
+
+return previous;},
+{});
+extras = {};},
 
 
 getTimespans:function(){
@@ -12533,9 +12906,26 @@ var label=labels[i / 2];
 PerformanceLogger.addTimespan(
 label,
 newTimespans[i + 1] - newTimespans[i],
-label);}}};
+label);}},
 
 
+
+
+setExtra:function(key,value){
+if(extras[key]){
+if(__DEV__){
+console.log(
+'PerformanceLogger: Attempting to set an extra that already exists ',
+key);}
+
+
+return;}
+
+extras[key] = value;},
+
+
+getExtras:function(){
+return extras;}};
 
 
 
@@ -16013,80 +16403,6 @@ RCTUIManager.clearJSResponder();}}};
 
 module.exports = ReactNativeGlobalResponderHandler;
 });
-__d('ReactNativeTextComponent',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-var ReactNativeTagHandles=require('ReactNativeTagHandles');
-var RCTUIManager=require('NativeModules').UIManager;
-
-var assign=require('Object.assign');
-
-var ReactNativeTextComponent=function(props){};
-
-
-
-assign(ReactNativeTextComponent.prototype,{
-
-construct:function(text){
-
-this._currentElement = text;
-this._stringText = '' + text;
-this._rootNodeID = null;},
-
-
-mountComponent:function(rootID,transaction,context){
-this._rootNodeID = rootID;
-var tag=ReactNativeTagHandles.allocateTag();
-var nativeTopRootID=ReactNativeTagHandles.getNativeTopRootIDFromNodeID(rootID);
-RCTUIManager.createView(
-tag,
-'RCTRawText',
-nativeTopRootID?ReactNativeTagHandles.rootNodeIDToTag[nativeTopRootID]:null,
-{text:this._stringText});
-
-return {
-rootNodeID:rootID,
-tag:tag};},
-
-
-
-receiveComponent:function(nextText,transaction,context){
-if(nextText !== this._currentElement){
-this._currentElement = nextText;
-var nextStringText='' + nextText;
-if(nextStringText !== this._stringText){
-this._stringText = nextStringText;
-RCTUIManager.updateView(
-ReactNativeTagHandles.mostRecentMountedNodeHandleForRootNodeID(
-this._rootNodeID),
-
-'RCTRawText',
-{text:this._stringText});}}},
-
-
-
-
-
-unmountComponent:function(){
-this._currentElement = null;
-this._stringText = null;
-this._rootNodeID = null;}});
-
-
-
-
-module.exports = ReactNativeTextComponent;
-});
 __d('ResponderEventPlugin',function(global, require, module, exports) {  'use strict';
 
 
@@ -17956,106 +18272,6 @@ return true;}
 
 
 module.exports = styleDiffer;
-});
-__d('flattenStyle',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-var StyleSheetRegistry=require('StyleSheetRegistry');
-var invariant=require('invariant');
-
-
-
-function getStyle(style){
-if(typeof style === 'number'){
-return StyleSheetRegistry.getStyleByID(style);}
-
-return style;}
-
-
-function flattenStyle(style){
-if(!style){
-return undefined;}
-
-invariant(style !== true,'style may be false but not true');
-
-if(!Array.isArray(style)){
-return getStyle(style);}
-
-
-var result={};
-for(var i=0;i < style.length;++i) {
-var computedStyle=flattenStyle(style[i]);
-if(computedStyle){
-for(var key in computedStyle) {
-result[key] = computedStyle[key];
-
-if(__DEV__){
-var value=computedStyle[key];}}}}
-
-
-
-
-return result;}
-
-
-module.exports = flattenStyle;
-});
-__d('StyleSheetTypes',function(global, require, module, exports) {  'use strict';Object.defineProperty(exports,'__esModule',{value:true});
-});
-__d('StyleSheetRegistry',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}
-
-
-
-
-
-
-
-
-
-
-
-
-var styles={};
-var uniqueID=1;
-var emptyStyle={};var 
-
-StyleSheetRegistry=(function(){function StyleSheetRegistry(){_classCallCheck(this,StyleSheetRegistry);}_createClass(StyleSheetRegistry,null,[{key:'registerStyle',value:
-function registerStyle(style){
-var id=++uniqueID;
-if(__DEV__){
-Object.freeze(style);}
-
-styles[id] = style;
-return id;}},{key:'getStyleByID',value:
-
-
-function getStyleByID(id){
-if(!id){
-
-
-return emptyStyle;}
-
-
-var style=styles[id];
-if(!style){
-console.warn('Invalid style with id `' + id + '`. Skipping ...');
-return emptyStyle;}
-
-return style;}}]);return StyleSheetRegistry;})();
-
-
-
-module.exports = StyleSheetRegistry;
 });
 __d('TextInputState',function(global, require, module, exports) {  'use strict';
 
@@ -23775,7 +23991,8 @@ __d('StyleSheet',function(global, require, module, exports) {  'use strict';var 
 
 
 var StyleSheetRegistry=require('StyleSheetRegistry');
-var StyleSheetValidation=require('StyleSheetValidation');var 
+var StyleSheetValidation=require('StyleSheetValidation');
+var flattenStyle=require('flattenStyle');var 
 
 
 
@@ -23822,6 +24039,8 @@ var StyleSheetValidation=require('StyleSheetValidation');var
 
 
 StyleSheet=(function(){function StyleSheet(){_classCallCheck(this,StyleSheet);}_createClass(StyleSheet,null,[{key:'create',value:
+
+
 function create(obj){
 var result={};
 for(var key in obj) {
@@ -23831,6 +24050,9 @@ result[key] = StyleSheetRegistry.registerStyle(obj[key]);}
 return result;}}]);return StyleSheet;})();
 
 
+
+
+StyleSheet.flatten = flattenStyle;
 
 module.exports = StyleSheet;
 });
@@ -24088,7 +24310,6 @@ testID:PropTypes.string,
 
 
 
-onMoveShouldSetResponder:PropTypes.func,
 onResponderGrant:PropTypes.func,
 onResponderMove:PropTypes.func,
 onResponderReject:PropTypes.func,
@@ -24097,6 +24318,8 @@ onResponderTerminate:PropTypes.func,
 onResponderTerminationRequest:PropTypes.func,
 onStartShouldSetResponder:PropTypes.func,
 onStartShouldSetResponderCapture:PropTypes.func,
+onMoveShouldSetResponder:PropTypes.func,
+onMoveShouldSetResponderCapture:PropTypes.func,
 
 
 
@@ -24697,6 +24920,1336 @@ one.y !== two.y);};
 
 module.exports = pointsDiffer;
 });
+__d('ReactNativeART',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+var Color=require('art/core/color.js');
+var Path=require('ARTSerializablePath');
+var Transform=require('art/core/transform.js');
+
+var React=require('React');
+var ReactNativeViewAttributes=require('ReactNativeViewAttributes');
+
+var createReactNativeComponentClass=require('createReactNativeComponentClass');
+var merge=require('merge');
+
+
+
+function arrayDiffer(a,b){
+if(a == null){
+return true;}
+
+if(a.length !== b.length){
+return true;}
+
+for(var i=0;i < a.length;i++) {
+if(a[i] !== b[i]){
+return true;}}
+
+
+return false;}
+
+
+function fontAndLinesDiffer(a,b){
+if(a === b){
+return false;}
+
+if(a.font !== b.font){
+if(a.font === null){
+return true;}
+
+if(b.font === null){
+return true;}
+
+
+if(
+a.font.fontFamily !== b.font.fontFamily || 
+a.font.fontSize !== b.font.fontSize || 
+a.font.fontWeight !== b.font.fontWeight || 
+a.font.fontStyle !== b.font.fontStyle)
+{
+return true;}}
+
+
+return arrayDiffer(a.lines,b.lines);}
+
+
+
+
+var SurfaceViewAttributes=merge(ReactNativeViewAttributes.UIView,{});
+
+
+
+
+
+var NodeAttributes={
+transform:{diff:arrayDiffer},
+opacity:true};
+
+
+var GroupAttributes=merge(NodeAttributes,{
+clipping:{diff:arrayDiffer}});
+
+
+var RenderableAttributes=merge(NodeAttributes,{
+fill:{diff:arrayDiffer},
+stroke:{diff:arrayDiffer},
+strokeWidth:true,
+strokeCap:true,
+strokeJoin:true,
+strokeDash:{diff:arrayDiffer}});
+
+
+var ShapeAttributes=merge(RenderableAttributes,{
+d:{diff:arrayDiffer}});
+
+
+var TextAttributes=merge(RenderableAttributes,{
+alignment:true,
+frame:{diff:fontAndLinesDiffer},
+path:{diff:arrayDiffer}});
+
+
+
+
+var NativeSurfaceView=createReactNativeComponentClass({
+validAttributes:SurfaceViewAttributes,
+uiViewClassName:'ARTSurfaceView'});
+
+
+var NativeGroup=createReactNativeComponentClass({
+validAttributes:GroupAttributes,
+uiViewClassName:'ARTGroup'});
+
+
+var NativeShape=createReactNativeComponentClass({
+validAttributes:ShapeAttributes,
+uiViewClassName:'ARTShape'});
+
+
+var NativeText=createReactNativeComponentClass({
+validAttributes:TextAttributes,
+uiViewClassName:'ARTText'});
+
+
+
+
+function childrenAsString(children){
+if(!children){
+return '';}
+
+if(typeof children === 'string'){
+return children;}
+
+if(children.length){
+return children.join('\n');}
+
+return '';}
+
+
+
+
+var Surface=React.createClass({displayName:'Surface',
+
+render:function(){
+var props=this.props;
+var w=extractNumber(props.width,0);
+var h=extractNumber(props.height,0);
+return (
+React.createElement(NativeSurfaceView,{style:[props.style,{width:w,height:h}]},
+this.props.children));}});
+
+
+
+
+
+
+
+
+
+
+
+function extractNumber(value,defaultValue){
+if(value == null){
+return defaultValue;}
+
+return +value;}
+
+
+var pooledTransform=new Transform();
+
+function extractTransform(props){
+var scaleX=props.scaleX != null?props.scaleX:
+props.scale != null?props.scale:1;
+var scaleY=props.scaleY != null?props.scaleY:
+props.scale != null?props.scale:1;
+
+pooledTransform.
+transformTo(1,0,0,1,0,0).
+move(props.x || 0,props.y || 0).
+rotate(props.rotation || 0,props.originX,props.originY).
+scale(scaleX,scaleY,props.originX,props.originY);
+
+if(props.transform != null){
+pooledTransform.transform(props.transform);}
+
+
+return [
+pooledTransform.xx,pooledTransform.yx,
+pooledTransform.xy,pooledTransform.yy,
+pooledTransform.x,pooledTransform.y];}
+
+
+
+function extractOpacity(props){
+
+if(props.visible === false){
+return 0;}
+
+if(props.opacity == null){
+return 1;}
+
+return +props.opacity;}
+
+
+
+
+
+
+
+var Group=React.createClass({displayName:'Group',
+
+render:function(){
+var props=this.props;
+return (
+React.createElement(NativeGroup,{
+opacity:extractOpacity(props),
+transform:extractTransform(props)},
+this.props.children));}});
+
+
+
+
+
+
+var ClippingRectangle=React.createClass({displayName:'ClippingRectangle',
+
+render:function(){
+var props=this.props;
+var x=extractNumber(props.x,0);
+var y=extractNumber(props.y,0);
+var w=extractNumber(props.width,0);
+var h=extractNumber(props.height,0);
+var clipping=new Path().
+moveTo(x,y).
+line(w,0).
+line(0,h).
+line(w,0).
+close().
+toJSON();
+
+var propsExcludingXAndY=merge(props);
+delete propsExcludingXAndY.x;
+delete propsExcludingXAndY.y;
+return (
+React.createElement(NativeGroup,{
+clipping:clipping,
+opacity:extractOpacity(props),
+transform:extractTransform(propsExcludingXAndY)},
+this.props.children));}});
+
+
+
+
+
+
+
+
+var SOLID_COLOR=0;
+var LINEAR_GRADIENT=1;
+var RADIAL_GRADIENT=2;
+var PATTERN=3;
+
+function insertColorIntoArray(color,targetArray,atIndex){
+var c=new Color(color);
+targetArray[atIndex + 0] = c.red / 255;
+targetArray[atIndex + 1] = c.green / 255;
+targetArray[atIndex + 2] = c.blue / 255;
+targetArray[atIndex + 3] = c.alpha;}
+
+
+function insertColorsIntoArray(stops,targetArray,atIndex){
+var i=0;
+if('length' in stops){
+while(i < stops.length) {
+insertColorIntoArray(stops[i],targetArray,atIndex + i * 4);
+i++;}}else 
+
+{
+for(var offset in stops) {
+insertColorIntoArray(stops[offset],targetArray,atIndex + i * 4);
+i++;}}
+
+
+return atIndex + i * 4;}
+
+
+function insertOffsetsIntoArray(stops,targetArray,atIndex,multi,reverse){
+var offsetNumber;
+var i=0;
+if('length' in stops){
+while(i < stops.length) {
+offsetNumber = i / (stops.length - 1) * multi;
+targetArray[atIndex + i] = reverse?1 - offsetNumber:offsetNumber;
+i++;}}else 
+
+{
+for(var offsetString in stops) {
+offsetNumber = +offsetString * multi;
+targetArray[atIndex + i] = reverse?1 - offsetNumber:offsetNumber;
+i++;}}
+
+
+return atIndex + i;}
+
+
+function insertColorStopsIntoArray(stops,targetArray,atIndex){
+var lastIndex=insertColorsIntoArray(stops,targetArray,atIndex);
+insertOffsetsIntoArray(stops,targetArray,lastIndex,1,false);}
+
+
+function insertDoubleColorStopsIntoArray(stops,targetArray,atIndex){
+var lastIndex=insertColorsIntoArray(stops,targetArray,atIndex);
+lastIndex = insertColorsIntoArray(stops,targetArray,lastIndex);
+lastIndex = insertOffsetsIntoArray(stops,targetArray,lastIndex,0.5,false);
+insertOffsetsIntoArray(stops,targetArray,lastIndex,0.5,true);}
+
+
+function applyBoundingBoxToBrushData(brushData,props){
+var type=brushData[0];
+var width=+props.width;
+var height=+props.height;
+if(type === LINEAR_GRADIENT){
+brushData[1] *= width;
+brushData[2] *= height;
+brushData[3] *= width;
+brushData[4] *= height;}else 
+if(type === RADIAL_GRADIENT){
+brushData[1] *= width;
+brushData[2] *= height;
+brushData[3] *= width;
+brushData[4] *= height;
+brushData[5] *= width;
+brushData[6] *= height;}else 
+if(type === PATTERN){}}
+
+
+
+
+function extractBrush(colorOrBrush,props){
+if(colorOrBrush == null){
+return null;}
+
+if(colorOrBrush._brush){
+if(colorOrBrush._bb){
+
+
+
+
+
+applyBoundingBoxToBrushData(colorOrBrush._brush,props);
+colorOrBrush._bb = false;}
+
+return colorOrBrush._brush;}
+
+var c=new Color(colorOrBrush);
+return [SOLID_COLOR,c.red / 255,c.green / 255,c.blue / 255,c.alpha];}
+
+
+function extractColor(color){
+if(color == null){
+return null;}
+
+var c=new Color(color);
+return [c.red / 255,c.green / 255,c.blue / 255,c.alpha];}
+
+
+function extractStrokeCap(strokeCap){
+switch(strokeCap){
+case 'butt':return 0;
+case 'square':return 2;
+default:return 1;}}
+
+
+
+function extractStrokeJoin(strokeJoin){
+switch(strokeJoin){
+case 'miter':return 0;
+case 'bevel':return 2;
+default:return 1;}}
+
+
+
+
+
+
+
+
+var Shape=React.createClass({displayName:'Shape',
+
+render:function(){
+var props=this.props;
+var path=props.d || childrenAsString(props.children);
+var d=new Path(path).toJSON();
+return (
+React.createElement(NativeShape,{
+fill:extractBrush(props.fill,props),
+opacity:extractOpacity(props),
+stroke:extractColor(props.stroke),
+strokeCap:extractStrokeCap(props.strokeCap),
+strokeDash:props.strokeDash || null,
+strokeJoin:extractStrokeJoin(props.strokeJoin),
+strokeWidth:extractNumber(props.strokeWidth,1),
+transform:extractTransform(props),
+
+d:d}));}});
+
+
+
+
+
+
+
+
+var cachedFontObjectsFromString={};
+
+var fontFamilyPrefix=/^[\s"']*/;
+var fontFamilySuffix=/[\s"']*$/;
+
+function extractSingleFontFamily(fontFamilyString){
+
+
+
+return fontFamilyString.split(',')[0].
+replace(fontFamilyPrefix,'').
+replace(fontFamilySuffix,'');}
+
+
+function parseFontString(font){
+if(cachedFontObjectsFromString.hasOwnProperty(font)){
+return cachedFontObjectsFromString[font];}
+
+var regexp=/^\s*((?:(?:normal|bold|italic)\s+)*)(?:(\d+(?:\.\d+)?)[ptexm\%]*(?:\s*\/.*?)?\s+)?\s*\"?([^\"]*)/i;
+var match=regexp.exec(font);
+if(!match){
+return null;}
+
+var fontFamily=extractSingleFontFamily(match[3]);
+var fontSize=+match[2] || 12;
+var isBold=/bold/.exec(match[1]);
+var isItalic=/italic/.exec(match[1]);
+cachedFontObjectsFromString[font] = {
+fontFamily:fontFamily,
+fontSize:fontSize,
+fontWeight:isBold?'bold':'normal',
+fontStyle:isItalic?'italic':'normal'};
+
+return cachedFontObjectsFromString[font];}
+
+
+function extractFont(font){
+if(font == null){
+return null;}
+
+if(typeof font === 'string'){
+return parseFontString(font);}
+
+var fontFamily=extractSingleFontFamily(font.fontFamily);
+var fontSize=+font.fontSize || 12;
+return {
+
+fontFamily:fontFamily,
+fontSize:fontSize,
+fontWeight:font.fontWeight,
+fontStyle:font.fontStyle};}
+
+
+
+var newLine=/\n/g;
+function extractFontAndLines(font,text){
+return {font:extractFont(font),lines:text.split(newLine)};}
+
+
+function extractAlignment(alignment){
+switch(alignment){
+case 'right':
+return 1;
+case 'center':
+return 2;
+default:
+return 0;}}
+
+
+
+var Text=React.createClass({displayName:'Text',
+
+render:function(){
+var props=this.props;
+var textPath=props.path?new Path(props.path).toJSON():null;
+var textFrame=extractFontAndLines(
+props.font,
+childrenAsString(props.children));
+
+return (
+React.createElement(NativeText,{
+fill:extractBrush(props.fill,props),
+opacity:extractOpacity(props),
+stroke:extractColor(props.stroke),
+strokeCap:extractStrokeCap(props.strokeCap),
+strokeDash:props.strokeDash || null,
+strokeJoin:extractStrokeJoin(props.strokeJoin),
+strokeWidth:extractNumber(props.strokeWidth,1),
+transform:extractTransform(props),
+
+alignment:extractAlignment(props.alignment),
+frame:textFrame,
+path:textPath}));}});
+
+
+
+
+
+
+
+
+function LinearGradient(stops,x1,y1,x2,y2){
+var type=LINEAR_GRADIENT;
+
+if(arguments.length < 5){
+var angle=(x1 == null?270:x1) * Math.PI / 180;
+
+var x=Math.cos(angle);
+var y=-Math.sin(angle);
+var l=(Math.abs(x) + Math.abs(y)) / 2;
+
+x *= l;y *= l;
+
+x1 = 0.5 - x;
+x2 = 0.5 + x;
+y1 = 0.5 - y;
+y2 = 0.5 + y;
+this._bb = true;}else 
+{
+this._bb = false;}
+
+
+var brushData=[type,+x1,+y1,+x2,+y2];
+insertColorStopsIntoArray(stops,brushData,5);
+this._brush = brushData;}
+
+
+function RadialGradient(stops,fx,fy,rx,ry,cx,cy){
+if(ry == null){
+ry = rx;}
+
+if(cx == null){
+cx = fx;}
+
+if(cy == null){
+cy = fy;}
+
+if(fx == null){
+
+
+fx = fy = rx = ry = cx = cy = 0.5;
+this._bb = true;}else 
+{
+this._bb = false;}
+
+
+
+
+
+var brushData=[RADIAL_GRADIENT,+fx,+fy,+rx * 2,+ry * 2,+cx,+cy];
+insertDoubleColorStopsIntoArray(stops,brushData,7);
+this._brush = brushData;}
+
+
+function Pattern(url,width,height,left,top){
+this._brush = [PATTERN,url,+left || 0,+top || 0,+width,+height];}
+
+
+
+
+
+function CSSBackgroundPattern(){
+return new Color('rgba(0,0,0,0)');}
+
+
+var ReactART={
+LinearGradient:LinearGradient,
+RadialGradient:RadialGradient,
+Pattern:Pattern,
+Transform:Transform,
+Path:Path,
+Surface:Surface,
+Group:Group,
+ClippingRectangle:ClippingRectangle,
+Shape:Shape,
+Text:Text,
+CSSBackgroundPattern:CSSBackgroundPattern};
+
+
+module.exports = ReactART;
+});
+__d('art/core/color.js',function(global, require, module, exports) {  var colors={
+maroon:'#800000',red:'#ff0000',orange:'#ffA500',yellow:'#ffff00',olive:'#808000',
+purple:'#800080',fuchsia:"#ff00ff",white:'#ffffff',lime:'#00ff00',green:'#008000',
+navy:'#000080',blue:'#0000ff',aqua:'#00ffff',teal:'#008080',
+black:'#000000',silver:'#c0c0c0',gray:'#808080'};
+
+
+var map=function(array,fn){
+var results=[];
+for(var i=0,l=array.length;i < l;i++) 
+results[i] = fn(array[i],i);
+return results;};
+
+
+var Color=function(color,type){
+
+if(color.isColor){
+
+this.red = color.red;
+this.green = color.green;
+this.blue = color.blue;
+this.alpha = color.alpha;}else 
+
+{
+
+var namedColor=colors[color];
+if(namedColor){
+color = namedColor;
+type = 'hex';}
+
+
+switch(typeof color){
+case 'string':if(!type)type = (type = color.match(/^rgb|^hsb|^hsl/))?type[0]:'hex';break;
+case 'object':type = type || 'rgb';color = color.toString();break;
+case 'number':type = 'hex';color = color.toString(16);break;}
+
+
+color = Color['parse' + type.toUpperCase()](color);
+this.red = color[0];
+this.green = color[1];
+this.blue = color[2];
+this.alpha = color[3];}
+
+
+this.isColor = true;};
+
+
+
+var limit=function(number,min,max){
+return Math.min(max,Math.max(min,number));};
+
+
+var listMatch=/([-.\d]+\%?)\s*,\s*([-.\d]+\%?)\s*,\s*([-.\d]+\%?)\s*,?\s*([-.\d]*\%?)/;
+var hexMatch=/^#?([a-f0-9]{1,2})([a-f0-9]{1,2})([a-f0-9]{1,2})([a-f0-9]{0,2})$/i;
+
+Color.parseRGB = function(color){
+return map(color.match(listMatch).slice(1),function(bit,i){
+if(bit)bit = parseFloat(bit) * (bit[bit.length - 1] == '%'?2.55:1);
+return i < 3?Math.round((bit %= 256) < 0?bit + 256:bit):limit(bit === ''?1:Number(bit),0,1);});};
+
+
+
+Color.parseHEX = function(color){
+if(color.length == 1)color = color + color + color;
+return map(color.match(hexMatch).slice(1),function(bit,i){
+if(i == 3)return bit?parseInt(bit,16) / 255:1;
+return parseInt(bit.length == 1?bit + bit:bit,16);});};
+
+
+
+Color.parseHSB = function(color){
+var hsb=map(color.match(listMatch).slice(1),function(bit,i){
+if(bit)bit = parseFloat(bit);
+if(i === 0)return Math.round((bit %= 360) < 0?bit + 360:bit);else 
+if(i < 3)return limit(Math.round(bit),0,100);else 
+return limit(bit === ''?1:Number(bit),0,1);});
+
+
+var a=hsb[3];
+var br=Math.round(hsb[2] / 100 * 255);
+if(hsb[1] == 0)return [br,br,br,a];
+
+var hue=hsb[0];
+var f=hue % 60;
+var p=Math.round(hsb[2] * (100 - hsb[1]) / 10000 * 255);
+var q=Math.round(hsb[2] * (6000 - hsb[1] * f) / 600000 * 255);
+var t=Math.round(hsb[2] * (6000 - hsb[1] * (60 - f)) / 600000 * 255);
+
+switch(Math.floor(hue / 60)){
+case 0:return [br,t,p,a];
+case 1:return [q,br,p,a];
+case 2:return [p,br,t,a];
+case 3:return [p,q,br,a];
+case 4:return [t,p,br,a];
+default:return [br,p,q,a];}};
+
+
+
+Color.parseHSL = function(color){
+var hsb=map(color.match(listMatch).slice(1),function(bit,i){
+if(bit)bit = parseFloat(bit);
+if(i === 0)return Math.round((bit %= 360) < 0?bit + 360:bit);else 
+if(i < 3)return limit(Math.round(bit),0,100);else 
+return limit(bit === ''?1:Number(bit),0,1);});
+
+
+var h=hsb[0] / 60;
+var s=hsb[1] / 100;
+var l=hsb[2] / 100;
+var a=hsb[3];
+
+var c=(1 - Math.abs(2 * l - 1)) * s;
+var x=c * (1 - Math.abs(h % 2 - 1));
+var m=l - c / 2;
+
+var p=Math.round((c + m) * 255);
+var q=Math.round((x + m) * 255);
+var t=Math.round(m * 255);
+
+switch(Math.floor(h)){
+case 0:return [p,q,t,a];
+case 1:return [q,p,t,a];
+case 2:return [t,p,q,a];
+case 3:return [t,q,p,a];
+case 4:return [q,t,p,a];
+default:return [p,t,q,a];}};
+
+
+
+var toString=function(type,array){
+if(array[3] != 1)type += 'a';else 
+array.pop();
+return type + '(' + array.join(', ') + ')';};
+
+
+Color.prototype = {
+
+toHSB:function(array){
+var red=this.red,green=this.green,blue=this.blue,alpha=this.alpha;
+
+var max=Math.max(red,green,blue),min=Math.min(red,green,blue),delta=max - min;
+var hue=0,saturation=delta != 0?delta / max:0,brightness=max / 255;
+if(saturation){
+var rr=(max - red) / delta,gr=(max - green) / delta,br=(max - blue) / delta;
+hue = red == max?br - gr:green == max?2 + rr - br:4 + gr - rr;
+if((hue /= 6) < 0)hue++;}
+
+
+var hsb=[Math.round(hue * 360),Math.round(saturation * 100),Math.round(brightness * 100),alpha];
+
+return array?hsb:toString('hsb',hsb);},
+
+
+toHSL:function(array){
+var red=this.red,green=this.green,blue=this.blue,alpha=this.alpha;
+
+var max=Math.max(red,green,blue),min=Math.min(red,green,blue),delta=max - min;
+var hue=0,saturation=delta != 0?delta / (255 - Math.abs(max + min - 255)):0,lightness=(max + min) / 512;
+if(saturation){
+var rr=(max - red) / delta,gr=(max - green) / delta,br=(max - blue) / delta;
+hue = red == max?br - gr:green == max?2 + rr - br:4 + gr - rr;
+if((hue /= 6) < 0)hue++;}
+
+
+var hsl=[Math.round(hue * 360),Math.round(saturation * 100),Math.round(lightness * 100),alpha];
+
+return array?hsl:toString('hsl',hsl);},
+
+
+toHEX:function(array){
+
+var a=this.alpha;
+var alpha=(a = Math.round(a * 255).toString(16)).length == 1?a + a:a;
+
+var hex=map([this.red,this.green,this.blue],function(bit){
+bit = bit.toString(16);
+return bit.length == 1?'0' + bit:bit;});
+
+
+return array?hex.concat(alpha):'#' + hex.join('') + (alpha == 'ff'?'':alpha);},
+
+
+toRGB:function(array){
+var rgb=[this.red,this.green,this.blue,this.alpha];
+return array?rgb:toString('rgb',rgb);}};
+
+
+
+
+Color.prototype.toString = Color.prototype.toRGB;
+
+Color.hex = function(hex){
+return new Color(hex,'hex');};
+
+
+if(this.hex == null)this.hex = Color.hex;
+
+Color.hsb = function(h,s,b,a){
+return new Color([h || 0,s || 0,b || 0,a == null?1:a],'hsb');};
+
+
+if(this.hsb == null)this.hsb = Color.hsb;
+
+Color.hsl = function(h,s,l,a){
+return new Color([h || 0,s || 0,l || 0,a == null?1:a],'hsl');};
+
+
+if(this.hsl == null)this.hsl = Color.hsl;
+
+Color.rgb = function(r,g,b,a){
+return new Color([r || 0,g || 0,b || 0,a == null?1:a],'rgb');};
+
+
+if(this.rgb == null)this.rgb = Color.rgb;
+
+Color.detach = function(color){
+color = new Color(color);
+return [Color.rgb(color.red,color.green,color.blue).toString(),color.alpha];};
+
+
+module.exports = Color;
+});
+__d('ARTSerializablePath',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+var Class=require('art/core/class.js');
+var Path=require('art/core/path.js');
+
+var MOVE_TO=0;
+var CLOSE=1;
+var LINE_TO=2;
+var CURVE_TO=3;
+var ARC=4;
+
+var SerializablePath=Class(Path,{
+
+initialize:function(path){
+this.reset();
+if(path instanceof SerializablePath){
+this.path = path.path.slice(0);}else 
+if(path){
+if(path.applyToPath){
+path.applyToPath(this);}else 
+{
+this.push(path);}}},
+
+
+
+
+onReset:function(){
+this.path = [];},
+
+
+onMove:function(sx,sy,x,y){
+this.path.push(MOVE_TO,x,y);},
+
+
+onLine:function(sx,sy,x,y){
+this.path.push(LINE_TO,x,y);},
+
+
+onBezierCurve:function(sx,sy,p1x,p1y,p2x,p2y,x,y){
+this.path.push(CURVE_TO,p1x,p1y,p2x,p2y,x,y);},
+
+
+_arcToBezier:Path.prototype.onArc,
+
+onArc:function(sx,sy,ex,ey,cx,cy,rx,ry,sa,ea,ccw,rotation){
+if(rx !== ry || rotation){
+return this._arcToBezier(
+sx,sy,ex,ey,cx,cy,rx,ry,sa,ea,ccw,rotation);}
+
+
+this.path.push(ARC,cx,cy,rx,sa,ea,ccw?0:1);},
+
+
+onClose:function(){
+this.path.push(CLOSE);},
+
+
+toJSON:function(){
+return this.path;}});
+
+
+
+
+module.exports = SerializablePath;
+});
+__d('art/core/class.js',function(global, require, module, exports) {  module.exports = function(mixins){
+var proto={};
+for(var i=0,l=arguments.length;i < l;i++) {
+var mixin=arguments[i];
+if(typeof mixin == 'function')mixin = mixin.prototype;
+for(var key in mixin) proto[key] = mixin[key];}
+
+if(!proto.initialize)proto.initialize = function(){};
+proto.constructor = function(a,b,c,d,e,f,g,h){
+return new proto.initialize(a,b,c,d,e,f,g,h);};
+
+proto.constructor.prototype = proto.initialize.prototype = proto;
+return proto.constructor;};
+});
+__d('art/core/path.js',function(global, require, module, exports) {  var Class=require('art/core/class.js');
+
+module.exports = Class({
+
+initialize:function(path){
+this.reset().push(path);},
+
+
+
+
+push:function(){
+var p=Array.prototype.join.call(arguments,' ').
+match(/[a-df-z]|[\-+]?(?:[\d\.]e[\-+]?|[^\s\-+,a-z])+/ig);
+if(!p)return this;
+
+var last,cmd=p[0],i=1;
+while(cmd) {
+switch(cmd){
+case 'm':this.move(p[i++],p[i++]);break;
+case 'l':this.line(p[i++],p[i++]);break;
+case 'c':this.curve(p[i++],p[i++],p[i++],p[i++],p[i++],p[i++]);break;
+case 's':this.curve(p[i++],p[i++],null,null,p[i++],p[i++]);break;
+case 'q':this.curve(p[i++],p[i++],p[i++],p[i++]);break;
+case 't':this.curve(p[i++],p[i++]);break;
+case 'a':this.arc(p[i + 5],p[i + 6],p[i],p[i + 1],p[i + 3],! +p[i + 4],p[i + 2]);i += 7;break;
+case 'h':this.line(p[i++],0);break;
+case 'v':this.line(0,p[i++]);break;
+
+case 'M':this.moveTo(p[i++],p[i++]);break;
+case 'L':this.lineTo(p[i++],p[i++]);break;
+case 'C':this.curveTo(p[i++],p[i++],p[i++],p[i++],p[i++],p[i++]);break;
+case 'S':this.curveTo(p[i++],p[i++],null,null,p[i++],p[i++]);break;
+case 'Q':this.curveTo(p[i++],p[i++],p[i++],p[i++]);break;
+case 'T':this.curveTo(p[i++],p[i++]);break;
+case 'A':this.arcTo(p[i + 5],p[i + 6],p[i],p[i + 1],p[i + 3],! +p[i + 4],p[i + 2]);i += 7;break;
+case 'H':this.lineTo(p[i++],this.penY);break;
+case 'V':this.lineTo(this.penX,p[i++]);break;
+
+case 'Z':case 'z':this.close();break;
+default:cmd = last;i--;continue;}
+
+
+last = cmd;
+if(last == 'm')last = 'l';else 
+if(last == 'M')last = 'L';
+cmd = p[i++];}
+
+return this;},
+
+
+
+
+reset:function(){
+this.penX = this.penY = 0;
+this.penDownX = this.penDownY = null;
+this._pivotX = this._pivotY = 0;
+this.onReset();
+return this;},
+
+
+move:function(x,y){
+this.onMove(this.penX,this.penY,this._pivotX = this.penX += +x,this._pivotY = this.penY += +y);
+return this;},
+
+moveTo:function(x,y){
+this.onMove(this.penX,this.penY,this._pivotX = this.penX = +x,this._pivotY = this.penY = +y);
+return this;},
+
+
+line:function(x,y){
+return this.lineTo(this.penX + +x,this.penY + +y);},
+
+lineTo:function(x,y){
+if(this.penDownX == null){this.penDownX = this.penX;this.penDownY = this.penY;}
+this.onLine(this.penX,this.penY,this._pivotX = this.penX = +x,this._pivotY = this.penY = +y);
+return this;},
+
+
+curve:function(c1x,c1y,c2x,c2y,ex,ey){
+var x=this.penX,y=this.penY;
+return this.curveTo(
+x + +c1x,y + +c1y,
+c2x == null?null:x + +c2x,
+c2y == null?null:y + +c2y,
+ex == null?null:x + +ex,
+ey == null?null:y + +ey);},
+
+
+curveTo:function(c1x,c1y,c2x,c2y,ex,ey){
+var x=this.penX,y=this.penY;
+if(c2x == null){
+c2x = +c1x;c2y = +c1y;
+c1x = x * 2 - (this._pivotX || 0);c1y = y * 2 - (this._pivotY || 0);}
+
+if(ex == null){
+this._pivotX = +c1x;this._pivotY = +c1y;
+ex = +c2x;ey = +c2y;
+c2x = (ex + +c1x * 2) / 3;c2y = (ey + +c1y * 2) / 3;
+c1x = (x + +c1x * 2) / 3;c1y = (y + +c1y * 2) / 3;}else 
+{
+this._pivotX = +c2x;this._pivotY = +c2y;}
+
+if(this.penDownX == null){this.penDownX = x;this.penDownY = y;}
+this.onBezierCurve(x,y,+c1x,+c1y,+c2x,+c2y,this.penX = +ex,this.penY = +ey);
+return this;},
+
+
+arc:function(x,y,rx,ry,outer,counterClockwise,rotation){
+return this.arcTo(this.penX + +x,this.penY + +y,rx,ry,outer,counterClockwise,rotation);},
+
+arcTo:function(x,y,rx,ry,outer,counterClockwise,rotation){
+ry = Math.abs(+ry || +rx || +y - this.penY);
+rx = Math.abs(+rx || +x - this.penX);
+
+if(!rx || !ry || x == this.penX && y == this.penY)return this.lineTo(x,y);
+
+var tX=this.penX,tY=this.penY,clockwise=! +counterClockwise,large=!! +outer;
+
+var rad=rotation?rotation * Math.PI / 180:0,cos=Math.cos(rad),sin=Math.sin(rad);
+x -= tX;y -= tY;
+
+
+var cx=cos * x / 2 + sin * y / 2,
+cy=-sin * x / 2 + cos * y / 2,
+rxry=rx * rx * ry * ry,
+rycx=ry * ry * cx * cx,
+rxcy=rx * rx * cy * cy,
+a=rxry - rxcy - rycx;
+
+if(a < 0){
+a = Math.sqrt(1 - a / rxry);
+rx *= a;ry *= a;
+cx = x / 2;cy = y / 2;}else 
+{
+a = Math.sqrt(a / (rxcy + rycx));
+if(large == clockwise)a = -a;
+var cxd=-a * cy * rx / ry,
+cyd=a * cx * ry / rx;
+cx = cos * cxd - sin * cyd + x / 2;
+cy = sin * cxd + cos * cyd + y / 2;}
+
+
+
+var xx=cos / rx,yx=sin / rx,
+xy=-sin / ry,yy=cos / ry;
+
+
+var sa=Math.atan2(xy * -cx + yy * -cy,xx * -cx + yx * -cy),
+ea=Math.atan2(xy * (x - cx) + yy * (y - cy),xx * (x - cx) + yx * (y - cy));
+
+cx += tX;cy += tY;
+x += tX;y += tY;
+
+
+if(this.penDownX == null){this.penDownX = this.penX;this.penDownY = this.penY;}
+this.onArc(
+tX,tY,this._pivotX = this.penX = x,this._pivotY = this.penY = y,
+cx,cy,rx,ry,sa,ea,!clockwise,rotation);
+
+return this;},
+
+
+counterArc:function(x,y,rx,ry,outer){
+return this.arc(x,y,rx,ry,outer,true);},
+
+counterArcTo:function(x,y,rx,ry,outer){
+return this.arcTo(x,y,rx,ry,outer,true);},
+
+
+close:function(){
+if(this.penDownX != null){
+this.onClose(this.penX,this.penY,this.penX = this.penDownX,this.penY = this.penDownY);
+this.penDownX = null;}
+
+return this;},
+
+
+
+
+onReset:function(){},
+
+
+onMove:function(sx,sy,ex,ey){},
+
+
+onLine:function(sx,sy,ex,ey){
+this.onBezierCurve(sx,sy,sx,sy,ex,ey,ex,ey);},
+
+
+onBezierCurve:function(sx,sy,c1x,c1y,c2x,c2y,ex,ey){
+var gx=ex - sx,gy=ey - sy,
+g=gx * gx + gy * gy,
+v1,v2,cx,cy,u;
+
+cx = c1x - sx;cy = c1y - sy;
+u = cx * gx + cy * gy;
+
+if(u > g){
+cx -= gx;
+cy -= gy;}else 
+if(u > 0 && g != 0){
+cx -= u / g * gx;
+cy -= u / g * gy;}
+
+
+v1 = cx * cx + cy * cy;
+
+cx = c2x - sx;cy = c2y - sy;
+u = cx * gx + cy * gy;
+
+if(u > g){
+cx -= gx;
+cy -= gy;}else 
+if(u > 0 && g != 0){
+cx -= u / g * gx;
+cy -= u / g * gy;}
+
+
+v2 = cx * cx + cy * cy;
+
+if(v1 < 0.01 && v2 < 0.01){
+this.onLine(sx,sy,ex,ey);
+return;}
+
+
+
+if(isNaN(v1) || isNaN(v2)){
+throw new Error('Bad input');}
+
+
+
+var s1x=(c1x + c2x) * 0.5,s1y=(c1y + c2y) * 0.5,
+l1x=(c1x + sx) * 0.5,l1y=(c1y + sy) * 0.5,
+l2x=(l1x + s1x) * 0.5,l2y=(l1y + s1y) * 0.5,
+r2x=(ex + c2x) * 0.5,r2y=(ey + c2y) * 0.5,
+r1x=(r2x + s1x) * 0.5,r1y=(r2y + s1y) * 0.5,
+l2r1x=(l2x + r1x) * 0.5,l2r1y=(l2y + r1y) * 0.5;
+
+
+this.onBezierCurve(sx,sy,l1x,l1y,l2x,l2y,l2r1x,l2r1y);
+this.onBezierCurve(l2r1x,l2r1y,r1x,r1y,r2x,r2y,ex,ey);},
+
+
+onArc:function(sx,sy,ex,ey,cx,cy,rx,ry,sa,ea,ccw,rotation){
+
+var rad=rotation?rotation * Math.PI / 180:0,cos=Math.cos(rad),sin=Math.sin(rad),
+xx=cos * rx,yx=-sin * ry,
+xy=sin * rx,yy=cos * ry;
+
+
+var arc=ea - sa;
+if(arc < 0 && !ccw)arc += Math.PI * 2;else 
+if(arc > 0 && ccw)arc -= Math.PI * 2;
+
+var n=Math.ceil(Math.abs(arc / (Math.PI / 2))),
+step=arc / n,
+k=4 / 3 * Math.tan(step / 4);
+
+var x=Math.cos(sa),y=Math.sin(sa);
+
+for(var i=0;i < n;i++) {
+var cp1x=x - k * y,cp1y=y + k * x;
+
+sa += step;
+x = Math.cos(sa);y = Math.sin(sa);
+
+var cp2x=x + k * y,cp2y=y - k * x;
+
+this.onBezierCurve(
+sx,sy,
+cx + xx * cp1x + yx * cp1y,cy + xy * cp1x + yy * cp1y,
+cx + xx * cp2x + yx * cp2y,cy + xy * cp2x + yy * cp2y,
+sx = cx + xx * x + yx * y,sy = cy + xy * x + yy * y);}},
+
+
+
+
+onClose:function(sx,sy,ex,ey){
+this.onLine(sx,sy,ex,ey);}});
+});
+__d('art/core/transform.js',function(global, require, module, exports) {  var Class=require('art/core/class.js');
+
+function Transform(xx,yx,xy,yy,x,y){
+if(xx && typeof xx == 'object'){
+yx = xx.yx;yy = xx.yy;y = xx.y;
+xy = xx.xy;x = xx.x;xx = xx.xx;}
+
+this.xx = xx == null?1:xx;
+this.yx = yx || 0;
+this.xy = xy || 0;
+this.yy = yy == null?1:yy;
+this.x = (x == null?this.x:x) || 0;
+this.y = (y == null?this.y:y) || 0;
+this._transform();
+return this;}
+;
+
+module.exports = Class({
+
+initialize:Transform,
+
+_transform:function(){},
+
+xx:1,yx:0,x:0,
+xy:0,yy:1,y:0,
+
+transform:function(xx,yx,xy,yy,x,y){
+var m=this;
+if(xx && typeof xx == 'object'){
+yx = xx.yx;yy = xx.yy;y = xx.y;
+xy = xx.xy;x = xx.x;xx = xx.xx;}
+
+if(!x)x = 0;
+if(!y)y = 0;
+return this.transformTo(
+m.xx * xx + m.xy * yx,
+m.yx * xx + m.yy * yx,
+m.xx * xy + m.xy * yy,
+m.yx * xy + m.yy * yy,
+m.xx * x + m.xy * y + m.x,
+m.yx * x + m.yy * y + m.y);},
+
+
+
+transformTo:Transform,
+
+translate:function(x,y){
+return this.transform(1,0,0,1,x,y);},
+
+
+move:function(x,y){
+this.x += x || 0;
+this.y += y || 0;
+this._transform();
+return this;},
+
+
+scale:function(x,y){
+if(y == null)y = x;
+return this.transform(x,0,0,y,0,0);},
+
+
+rotate:function(deg,x,y){
+if(x == null || y == null){
+x = (this.left || 0) + (this.width || 0) / 2;
+y = (this.top || 0) + (this.height || 0) / 2;}
+
+
+var rad=deg * Math.PI / 180,sin=Math.sin(rad),cos=Math.cos(rad);
+
+this.transform(1,0,0,1,x,y);
+var m=this;
+
+return this.transformTo(
+cos * m.xx - sin * m.yx,
+sin * m.xx + cos * m.yx,
+cos * m.xy - sin * m.yy,
+sin * m.xy + cos * m.yy,
+m.x,
+m.y).
+transform(1,0,0,1,-x,-y);},
+
+
+moveTo:function(x,y){
+var m=this;
+return this.transformTo(m.xx,m.yx,m.xy,m.yy,x,y);},
+
+
+rotateTo:function(deg,x,y){
+var m=this;
+var flip=m.yx / m.xx > m.yy / m.xy?-1:1;
+if(m.xx < 0?m.xy >= 0:m.xy < 0)flip = -flip;
+return this.rotate(deg - Math.atan2(flip * m.yx,flip * m.xx) * 180 / Math.PI,x,y);},
+
+
+scaleTo:function(x,y){
+
+var m=this;
+
+var h=Math.sqrt(m.xx * m.xx + m.yx * m.yx);
+m.xx /= h;m.yx /= h;
+
+h = Math.sqrt(m.yy * m.yy + m.xy * m.xy);
+m.yy /= h;m.xy /= h;
+
+return this.scale(x,y);},
+
+
+resizeTo:function(width,height){
+var w=this.width,h=this.height;
+if(!w || !h)return this;
+return this.scaleTo(width / w,height / h);},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inversePoint:function(x,y){
+var a=this.xx,b=this.yx,
+c=this.xy,d=this.yy,
+e=this.x,f=this.y;
+var det=b * c - a * d;
+if(det == 0)return null;
+return {
+x:(d * (e - x) + c * (y - f)) / det,
+y:(a * (f - y) + b * (x - e)) / det};},
+
+
+
+point:function(x,y){
+var m=this;
+return {
+x:m.xx * x + m.xy * y + m.x,
+y:m.yx * x + m.yy * y + m.y};}});
+});
 __d('DatePickerIOS',function(global, require, module, exports) {  'use strict';
 
 
@@ -25143,7 +26696,7 @@ var PixelRatio=require('PixelRatio');
 var Platform=require('Platform');
 var SourceCode=require('NativeModules').SourceCode;
 
-var _serverURL;
+var _serverURL,_offlinePath;
 
 function getDevServerURL(){
 if(_serverURL === undefined){
@@ -25161,6 +26714,20 @@ _serverURL = null;}}
 return _serverURL;}
 
 
+function getOfflinePath(){
+if(_offlinePath === undefined){
+var scriptURL=SourceCode.scriptURL;
+var match=scriptURL && scriptURL.match(/^file:\/\/(\/.*\/)/);
+if(match){
+_offlinePath = match[1];}else 
+{
+_offlinePath = '';}}
+
+
+
+return _offlinePath;}
+
+
 
 
 
@@ -25176,7 +26743,7 @@ replace(/([^a-z0-9_])/g,'').
 replace(/^assets_/,'');}else 
 {
 
-return getScaledAssetPath(asset);}}
+return getOfflinePath() + getScaledAssetPath(asset);}}
 
 
 
@@ -25736,6 +27303,7 @@ _this._measureAndUpdateScrollProps();});},
 
 componentWillReceiveProps:function(nextProps){
 if(this.props.dataSource !== nextProps.dataSource){
+this._sentEndForContentLength = null;
 this.setState(function(state,props){
 var rowsToRender=Math.min(
 state.curRenderedRowsCount + props.pageSize,
@@ -25959,9 +27527,11 @@ prevRenderedRowsCount:state.curRenderedRowsCount};});});},
 
 
 _getDistanceFromEnd:function(scrollProperties){
-return scrollProperties.contentLength - 
-scrollProperties.visibleLength - 
-scrollProperties.offset;},
+var maxLength=Math.max(
+scrollProperties.contentLength,
+scrollProperties.visibleLength);
+
+return maxLength - scrollProperties.visibleLength - scrollProperties.offset;},
 
 
 _updateVisibleRows:function(updatedFrames){var _this4=this;
@@ -26047,6 +27617,12 @@ isVertical?'y':'x'];
 this._updateVisibleRows(e.nativeEvent.updatedChildFrames);
 if(!this._maybeCallOnEndReached(e)){
 this._renderMoreRowsIfNeeded();}
+
+
+if(this.props.onEndReached && 
+this._getDistanceFromEnd(this.scrollProperties) > this.props.onEndReachedThreshold){
+
+this._sentEndForContentLength = null;}
 
 
 this.props.onScroll && this.props.onScroll(e);}});
@@ -27818,6 +29394,13 @@ showsUserLocation:React.PropTypes.bool,
 
 
 
+
+showsPointsOfInterest:React.PropTypes.bool,
+
+
+
+
+
 zoomEnabled:React.PropTypes.bool,
 
 
@@ -28079,7 +29662,12 @@ this.props.children)));}}]);return Modal;})(React.Component);
 Modal.propTypes = {
 animated:PropTypes.bool,
 transparent:PropTypes.bool,
+visible:PropTypes.bool,
 onDismiss:PropTypes.func};
+
+
+Modal.defaultProps = {
+visible:true};
 
 
 var styles=StyleSheet.create({
@@ -28370,6 +29958,8 @@ sceneStyle:styles.defaultSceneStyle};},
 
 
 getInitialState:function(){var _this=this;
+this._navigationBarNavigator = this.props.navigationBarNavigator || this;
+
 this._renderedSceneMap = new Map();
 
 var routeStack=this.props.initialRouteStack || [this.props.initialRoute];
@@ -28441,8 +30031,9 @@ this._emitDidFocus(this.state.routeStack[this.state.presentedIndex]);},
 componentWillUnmount:function(){
 if(this._navigationContext){
 this._navigationContext.dispose();
-this._navigationContext = null;}},
+this._navigationContext = null;}
 
+this.spring.removeAllListeners();},
 
 
 
@@ -29170,7 +30761,7 @@ return null;}
 
 return React.cloneElement(this.props.navigationBar,{
 ref:function(navBar){_this11._navBar = navBar;},
-navigator:this,
+navigator:this._navigationBarNavigator,
 navState:this.state});},
 
 
@@ -29298,6 +30889,8 @@ var NavigationEvent=require('NavigationEvent');
 var NavigationEventEmitter=require('NavigationEventEmitter');
 var NavigationTreeNode=require('NavigationTreeNode');
 
+var Set=require('Set');
+
 var emptyFunction=require('emptyFunction');
 var invariant=require('invariant');var 
 
@@ -29307,7 +30900,14 @@ var invariant=require('invariant');var
 AT_TARGET=
 
 
-NavigationEvent.AT_TARGET;var BUBBLING_PHASE=NavigationEvent.BUBBLING_PHASE;var CAPTURING_PHASE=NavigationEvent.CAPTURING_PHASE;var 
+NavigationEvent.AT_TARGET;var BUBBLING_PHASE=NavigationEvent.BUBBLING_PHASE;var CAPTURING_PHASE=NavigationEvent.CAPTURING_PHASE;
+
+
+
+var LegacyEventTypes=new Set([
+'willfocus',
+'didfocus']);var 
+
 
 
 
@@ -29331,8 +30931,19 @@ this.__node = new NavigationTreeNode(this);
 this._emitCounter = 0;
 this._emitQueue = [];
 
-this.addListener('willfocus',this._onFocus,this);
-this.addListener('didfocus',this._onFocus,this);}_createClass(NavigationContext,[{key:'appendChild',value:
+this.addListener('willfocus',this._onFocus);
+this.addListener('didfocus',this._onFocus);}_createClass(NavigationContext,[{key:'appendChild',value:
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -29353,14 +30964,18 @@ this.__node.appendChild(childContext.__node);}},{key:'addListener',value:
 function addListener(
 eventType,
 listener,
-context,
 useCapture)
 {
+if(LegacyEventTypes.has(eventType)){
+useCapture = false;}
+
+
 var emitter=useCapture?
 this._captureEventEmitter:
 this._bubbleEventEmitter;
+
 if(emitter){
-return emitter.addListener(eventType,listener,context);}else 
+return emitter.addListener(eventType,listener,this);}else 
 {
 return {remove:emptyFunction};}}},{key:'emit',value:
 
@@ -29377,6 +30992,20 @@ return;}
 
 this._emitCounter++;
 
+if(LegacyEventTypes.has(eventType)){
+
+this.__emit(
+eventType,
+data,
+null,
+{
+defaultPrevented:false,
+eventPhase:AT_TARGET,
+propagationStopped:true,
+target:this});}else 
+
+
+{
 var targets=[this];
 var parentTarget=this.parent;
 while(parentTarget) {
@@ -29419,7 +31048,8 @@ propagationStopped:propagationStopped,
 target:_this};
 
 currentTarget.__emit(eventType,data,callback,extraInfo);},
-this);
+this);}
+
 
 if(didEmitCallback){
 var event=NavigationEvent.pool(eventType,this,data);
@@ -29457,9 +31087,15 @@ switch(extraInfo.eventPhase){
 case CAPTURING_PHASE:
 emitter = this._captureEventEmitter;
 break;
+
+case AT_TARGET:
+emitter = this._bubbleEventEmitter;
+break;
+
 case BUBBLING_PHASE:
 emitter = this._bubbleEventEmitter;
 break;
+
 default:
 invariant(false,'invalid event phase %s',extraInfo.eventPhase);}
 
@@ -29482,9 +31118,11 @@ extraInfo);}}},{key:'_onFocus',value:
 function _onFocus(event){
 invariant(
 event.data && event.data.hasOwnProperty('route'),
-'didfocus event should provide route');
+'event type "%s" should provide route',
+event.type);
 
-this._currentRoute = event.data.route;}},{key:'parent',get:function(){var parent=this.__node.getParent();return parent?parent.getValue():null;}},{key:'currentRoute',get:function(){return this._currentRoute;}}]);return NavigationContext;})();
+
+this._currentRoute = event.data.route;}},{key:'parent',get:function(){var parent=this.__node.getParent();return parent?parent.getValue():null;}},{key:'top',get:function(){var result=null;var parentNode=this.__node.getParent();while(parentNode) {result = parentNode.getValue();parentNode = parentNode.getParent();}return result;}},{key:'currentRoute',get:function(){return this._currentRoute;}}]);return NavigationContext;})();
 
 
 
@@ -39836,7 +41474,7 @@ SegmentedControlIOS);
 
 module.exports = SegmentedControlIOS;
 });
-__d('SliderIOS',function(global, require, module, exports) {  'use strict';
+__d('SliderIOS',function(global, require, module, exports) {  'use strict';var _extends=Object.assign || function(target){for(var i=1;i < arguments.length;i++) {var source=arguments[i];for(var key in source) {if(Object.prototype.hasOwnProperty.call(source,key)){target[key] = source[key];}}}return target;};function _objectWithoutProperties(obj,keys){var target={};for(var i in obj) {if(keys.indexOf(i) >= 0)continue;if(!Object.prototype.hasOwnProperty.call(obj,i))continue;target[i] = obj[i];}return target;}
 
 
 
@@ -39882,6 +41520,13 @@ value:PropTypes.number,
 
 
 
+
+
+step:PropTypes.number,
+
+
+
+
 minimumValue:PropTypes.number,
 
 
@@ -39904,6 +41549,12 @@ maximumTrackTintColor:PropTypes.string,
 
 
 
+
+disabled:PropTypes.bool,
+
+
+
+
 onValueChange:PropTypes.func,
 
 
@@ -39913,27 +41564,33 @@ onValueChange:PropTypes.func,
 onSlidingComplete:PropTypes.func},
 
 
-_onValueChange:function(event){
-this.props.onChange && this.props.onChange(event);
-if(event.nativeEvent.continuous){
-this.props.onValueChange && 
-this.props.onValueChange(event.nativeEvent.value);}else 
-{
-this.props.onSlidingComplete && event.nativeEvent.value !== undefined && 
-this.props.onSlidingComplete(event.nativeEvent.value);}},
+getDefaultProps:function(){
+return {
+disabled:false};},
 
 
 
-render:function(){
+render:function(){var _this=this;
+
+var onValueChange=this.props.onValueChange && function(event){
+_this.props.onValueChange && 
+_this.props.onValueChange(event.nativeEvent.value);};
+
+
+var onSlidingComplete=this.props.onSlidingComplete && function(event){
+_this.props.onSlidingComplete && 
+_this.props.onSlidingComplete(event.nativeEvent.value);};var _props=
+
+
+this.props;var style=_props.style;var props=_objectWithoutProperties(_props,['style']);
+style = [styles.slider,this.props.style];
+
 return (
-React.createElement(RCTSlider,{
-style:[styles.slider,this.props.style],
-value:this.props.value,
-maximumValue:this.props.maximumValue,
-minimumValue:this.props.minimumValue,
-minimumTrackTintColor:this.props.minimumTrackTintColor,
-maximumTrackTintColor:this.props.maximumTrackTintColor,
-onChange:this._onValueChange}));}});
+React.createElement(RCTSlider,_extends({},
+props,{
+style:style,
+onValueChange:onValueChange,
+onSlidingComplete:onSlidingComplete})));}});
 
 
 
@@ -39945,9 +41602,7 @@ height:40}});
 
 
 
-var RCTSlider=requireNativeComponent('RCTSlider',SliderIOS,{
-nativeOnly:{onChange:true}});
-
+var RCTSlider=requireNativeComponent('RCTSlider',SliderIOS);
 
 module.exports = SliderIOS;
 });
@@ -41664,7 +43319,16 @@ var RCTTextField=requireNativeComponent('RCTTextField',null);}
 
 
 
+
+
+
+
 var TextInput=React.createClass({displayName:'TextInput',
+statics:{
+
+State:TextInputState},
+
+
 propTypes:{
 
 
@@ -41803,6 +43467,13 @@ onSubmitEditing:PropTypes.func,
 
 
 
+
+
+
+onKeyPress:PropTypes.func,
+
+
+
 onLayout:PropTypes.func,
 
 
@@ -41862,6 +43533,12 @@ selectTextOnFocus:PropTypes.bool,
 
 
 
+
+
+blurOnSubmit:PropTypes.bool,
+
+
+
 style:Text.propTypes.style,
 
 
@@ -41872,6 +43549,12 @@ testID:PropTypes.string,
 
 
 underlineColorAndroid:PropTypes.string},
+
+
+getDefaultProps:function(){
+return {
+blurOnSubmit:true};},
+
 
 
 
@@ -42106,11 +43789,14 @@ this.props.onChange && this.props.onChange(event);
 this.props.onChangeText && this.props.onChangeText(text);
 this.setState({mostRecentEventCount:eventCount},function(){
 
+if(Platform.OS === 'android'){
+
 
 
 if(text !== _this2.props.value && typeof _this2.props.value === 'string'){
 _this2.refs.input.setNativeProps({
-text:_this2.props.value});}});},
+text:_this2.props.value});}}});},
+
 
 
 
@@ -45637,10 +47323,19 @@ checkPattern(outputRange);
 
 
 
+
+
+
 var outputRanges=outputRange[0].match(stringShapeRegex).map(function(){return [];});
 outputRange.forEach(function(value){
+
+
+
 value.match(stringShapeRegex).forEach(function(number,i){
 outputRanges[i].push(+number);});});
+
+
+
 
 
 
@@ -46190,6 +47885,12 @@ React.createElement(Text,{style:styles.errorText},
 
 
 
+
+
+
+
+
+
 var WebView=React.createClass({displayName:'WebView',
 statics:{
 JSNavigationScheme:JSNavigationScheme,
@@ -46221,7 +47922,13 @@ injectedJavaScript:PropTypes.string,
 
 
 
-scalesPageToFit:PropTypes.bool},
+scalesPageToFit:PropTypes.bool,
+
+
+
+
+
+onShouldStartLoadWithRequest:PropTypes.func},
 
 
 getInitialState:function(){
@@ -46238,7 +47945,7 @@ this.setState({viewState:WebViewState.LOADING});}},
 
 
 
-render:function(){
+render:function(){var _this=this;
 var otherView=null;
 
 if(this.state.viewState === WebViewState.LOADING){
@@ -46267,6 +47974,12 @@ this.state.viewState === WebViewState.ERROR){
 webViewStyles.push(styles.hidden);}
 
 
+var onShouldStartLoadWithRequest=this.props.onShouldStartLoadWithRequest && function(event){
+var shouldStart=_this.props.onShouldStartLoadWithRequest && 
+_this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+RCTWebViewManager.startLoadWithResult(!!shouldStart,event.nativeEvent.lockIdentifier);};
+
+
 var webView=
 React.createElement(RCTWebView,{
 ref:RCT_WEBVIEW_REF,
@@ -46282,6 +47995,7 @@ automaticallyAdjustContentInsets:this.props.automaticallyAdjustContentInsets,
 onLoadingStart:this.onLoadingStart,
 onLoadingFinish:this.onLoadingFinish,
 onLoadingError:this.onLoadingError,
+onShouldStartLoadWithRequest:onShouldStartLoadWithRequest,
 scalesPageToFit:this.props.scalesPageToFit});
 
 
@@ -46752,11 +48466,6 @@ invariant(
 rootTag,
 'Expect to have a valid rootTag, instead got ',rootTag);
 
-
-if(__DEV__ && !window.document){
-var setupDevtools=require('setupDevtools');
-setupDevtools();}
-
 React.render(
 React.createElement(AppContainer,{rootTag:rootTag},
 React.createElement(RootComponent,_extends({},
@@ -46770,11 +48479,7 @@ rootTag);}
 
 var styles=StyleSheet.create({
 appContainer:{
-position:'absolute',
-left:0,
-top:0,
-right:0,
-bottom:0}});
+flex:1}});
 
 
 
@@ -48143,11 +49848,12 @@ __d('AsyncStorage',function(global, require, module, exports) {  'use strict';
 
 
 var NativeModules=require('NativeModules');
-var RCTAsyncLocalStorage=NativeModules.AsyncLocalStorage;
+var RCTAsyncSQLiteStorage=NativeModules.AsyncSQLiteDBStorage;
 var RCTAsyncRocksDBStorage=NativeModules.AsyncRocksDBStorage;
+var RCTAsyncFileStorage=NativeModules.AsyncLocalStorage;
 
 
-var RCTAsyncStorage=RCTAsyncRocksDBStorage || RCTAsyncLocalStorage;
+var RCTAsyncStorage=RCTAsyncRocksDBStorage || RCTAsyncSQLiteStorage || RCTAsyncFileStorage;
 
 
 
@@ -48174,9 +49880,10 @@ return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiGet([key],function(errors,result){
 
 var value=result && result[0] && result[0][1]?result[0][1]:null;
-callback && callback(errors && convertError(errors[0]) || null,value);
-if(errors){
-reject(convertError(errors[0]));}else 
+var errs=convertErrors(errors);
+callback && callback(errs && errs[0],value);
+if(errs){
+reject(errs[0]);}else 
 {
 resolve(value);}});});},
 
@@ -48195,11 +49902,13 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiSet([[key,value]],function(errors){
-callback && callback(errors && convertError(errors[0]) || null);
-if(errors){
-reject(convertError(errors[0]));}else 
+var errs=convertErrors(errors);
+callback && callback(errs && errs[0]);
+if(errs){
+reject(errs[0]);}else 
 {
 resolve(null);}});});},
+
 
 
 
@@ -48213,12 +49922,12 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiRemove([key],function(errors){
-callback && callback(errors && convertError(errors[0]) || null);
-if(errors){
-reject(convertError(errors[0]));}else 
+var errs=convertErrors(errors);
+callback && callback(errs && errs[0]);
+if(errs){
+reject(errs[0]);}else 
 {
 resolve(null);}});});},
-
 
 
 
@@ -48235,9 +49944,10 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiMerge([[key,value]],function(errors){
-callback && callback(errors && convertError(errors[0]) || null);
-if(errors){
-reject(convertError(errors[0]));}else 
+var errs=convertErrors(errors);
+callback && callback(errs && errs[0]);
+if(errs){
+reject(errs[0]);}else 
 {
 resolve(null);}});});},
 
@@ -48301,9 +50011,9 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiGet(keys,function(errors,result){
-var error=errors && errors.map(function(error){return convertError(error);}) || null;
+var error=convertErrors(errors);
 callback && callback(error,result);
-if(errors){
+if(error){
 reject(error);}else 
 {
 resolve(result);}});});},
@@ -48324,9 +50034,9 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiSet(keyValuePairs,function(errors){
-var error=errors && errors.map(function(error){return convertError(error);}) || null;
+var error=convertErrors(errors);
 callback && callback(error);
-if(errors){
+if(error){
 reject(error);}else 
 {
 resolve(null);}});});},
@@ -48344,9 +50054,9 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiRemove(keys,function(errors){
-var error=errors && errors.map(function(error){return convertError(error);}) || null;
+var error=convertErrors(errors);
 callback && callback(error);
-if(errors){
+if(error){
 reject(error);}else 
 {
 resolve(null);}});});},
@@ -48367,9 +50077,9 @@ callback)
 {
 return new Promise(function(resolve,reject){
 RCTAsyncStorage.multiMerge(keyValuePairs,function(errors){
-var error=errors && errors.map(function(error){return convertError(error);}) || null;
+var error=convertErrors(errors);
 callback && callback(error);
-if(errors){
+if(error){
 reject(error);}else 
 {
 resolve(null);}});});}};
@@ -48385,6 +50095,13 @@ delete AsyncStorage.mergeItem;
 delete AsyncStorage.multiMerge;}
 
 
+function convertErrors(errs){
+if(!errs){
+return null;}
+
+return (Array.isArray(errs)?errs:[errs]).map(function(e){return convertError(e);});}
+
+
 function convertError(error){
 if(!error){
 return null;}
@@ -48395,114 +50112,6 @@ return out;}
 
 
 module.exports = AsyncStorage;
-});
-__d('setupDevtools',function(global, require, module, exports) {  'use strict';
-
-
-
-
-
-
-
-
-
-
-
-
-function setupDevtools(){
-var messageListeners=[];
-var closeListeners=[];
-var ws=new window.WebSocket('ws://localhost:8081/devtools');
-
-var FOR_BACKEND={
-resolveRNStyle:require('flattenStyle'),
-wall:{
-listen:function(fn){
-messageListeners.push(fn);},
-
-onClose:function(fn){
-closeListeners.push(fn);},
-
-send:function(data){
-ws.send(JSON.stringify(data));}}};
-
-
-
-ws.onclose = function(){
-console.warn('devtools socket closed');
-closeListeners.forEach(function(fn){return fn();});};
-
-ws.onerror = function(error){
-console.warn('devtools socket errored',error);
-closeListeners.forEach(function(fn){return fn();});};
-
-ws.onopen = function(){
-tryToConnect();};
-
-
-function tryToConnect(){
-ws.send('attach:agent');
-var _interval=setInterval(function(){return ws.send('attach:agent');},500);
-ws.onmessage = function(evt){
-if(evt.data.indexOf('eval:') === 0){
-clearInterval(_interval);
-initialize(evt.data.slice('eval:'.length));}};}
-
-
-
-
-function initialize(text){
-try{
-
-eval(text);}
-catch(e) {
-console.error('Failed to eval' + e.message);
-return;}
-
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject({
-CurrentOwner:require('ReactCurrentOwner'),
-InstanceHandles:require('ReactInstanceHandles'),
-Mount:require('ReactNativeMount'),
-Reconciler:require('ReactReconciler'),
-TextComponent:require('ReactNativeTextComponent')});
-
-ws.onmessage = handleMessage;}
-
-
-function handleMessage(evt){
-
-
-var data;
-try{
-data = JSON.parse(evt.data);}
-catch(e) {
-return console.error('failed to parse json: ' + evt.data);}
-
-
-if(data.$close || data.$error){
-closeListeners.forEach(function(fn){return fn();});
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('shutdown');
-tryToConnect();
-return;}
-
-if(data.$open){
-return;}
-
-messageListeners.forEach(function(fn){
-try{
-fn(data);}
-catch(e) {
-
-
-
-console.log(data);
-throw e;}});}}
-
-
-
-
-
-module.exports = setupDevtools;
 });
 __d('RCTRenderingPerf',function(global, require, module, exports) {  'use strict';
 
@@ -51693,6 +53302,8 @@ CameraRoll=(function(){function CameraRoll(){_classCallCheck(this,CameraRoll);}_
 
 
 
+
+
 function saveImageWithTag(tag,successCallback,errorCallback){
 invariant(
 typeof tag === 'string',
@@ -51789,6 +53400,22 @@ return RCTImagePicker.openSelectDialog(config,successCallback,cancelCallback);}}
 
 
 module.exports = ImagePickerIOS;
+});
+__d('IntentAndroid',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+module.exports = {
+openURI:function(url){
+console.error('IntentAndroid is not supported on iOS');}};
 });
 __d('LayoutAnimation',function(global, require, module, exports) {  'use strict';
 
@@ -54098,16 +55725,16 @@ React.createElement(SearchView,null)),
 React.createElement(View,{tabLabel:'ion|disc',style:styles.tabView},
 React.createElement(OrderView,null)),
 
-React.createElement(ScrollView,{tabLabel:'ion|share',style:styles.tabView},
-React.createElement(View,{style:styles.card},
-React.createElement(Text,null,'Share'))),
-
-
 React.createElement(View,{tabLabel:'ion|ios-world',style:styles.tabView},
 React.createElement(InformationView,null)),
 
 React.createElement(View,{tabLabel:'ion|navicon-round',style:styles.tabView},
 React.createElement(SettingsView,null)))));}});
+
+
+
+
+
 
 
 
@@ -54839,7 +56466,7 @@ var geolocation=require('TipApp/app/mixins/geolocation.js');
 var netinfo=Platform.OS === 'ios'?require('TipApp/app/mixins/netinfo.ios.js'):{};
 var userinfo=require('TipApp/app/mixins/userinfo.js');
 var SearchListView=require('TipApp/app/views/SearchListView.js');
-var StarRating=require('react-native-star-rating/index.js');
+var SearchItemView=require('TipApp/app/views/SearchItemView.js');
 
 var Search=React.createClass({displayName:'Search',
 mixins:[geolocation,netinfo,userinfo],
@@ -54857,9 +56484,6 @@ yelpActions.search({term:this.state.text,ll:loc});}else
 var loc="37.788022,-122.399797";
 yelpActions.search({term:this.state.text,ll:loc});}},
 
-
-onStarRatingPress:function(value){
-console.log('Rated ' + value + ' stars!');},
 
 
 render:function(){var _this=this;
@@ -54880,12 +56504,6 @@ name:'ion|ios-search',
 size:30,
 color:'#887700',
 style:[styles.button,{width:60,height:40,marginTop:10}]}))));},
-
-
-
-
-
-
 
 
 
@@ -54926,8 +56544,10 @@ if(route.id === 'list'){
 if(route.items !== null){
 return React.createElement(SearchListView,{navigator:navigator,items:route.items});}else 
 {
-return React.createElement(SearchListView,{navigator:navigator});}}},
+return React.createElement(SearchListView,{navigator:navigator});}}else 
 
+if(route.id === 'item'){
+return React.createElement(SearchItemView,{navigator:navigator,item:route.item});}},
 
 
 
@@ -79748,20 +81368,23 @@ React.Image;var ListView=React.ListView;var ScrollView=React.ScrollView;var Styl
 require('react-native-icons/index.ios.js');var Icon=_require.Icon;
 var styles=require('TipApp/app/styles.js');
 var NAV_HEIGHT=require('TipApp/app/variables.js')('NAV_HEIGHT');
-var ItemCell=require('TipApp/app/views/components/ItemCell.js');var 
+var StarRating=require('react-native-star-rating/index.js');var 
 
 SearchListView=(function(_Component){_inherits(SearchListView,_Component);
 function SearchListView(props){_classCallCheck(this,SearchListView);
 _get(Object.getPrototypeOf(SearchListView.prototype),'constructor',this).call(this,props);
 this.state = {
 dataSource:new ListView.DataSource({rowHasChanged:function(row1,row2){return row1 !== row2;}}),
-loaded:false};}_createClass(SearchListView,[{key:'render',value:
+loaded:false};
 
+this._renderScene = this._renderScene.bind(this);
+this.renderItem = this.renderItem.bind(this);
+this.onSelectionItem = this.onSelectionItem.bind(this);}_createClass(SearchListView,[{key:'render',value:
 
-function render(){
+function render(){var _this=this;
 return (
 React.createElement(Navigator,{
-renderScene:this._renderScene.bind(this),
+renderScene:function(route,navigator){return _this._renderScene(route,navigator);},
 navigator:this.props.navigator,
 navigationBar:
 React.createElement(Navigator.NavigationBar,{style:{backgroundColor:'#246dd5'},
@@ -79798,11 +81421,22 @@ style:styles.listView})));}},{key:'renderItem',value:
 
 
 
-function renderItem(item){
+function renderItem(item,sectionID,rowID){var _this2=this;
+console.log(item);
 return (
-React.createElement(View,null,
-React.createElement(Text,null,item.name),
-React.createElement(Image,{source:{uri:item.image_url},style:[stylesLocal.image,{alignItems:"center",resizeMode:'contain'}]})));}},{key:'selectionItem',value:
+React.createElement(TouchableOpacity,{onPress:function(){return _this2.onSelectionItem(rowID);}},
+React.createElement(View,{style:stylesLocal.container},
+React.createElement(Image,{
+source:{uri:item.image_url},
+style:stylesLocal.image}),
+React.createElement(View,{style:stylesLocal.rightContainer},
+React.createElement(Text,{style:stylesLocal.title},item.name),
+React.createElement(View,{style:stylesLocal.subtitle},
+React.createElement(StarRating,{
+maxStars:5,
+rating:item.rating,
+disabled:true,
+starSize:30}))))));}},{key:'onSelectionItem',value:
 
 
 
@@ -79811,8 +81445,23 @@ React.createElement(Image,{source:{uri:item.image_url},style:[stylesLocal.image,
 
 
 
-function selectionItem(item){
-console.log(item);}},{key:'componentDidMount',value:
+
+
+
+
+
+
+
+
+
+function onSelectionItem(rowID){
+
+var item=this.state.dataSource._dataBlob.s1[rowID];
+this.props.navigator.push({id:'item',item:item,name:item.name});}},{key:'onStarRatingPress',value:
+
+
+function onStarRatingPress(value){
+console.log('Rated ' + value + ' stars!');}},{key:'componentDidMount',value:
 
 function componentDidMount(){
 this.setState({
@@ -79857,9 +81506,9 @@ React.createElement(Text,{style:{color:'white',margin:10,fontSize:16}},'Search L
 
 
 var stylesLocal=StyleSheet.create({
-container:{
-backgroundColor:'#F5FCFF',
-paddingTop:16},
+
+
+
 
 loadingText:{
 fontSize:25,
@@ -79875,7 +81524,31 @@ backgroundColor:'#F6F6EF'},
 image:{
 backgroundColor:'transparent',
 width:100,
-height:100}});
+height:100},
+
+container:{
+flex:1,
+flexDirection:'row',
+justifyContent:'center',
+alignItems:'center',
+backgroundColor:'#F5FCFF',
+borderTopWidth:1},
+
+rightContainer:{
+flex:1},
+
+title:{
+fontSize:20,
+marginBottom:8,
+textAlign:'left'},
+
+subtitle:{
+textAlign:'left',
+width:150},
+
+thumbnail:{
+width:53,
+height:81}});
 
 
 
@@ -79906,6 +81579,8 @@ gray20:'#CFD2D3',
 gray10:'#EBECEC',
 gray5:'#F5F6F6',
 
+background:'#f5f5f5',
+
 blue50:'#23B4D2',
 
 
@@ -79919,60 +81594,6 @@ return _constant[key];};
 
 
 module.exports = constant;
-});
-__d('TipApp/app/views/components/ItemCell.js',function(global, require, module, exports) {  'use strict';
-
-
-
-var React=require('react-native/Libraries/react-native/react-native.js');var 
-
-Image=
-
-
-
-
-React.Image;var StyleSheet=React.StyleSheet;var Text=React.Text;var TouchableHighlight=React.TouchableHighlight;var View=React.View;var _require=
-require('react-native-icons/index.ios.js');var Icon=_require.Icon;
-
-var styles=require("TipApp/app/styles.js");
-var SCREEN_WIDTH=require("TipApp/app/variables.js")('SCREEN_WIDTH');
-
-var ItemCell=React.createClass({displayName:'ItemCell',
-getInitialState:function(){
-return {};},
-
-
-
-render:function(){
-return (
-React.createElement(View,null,
-React.createElement(TouchableHighlight,{onPress:this.props.onSelection},
-React.createElement(View,{style:[stylesLocal.item,{alignItems:"center"}]},
-React.createElement(Image,{source:{uri:this.props.item.featured_image.source},style:[stylesLocal.image,{alignItems:"center",resizeMode:'contain'}]}))),
-
-
-React.createElement(Text,{style:{marginLeft:5}},this.props.item.title),
-React.createElement(Text,{style:{marginLeft:5}},'x',this.props.item.count)));}});
-
-
-
-
-
-var stylesLocal=StyleSheet.create({
-item:{
-backgroundColor:'#CCC',
-margin:5,
-width:SCREEN_WIDTH / 2 - 20,
-height:SCREEN_WIDTH / 2 - 20},
-
-image:{
-backgroundColor:'transparent',
-width:SCREEN_WIDTH / 2 - 20,
-height:SCREEN_WIDTH / 2 - 20}});
-
-
-
-module.exports = ItemCell;
 });
 __d('react-native-star-rating/index.js',function(global, require, module, exports) {  'use strict';
 
@@ -80074,6 +81695,312 @@ star:{}});
 
 
 module.exports = StarRating;
+});
+__d('TipApp/app/views/SearchItemView.js',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();var _get=function get(object,property,receiver){if(object === null)object = Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc === undefined){var parent=Object.getPrototypeOf(object);if(parent === null){return undefined;}else {return get(parent,property,receiver);}}else if('value' in desc){return desc.value;}else {var getter=desc.get;if(getter === undefined){return undefined;}return getter.call(receiver);}};function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}function _inherits(subClass,superClass){if(typeof superClass !== 'function' && superClass !== null){throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__ = superClass;}
+
+var React=require('react-native/Libraries/react-native/react-native.js');var 
+
+Image=
+
+
+
+
+
+
+
+
+
+
+React.Image;var LinkingIOS=React.LinkingIOS;var ListView=React.ListView;var MapView=React.MapView;var ScrollView=React.ScrollView;var StyleSheet=React.StyleSheet;var Component=React.Component;var View=React.View;var Text=React.Text;var Navigator=React.Navigator;var TouchableOpacity=React.TouchableOpacity;var _require=
+
+require('react-native-icons/index.ios.js');var Icon=_require.Icon;
+var styles=require('TipApp/app/styles.js');
+var NAV_HEIGHT=require('TipApp/app/variables.js')('NAV_HEIGHT');
+var StarRating=require('react-native-star-rating/index.js');
+var lodash=require('lodash/index.js');
+var KVBox=require('TipApp/app/views/components/KVBox.js');
+var FilledButton=require('TipApp/app/views/components/FilledButton.js');
+var StarRating=require('react-native-star-rating/index.js');var 
+
+SearchItemView=(function(_Component){_inherits(SearchItemView,_Component);
+function SearchItemView(props){_classCallCheck(this,SearchItemView);
+_get(Object.getPrototypeOf(SearchItemView.prototype),'constructor',this).call(this,props);
+this.state = {
+item:'',
+loaded:false};
+
+this._renderScene = this._renderScene.bind(this);
+this.renderItemView = this.renderItemView.bind(this);}_createClass(SearchItemView,[{key:'render',value:
+
+function render(){var _this=this;
+return (
+React.createElement(Navigator,{
+renderScene:function(route,navigator){return _this._renderScene(route,navigator);},
+navigator:this.props.navigator,
+title:this.state.item.name,
+navigationBar:
+React.createElement(Navigator.NavigationBar,{style:{backgroundColor:'#246dd5'},
+routeMapper:NavigationBarRouteMapper})}));}},{key:'_renderScene',value:
+
+
+
+function _renderScene(route,navigator){
+console.log(route);
+
+if(!this.state.loaded){
+return (
+React.createElement(View,{style:[styles.container,stylesLocal.container]},
+React.createElement(Text,{style:[styles.loadingText,stylesLocal.loadingText]},'Listing Items ...')));}else 
+
+
+
+
+{
+return (
+this.renderItemView());}}},{key:'renderItemView',value:
+
+
+
+function renderItemView(){
+var navigator_placeholder=React.createElement(View,{style:{height:NAV_HEIGHT}});
+var region={
+latitude:this.state.item.location.coordinate.latitude,
+longitude:this.state.item.location.coordinate.longitude,
+latitudeDelta:0.01,
+longitudeDelta:0.01};
+
+var mapPins=[];
+if(this.state.item.location.coordinate){
+mapPins = [{
+latitude:this.state.item.location.coordinate.latitude,
+longitude:this.state.item.location.coordinate.longitude,
+title:this.state.item.name}];}
+
+
+var kvElements=[];
+lodash.each(lodash.pick(this.state.item,["name","display_phone"]),function(item,key){
+if(!key || !item)return;
+if(key === 'display_phone')key = 'contact';
+kvElements.push(
+React.createElement(KVBox,{key:key,label:key.toUpperCase(),value:item}));});
+
+
+kvElements.push(
+React.createElement(KVBox,{key:'address',label:'address'.toUpperCase(),value:this.state.item.location.display_address.join(', ')}));
+
+var linkingMaps="http://maps.apple.com/?daddr=" + this.state.item.location.coordinate.latitude + "," + this.state.item.location.coordinate.longitude;
+return (
+React.createElement(ScrollView,null,
+navigator_placeholder,
+React.createElement(Image,{
+source:{uri:this.state.item.image_url},
+style:stylesLocal.image,
+resizeMode:"contain"}),
+
+React.createElement(View,{style:stylesLocal.descContainer},
+React.createElement(Text,{style:stylesLocal.descLabel},'REMARKS:'),
+React.createElement(Text,{style:stylesLocal.descText},
+this.state.item.snippet_text)),
+
+
+
+React.createElement(View,{style:stylesLocal.stars},
+React.createElement(StarRating,{
+maxStars:5,
+rating:this.state.item.rating,
+disabled:true,
+starSize:45})),
+
+
+React.createElement(View,{style:stylesLocal.kvContainer},
+kvElements),
+
+
+React.createElement(MapView,{
+style:stylesLocal.map,
+region:region,
+annotations:mapPins}),
+
+React.createElement(FilledButton,{
+style:{marginTop:5,backgroundColor:'#0ea378'},
+highlightedColor:'#007655',
+title:"Direction",
+titleStyle:{color:'white'},
+onPress:function(){return LinkingIOS.openURL(linkingMaps);}})));}},{key:'componentDidMount',value:
+
+
+
+function componentDidMount(){
+this.setState({
+item:this.props.item,
+loaded:true});}}]);return SearchItemView;})(Component);
+
+
+
+
+var NavigationBarRouteMapper={
+LeftButton:function(route,navigator,index,nextState){
+return (
+React.createElement(TouchableOpacity,{style:{flex:1,justifyContent:'center'},
+onPress:function(){return navigator.parentNavigator.pop();}},
+React.createElement(Icon,{
+name:'ion|ios-arrow-back',
+size:40,
+color:'#887700',
+style:{width:40,height:40}})));},
+
+
+
+RightButton:function(route,navigator,index,nextState){
+return null;},
+
+Title:function(route,navigator,index,nextState){
+console.log(route);
+return (
+React.createElement(Text,{style:{color:'white',margin:10,fontSize:16}},
+"Details"));}};
+
+
+
+
+
+var stylesLocal=StyleSheet.create({
+container:{
+flex:1,
+backgroundColor:"#f5f5f5"},
+
+image:{
+backgroundColor:'transparent',
+height:200},
+
+map:{
+height:200,
+borderWidth:1,
+borderColor:'#ccc'},
+
+stars:{
+
+justifyContent:'center',
+alignItems:'center'},
+
+descContainer:{},
+
+descLabel:{
+fontSize:12,
+fontWeight:'400',
+color:"#666"},
+
+descText:{
+fontSize:14,
+fontWeight:'200',
+color:"#666",
+lineHeight:20},
+
+kvContainer:{
+paddingTop:0}});
+
+
+
+module.exports = SearchItemView;
+});
+__d('TipApp/app/views/components/KVBox.js',function(global, require, module, exports) {  'use strict';
+
+var React=require('react-native/Libraries/react-native/react-native.js');var 
+
+StyleSheet=
+
+
+React.StyleSheet;var Text=React.Text;var View=React.View;
+
+var KVBox=React.createClass({displayName:'KVBox',
+
+getDefaultProps:function(){
+return {
+label:'',
+value:''};},
+
+
+
+render:function(){
+return (
+React.createElement(View,{style:styles.container},
+React.createElement(Text,{style:styles.label},this.props.label),
+React.createElement(Text,{style:styles.value},this.props.value)));}});
+
+
+
+
+
+var styles=StyleSheet.create({
+container:{
+flexDirection:'row',
+padding:5},
+
+
+label:{
+flex:1,
+fontSize:12,
+fontWeight:'bold',
+color:"#666"},
+
+
+value:{
+flex:2,
+fontSize:14,
+fontWeight:'200',
+color:"#666"}});
+
+
+
+module.exports = KVBox;
+});
+__d('TipApp/app/views/components/FilledButton.js',function(global, require, module, exports) {  'use strict';
+
+var React=require('react-native/Libraries/react-native/react-native.js');var 
+
+StyleSheet=
+
+
+
+React.StyleSheet;var Text=React.Text;var TouchableHighlight=React.TouchableHighlight;var View=React.View;
+
+
+
+
+
+var FilledButton=React.createClass({displayName:'FilledButton',
+propTypes:{
+style:View.propTypes.style,
+titleStyle:Text.propTypes.style},
+
+render:function(){
+return (
+React.createElement(TouchableHighlight,{
+onPress:this.props.onPress,
+underlayColor:this.props.highlightedColor,
+style:[styles.buttonBack,this.props.style]},
+React.createElement(Text,{
+style:[styles.buttonText,this.props.titleStyle]},
+this.props.title)));}});
+
+
+
+
+
+
+var styles=StyleSheet.create({
+buttonText:{
+backgroundColor:'transparent',
+fontSize:16,
+textAlign:'center'},
+
+buttonBack:{
+padding:12,
+borderRadius:4}});
+
+
+
+module.exports = FilledButton;
 });
 __d('TipApp/app/views/OrderView.js',function(global, require, module, exports) {  'use strict';
 
@@ -80208,8 +82135,10 @@ function OrderListView(props){_classCallCheck(this,OrderListView);
 _get(Object.getPrototypeOf(OrderListView.prototype),'constructor',this).call(this,props);
 this.state = {
 dataSource:new ListView.DataSource({rowHasChanged:function(row1,row2){return row1 !== row2;}}),
-loaded:false};}_createClass(OrderListView,[{key:'render',value:
+loaded:false};
 
+this.renderItem = this.renderItem.bind(this);
+this.selectionItem = this.selectionItem.bind(this);}_createClass(OrderListView,[{key:'render',value:
 
 function render(){
 return (
@@ -80251,15 +82180,16 @@ style:styles.listView})));}},{key:'renderItem',value:
 
 
 
-function renderItem(item){
+function renderItem(item,sectionID,rowID){
 return (
 React.createElement(ItemCell,{
+onSelection:this.selectionItem.bind(this,item),
 item:item}));}},{key:'selectionItem',value:
 
 
-
 function selectionItem(item){
-console.log(item);}},{key:'componentDidMount',value:
+console.log(item);
+this.props.navigator.push({id:'detail',params:{item:item}});}},{key:'componentDidMount',value:
 
 function componentDidMount(){
 
@@ -80339,6 +82269,60 @@ flexWrap:'wrap'}});
 
 
 module.exports = OrderListView;
+});
+__d('TipApp/app/views/components/ItemCell.js',function(global, require, module, exports) {  'use strict';
+
+
+
+var React=require('react-native/Libraries/react-native/react-native.js');var 
+
+Image=
+
+
+
+
+React.Image;var StyleSheet=React.StyleSheet;var Text=React.Text;var TouchableHighlight=React.TouchableHighlight;var View=React.View;var _require=
+require('react-native-icons/index.ios.js');var Icon=_require.Icon;
+
+var styles=require("TipApp/app/styles.js");
+var SCREEN_WIDTH=require("TipApp/app/variables.js")('SCREEN_WIDTH');
+
+var ItemCell=React.createClass({displayName:'ItemCell',
+getInitialState:function(){
+return {};},
+
+
+
+render:function(){
+return (
+React.createElement(View,null,
+React.createElement(TouchableHighlight,{onPress:this.props.onSelection},
+React.createElement(View,{style:[stylesLocal.item,{alignItems:"center"}]},
+React.createElement(Image,{source:{uri:this.props.item.featured_image.source},style:[stylesLocal.image,{alignItems:"center",resizeMode:'contain'}]}))),
+
+
+React.createElement(Text,{style:{marginLeft:5}},this.props.item.title),
+React.createElement(Text,{style:{marginLeft:5}},'x',this.props.item.count)));}});
+
+
+
+
+
+var stylesLocal=StyleSheet.create({
+item:{
+backgroundColor:'#CCC',
+margin:5,
+width:SCREEN_WIDTH / 2 - 20,
+height:SCREEN_WIDTH / 2 - 20},
+
+image:{
+backgroundColor:'transparent',
+width:SCREEN_WIDTH / 2 - 20,
+height:SCREEN_WIDTH / 2 - 20}});
+
+
+
+module.exports = ItemCell;
 });
 __d('TipApp/app/actions/ordered_items.js',function(global, require, module, exports) {  'use strict';
 
@@ -80831,7 +82815,9 @@ require('react-native-icons/index.ios.js');var Icon=_require.Icon;
 var NAV_HEIGHT=require('TipApp/app/variables.js')('NAV_HEIGHT');
 var itemsActions=require('TipApp/app/actions/items.js');
 var itemsStores=require('TipApp/app/stores/items.js');
-var orderedItemsActions=require('TipApp/app/actions/ordered_items.js');var 
+var orderedItemsActions=require('TipApp/app/actions/ordered_items.js');
+var FilledButton=require('TipApp/app/views/components/FilledButton.js');
+var Share=require('RNShare');var 
 
 ItemDetailView=(function(_Component){_inherits(ItemDetailView,_Component);
 function ItemDetailView(props){_classCallCheck(this,ItemDetailView);
@@ -80853,23 +82839,37 @@ routeMapper:NavigationBarRouteMapper})}));}},{key:'_renderScene',value:
 
 
 
-function _renderScene(route,navigator){
+function _renderScene(route,navigator){var _this=this;
 var image_display=this.state.item && this.state.item.featured_image?
 React.createElement(Image,{source:{uri:this.state.item.featured_image.source},style:[styles.image,{overflow:'visible'}]}):null;
-var navigator_placeholder=React.createElement(View,{style:{height:NAV_HEIGHT}});
+var navigator_placeholder=React.createElement(View,{style:{height:NAV_HEIGHT + 5}});
 return (
 React.createElement(ScrollView,{contentContainerStyle:{alignItems:'center',justifyContent:'center'}},
 navigator_placeholder,
 image_display,
 React.createElement(Text,null,this.state.item.title),
 React.createElement(Text,null,this.state.item.content),
-React.createElement(Button,{
-style:{fontSize:20,color:'green'},
-styleDisabled:{color:'red'},
-onPress:this._onSubmit.bind(this)},'Confirm!')));}},{key:'_onSubmit',value:
+
+React.createElement(FilledButton,{
+style:{marginTop:5,backgroundColor:'#0ea378'},
+highlightedColor:'#007655',
+title:"Share",
+titleStyle:{color:'white'},
+onPress:function(){return _this._onShare();}})));}},{key:'_onShare',value:
 
 
 
+
+
+
+
+
+
+function _onShare(){
+Share.open({
+share_text:this.state.item.title,
+share_URL:"http://google.cl",
+title:this.state.item.title});}},{key:'_onSubmit',value:
 
 
 function _onSubmit(){
@@ -80881,7 +82881,11 @@ this.props.navigator.popToTop();}},{key:'componentDidMount',value:
 function componentDidMount(){
 
 this.unsubscribe = itemsStores.listen(this.onFoundItem.bind(this));
-itemsActions.find({itemId:this.props.params.data});}},{key:'componentWillUnmount',value:
+if(this.props.params && this.props.params.data){
+itemsActions.find({itemId:this.props.params.data});}else 
+if(this.props.params && this.props.params.item){
+this.setState({item:this.props.params.item});}}},{key:'componentWillUnmount',value:
+
 
 function componentWillUnmount(){
 this.unsubscribe();}},{key:'onFoundItem',value:
@@ -81086,6 +83090,83 @@ this.trigger(result);}});
 
 module.exports = store;
 });
+__d('RNShare',function(global, require, module, exports) {  'use strict';var _require=
+
+
+
+
+
+require('react-native/Libraries/react-native/react-native.js');var NativeModules=_require.NativeModules;
+var NativeRNShare=NativeModules.RNShare;
+var invariant=require('invariant/browser.js');
+
+
+
+
+
+var RNShare={
+test:function(){
+NativeRNShare.test();},
+
+open:function(options){
+NativeRNShare.open(options);}};
+
+
+
+module.exports = RNShare;
+});
+__d('invariant/browser.js',function(global, require, module, exports) {  'use strict';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var invariant=function(condition,format,a,b,c,d,e,f){
+if(process.env.NODE_ENV !== 'production'){
+if(format === undefined){
+throw new Error('invariant requires an error message argument');}}
+
+
+
+if(!condition){
+var error;
+if(format === undefined){
+error = new Error(
+'Minified exception occurred; use the non-minified dev environment ' + 
+'for the full error message and additional helpful warnings.');}else 
+
+{
+var args=[a,b,c,d,e,f];
+var argIndex=0;
+error = new Error(
+format.replace(/%s/g,function(){return args[argIndex++];}));
+
+error.name = 'Invariant Violation';}
+
+
+error.framesToPop = 1;
+throw error;}};
+
+
+
+module.exports = invariant;
+});
 __d('TipApp/app/views/SettingsView.js',function(global, require, module, exports) {  'use strict';
 
 
@@ -81225,9 +83306,9 @@ React.createElement(View,{style:styles.signup},
 React.createElement(Text,{style:styles.greyFont},'"Not a user?"',React.createElement(Text,{style:styles.whiteFont,onPress:this.onSignup.bind(this)},'  Sign Up'))),
 
 React.createElement(View,{style:styles.signup},
-React.createElement(Text,{style:styles.greyFont},'"Forgot password?"',React.createElement(Text,{style:styles.whiteFont,onPress:this.onResetPassword.bind(this)},'  Reset'))),
+React.createElement(Text,{style:styles.greyFont},'"Forgot password?"',React.createElement(Text,{style:styles.whiteFont,onPress:this.onResetPassword.bind(this)},'  Reset'))))));}},{key:'componentDidMount',value:
 
-React.createElement(Text,null,this.state.status))));}},{key:'componentDidMount',value:
+
 
 
 
@@ -81544,7 +83625,7 @@ title:"Conversations",
 subtitle:"Welcome to conversation!",
 actionType:null,
 nextIcon:true,
-onSelection:this._gotoConversation}]};},
+onSelection:this._createConversation}]};},
 
 
 
@@ -81553,7 +83634,7 @@ onSelection:this._gotoConversation}]};},
 
 
 
-_gotoConversation:function(){
+_createConversation:function(){
 this.props.navigator.push({id:'conversation'});},
 
 
@@ -82063,7 +84144,8 @@ StyleSheet=
 
 
 
-React.StyleSheet;var Component=React.Component;var Dimensions=React.Dimensions;var View=React.View;var Text=React.Text;var TextInput=React.TextInput;var Navigator=React.Navigator;var TouchableHighlight=React.TouchableHighlight;var TouchableOpacity=React.TouchableOpacity;
+
+React.StyleSheet;var Component=React.Component;var Dimensions=React.Dimensions;var Platform=React.Platform;var View=React.View;var Text=React.Text;var TextInput=React.TextInput;var Navigator=React.Navigator;var TouchableHighlight=React.TouchableHighlight;var TouchableOpacity=React.TouchableOpacity;
 
 var GiftedMessenger=require('react-native-gifted-messenger/GiftedMessenger.js');var _require=
 require('react-native-icons/index.ios.js');var Icon=_require.Icon;
@@ -82078,10 +84160,11 @@ return [
 handleSend:function(){var message=arguments.length <= 0 || arguments[0] === undefined?{}:arguments[0];var rowID=arguments.length <= 1 || arguments[1] === undefined?null:arguments[1];},
 
 
+
 handleReceive:function(){
 this._GiftedMessenger.appendMessage({
 text:'Received message',
-name:'Friend',
+name:'Developer',
 image:{uri:'https://facebook.github.io/react/img/logo_og.png'},
 position:'left',
 date:new Date()});},
@@ -82107,6 +84190,7 @@ initialMessages:this.getInitialMessages(),
 handleSend:this.handleSend,
 maxHeight:Dimensions.get('window').height - 64 - 30,
 
+
 styles:{
 bubbleLeft:{
 backgroundColor:'#e6e6eb',
@@ -82114,9 +84198,10 @@ marginRight:70},
 
 bubbleRight:{
 backgroundColor:'#007aff',
-marginLeft:70}}}));}});
+marginLeft:70}},
 
 
+inverted:true}));}});
 
 
 
@@ -82146,6 +84231,10 @@ React.createElement(Text,{style:{color:'white',margin:10,fontSize:16}},'Conversa
 
 
 
+var navBarHeight=Platform.OS === 'android'?56:64;
+
+
+var statusBarHeight=Platform.OS === 'android'?25:0;
 
 module.exports = ConversationView;
 });
@@ -82169,7 +84258,7 @@ __d('react-native-gifted-messenger/GiftedMessenger.js',function(global, require,
 
 'react-native-invertible-scroll-view/InvertibleScrollView.js');var _reactNativeInvertibleScrollView2=_interopRequireDefault(_reactNativeInvertibleScrollView);'use strict';var React=require('react-native/Libraries/react-native/react-native.js');var Text=React.Text;var View=React.View;var ListView=React.ListView;var TextInput=React.TextInput;var Dimensions=React.Dimensions;var Animated=React.Animated;var Image=React.Image;var TouchableHighlight=React.TouchableHighlight;var Platform=React.Platform;var moment=require('moment/moment.js');var extend=require('extend/index.js');
 var GiftedSpinner=require('react-native-gifted-spinner/GiftedSpinner.js');
-
+var ParsedText=require('react-native-parsed-text/lib/ParsedText.js');
 var Button=require('react-native-button/Button.js');
 
 var GiftedMessenger=React.createClass({displayName:'GiftedMessenger',
@@ -82404,7 +84493,7 @@ var parse=[
 {type:'email',style:[this.styles.link,rowData.position === 'left'?this.styles.linkLeft:this.styles.linkRight],onPress:this.props.handleEmailPress}];
 
 return (
-React.createElement(Text,{
+React.createElement(ParsedText,{
 style:[this.styles.text,rowData.position === 'left'?this.styles.textLeft:this.styles.textRight],
 parse:parse},
 
@@ -82580,13 +84669,19 @@ return rowID;},
 
 deleteMessage:function(){var rowID=arguments.length <= 0 || arguments[0] === undefined?null:arguments[0];
 
-var id_index=this._rowIds.indexOf(rowID);
 
-if(id_index !== -1){
+Array.prototype.remove = function(from,to){
+var rest=this.slice((to || from) + 1 || this.length);
+this.length = from < 0?this.length + from:from;
+return this.push.apply(this,rest);};
 
-this._rowIds.splice(id_index,1);
-this._data.splice(this._data.length - id_index,1);
 
+if(rowID != null){
+
+this._data.remove(rowID);
+
+
+this._rowIds.shift();
 
 this.setState({
 dataSource:this.state.dataSource.cloneWithRows(this._data,this._rowIds)});}},
@@ -86374,6 +88469,664 @@ this._getSpinner()));}});
 
 module.exports = GiftedSpinner;
 });
+__d('react-native-parsed-text/lib/ParsedText.js',function(global, require, module, exports) {  'use strict';
+
+var _extends=require('babel-runtime/helpers/extends.js')['default'];
+
+var _get=require('babel-runtime/helpers/get.js')['default'];
+
+var _inherits=require('babel-runtime/helpers/inherits.js')['default'];
+
+var _createClass=require('babel-runtime/helpers/create-class.js')['default'];
+
+var _classCallCheck=require('babel-runtime/helpers/class-call-check.js')['default'];
+
+var _objectWithoutProperties=require('babel-runtime/helpers/object-without-properties.js')['default'];
+
+var _Object$keys=require('babel-runtime/core-js/object/keys.js')['default'];
+
+var _interopRequireDefault=require('babel-runtime/helpers/interop-require-default.js')['default'];
+
+Object.defineProperty(exports,'__esModule',{
+value:true});
+
+
+var _reactNative=require('react-native/Libraries/react-native/react-native.js');
+
+var _reactNative2=_interopRequireDefault(_reactNative);
+
+var _libTextExtraction=require('react-native-parsed-text/lib/lib/TextExtraction.js');
+
+var _libTextExtraction2=_interopRequireDefault(_libTextExtraction);
+
+var PATTERNS={
+url:/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/,
+phone:/[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}/,
+email:/\S+@\S+\.\S+/};
+
+
+var defaultParseShape=_reactNative2['default'].PropTypes.shape(_extends({},_reactNative2['default'].Text.propTypes,{
+type:_reactNative2['default'].PropTypes.oneOf(_Object$keys(PATTERNS)).isRequired}));
+
+
+var customParseShape=_reactNative2['default'].PropTypes.shape(_extends({},_reactNative2['default'].Text.propTypes,{
+pattern:_reactNative2['default'].PropTypes.oneOfType([_reactNative2['default'].PropTypes.string,_reactNative2['default'].PropTypes.instanceOf(RegExp)]).isRequired}));
+
+
+var ParsedText=(function(_React$Text){
+_inherits(ParsedText,_React$Text);
+
+function ParsedText(){
+_classCallCheck(this,ParsedText);
+
+_get(Object.getPrototypeOf(ParsedText.prototype),'constructor',this).apply(this,arguments);}
+
+
+_createClass(ParsedText,[{
+key:'getPatterns',
+value:function getPatterns(){
+return this.props.parse.map(function(option){
+var type=option.type;
+
+var patternOption=_objectWithoutProperties(option,['type']);
+
+if(type){
+if(!PATTERNS[type]){
+throw new Error(option.type + ' is not a supported type');}
+
+patternOption.pattern = PATTERNS[type];}
+
+
+return patternOption;});}},
+
+
+{
+key:'getParsedText',
+value:function getParsedText(){
+if(!this.props.parse){
+return this.props.children;}
+
+if(typeof this.props.children !== 'string'){
+return this.props.children;}
+
+
+var textExtraction=new _libTextExtraction2['default'](this.props.children,this.getPatterns());
+
+return textExtraction.parse().map(function(props,index){
+return _reactNative2['default'].createElement(_reactNative2['default'].Text,_extends({
+key:'parsedText-' + index},
+props));});}},
+
+
+{
+key:'render',
+value:function render(){
+return _reactNative2['default'].createElement(
+_reactNative2['default'].Text,
+this.props,
+this.getParsedText());}}],
+
+
+[{
+key:'displayName',
+value:'ParsedText',
+enumerable:true},
+{
+key:'propTypes',
+value:_extends({},_reactNative2['default'].Text.propTypes,{
+parse:_reactNative2['default'].PropTypes.arrayOf(_reactNative2['default'].PropTypes.oneOfType([defaultParseShape,customParseShape]))}),
+
+enumerable:true},
+{
+key:'defaultProps',
+value:{
+parse:null},
+
+enumerable:true}]);
+
+
+return ParsedText;})(
+_reactNative2['default'].Text);
+
+exports['default'] = ParsedText;
+module.exports = exports['default'];
+});
+__d('babel-runtime/helpers/extends.js',function(global, require, module, exports) {  "use strict";
+
+var _Object$assign=require("babel-runtime/core-js/object/assign.js")["default"];
+
+exports["default"] = _Object$assign || function(target){
+for(var i=1;i < arguments.length;i++) {
+var source=arguments[i];
+
+for(var key in source) {
+if(Object.prototype.hasOwnProperty.call(source,key)){
+target[key] = source[key];}}}
+
+
+
+
+return target;};
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/core-js/object/assign.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/assign.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/assign.js',function(global, require, module, exports) {  require('core-js/library/modules/es6.object.assign.js');
+module.exports = require('core-js/library/modules/$.core.js').Object.assign;
+});
+__d('core-js/library/modules/es6.object.assign.js',function(global, require, module, exports) {  var 
+$export=require('core-js/library/modules/$.export.js');
+
+$export($export.S + $export.F,'Object',{assign:require('core-js/library/modules/$.object-assign.js')});
+});
+__d('core-js/library/modules/$.export.js',function(global, require, module, exports) {  var global=require('core-js/library/modules/$.global.js'),
+core=require('core-js/library/modules/$.core.js'),
+ctx=require('core-js/library/modules/$.ctx.js'),
+PROTOTYPE='prototype';
+
+var $export=function(type,name,source){
+var IS_FORCED=type & $export.F,
+IS_GLOBAL=type & $export.G,
+IS_STATIC=type & $export.S,
+IS_PROTO=type & $export.P,
+IS_BIND=type & $export.B,
+IS_WRAP=type & $export.W,
+exports=IS_GLOBAL?core:core[name] || (core[name] = {}),
+target=IS_GLOBAL?global:IS_STATIC?global[name]:(global[name] || {})[PROTOTYPE],
+key,own,out;
+if(IS_GLOBAL)source = name;
+for(key in source) {
+
+own = !IS_FORCED && target && key in target;
+if(own && key in exports)continue;
+
+out = own?target[key]:source[key];
+
+exports[key] = IS_GLOBAL && typeof target[key] != 'function'?source[key]:
+
+IS_BIND && own?ctx(out,global):
+
+IS_WRAP && target[key] == out?(function(C){
+var F=function(param){
+return this instanceof C?new C(param):C(param);};
+
+F[PROTOTYPE] = C[PROTOTYPE];
+return F;})(
+
+out):IS_PROTO && typeof out == 'function'?ctx(Function.call,out):out;
+if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;}};
+
+
+
+$export.F = 1;
+$export.G = 2;
+$export.S = 4;
+$export.P = 8;
+$export.B = 16;
+$export.W = 32;
+module.exports = $export;
+});
+__d('core-js/library/modules/$.global.js',function(global, require, module, exports) {  var 
+global=module.exports = typeof window != 'undefined' && window.Math == Math?
+window:typeof self != 'undefined' && self.Math == Math?self:Function('return this')();
+if(typeof __g == 'number')__g = global;
+});
+__d('core-js/library/modules/$.core.js',function(global, require, module, exports) {  var core=module.exports = {version:'1.2.6'};
+if(typeof __e == 'number')__e = core;
+});
+__d('core-js/library/modules/$.ctx.js',function(global, require, module, exports) {  var 
+aFunction=require('core-js/library/modules/$.a-function.js');
+module.exports = function(fn,that,length){
+aFunction(fn);
+if(that === undefined)return fn;
+switch(length){
+case 1:return function(a){
+return fn.call(that,a);};
+
+case 2:return function(a,b){
+return fn.call(that,a,b);};
+
+case 3:return function(a,b,c){
+return fn.call(that,a,b,c);};}
+
+
+return function(){
+return fn.apply(that,arguments);};};
+});
+__d('core-js/library/modules/$.a-function.js',function(global, require, module, exports) {  module.exports = function(it){
+if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+return it;};
+});
+__d('core-js/library/modules/$.object-assign.js',function(global, require, module, exports) {  var 
+$=require('core-js/library/modules/$.js'),
+toObject=require('core-js/library/modules/$.to-object.js'),
+IObject=require('core-js/library/modules/$.iobject.js');
+
+
+module.exports = require('core-js/library/modules/$.fails.js')(function(){
+var a=Object.assign,
+A={},
+B={},
+S=Symbol(),
+K='abcdefghijklmnopqrst';
+A[S] = 7;
+K.split('').forEach(function(k){B[k] = k;});
+return a({},A)[S] != 7 || Object.keys(a({},B)).join('') != K;})?
+function assign(target,source){
+var T=toObject(target),
+$$=arguments,
+$$len=$$.length,
+index=1,
+getKeys=$.getKeys,
+getSymbols=$.getSymbols,
+isEnum=$.isEnum;
+while($$len > index) {
+var S=IObject($$[index++]),
+keys=getSymbols?getKeys(S).concat(getSymbols(S)):getKeys(S),
+length=keys.length,
+j=0,
+key;
+while(length > j) if(isEnum.call(S,key = keys[j++]))T[key] = S[key];}
+
+return T;}:
+Object.assign;
+});
+__d('core-js/library/modules/$.js',function(global, require, module, exports) {  var $Object=Object;
+module.exports = {
+create:$Object.create,
+getProto:$Object.getPrototypeOf,
+isEnum:({}).propertyIsEnumerable,
+getDesc:$Object.getOwnPropertyDescriptor,
+setDesc:$Object.defineProperty,
+setDescs:$Object.defineProperties,
+getKeys:$Object.keys,
+getNames:$Object.getOwnPropertyNames,
+getSymbols:$Object.getOwnPropertySymbols,
+each:[].forEach};
+});
+__d('core-js/library/modules/$.to-object.js',function(global, require, module, exports) {  var 
+defined=require('core-js/library/modules/$.defined.js');
+module.exports = function(it){
+return Object(defined(it));};
+});
+__d('core-js/library/modules/$.defined.js',function(global, require, module, exports) {  module.
+exports = function(it){
+if(it == undefined)throw TypeError("Can't call method on  " + it);
+return it;};
+});
+__d('core-js/library/modules/$.iobject.js',function(global, require, module, exports) {  var 
+cof=require('core-js/library/modules/$.cof.js');
+module.exports = Object('z').propertyIsEnumerable(0)?Object:function(it){
+return cof(it) == 'String'?it.split(''):Object(it);};
+});
+__d('core-js/library/modules/$.cof.js',function(global, require, module, exports) {  var toString=({}).toString;
+
+module.exports = function(it){
+return toString.call(it).slice(8,-1);};
+});
+__d('core-js/library/modules/$.fails.js',function(global, require, module, exports) {  module.exports = function(exec){
+try{
+return !!exec();}
+catch(e) {
+return true;}};
+});
+__d('babel-runtime/helpers/get.js',function(global, require, module, exports) {  "use strict";
+
+var _Object$getOwnPropertyDescriptor=require("babel-runtime/core-js/object/get-own-property-descriptor.js")["default"];
+
+exports["default"] = function get(_x,_x2,_x3){
+var _again=true;
+
+_function: while(_again) {
+var object=_x,
+property=_x2,
+receiver=_x3;
+_again = false;
+if(object === null)object = Function.prototype;
+
+var desc=_Object$getOwnPropertyDescriptor(object,property);
+
+if(desc === undefined){
+var parent=Object.getPrototypeOf(object);
+
+if(parent === null){
+return undefined;}else 
+{
+_x = parent;
+_x2 = property;
+_x3 = receiver;
+_again = true;
+desc = parent = undefined;
+continue _function;}}else 
+
+if("value" in desc){
+return desc.value;}else 
+{
+var getter=desc.get;
+
+if(getter === undefined){
+return undefined;}
+
+
+return getter.call(receiver);}}};
+
+
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/core-js/object/get-own-property-descriptor.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/get-own-property-descriptor.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/get-own-property-descriptor.js',function(global, require, module, exports) {  var $=require('core-js/library/modules/$.js');
+require('core-js/library/modules/es6.object.get-own-property-descriptor.js');
+module.exports = function getOwnPropertyDescriptor(it,key){
+return $.getDesc(it,key);};
+});
+__d('core-js/library/modules/es6.object.get-own-property-descriptor.js',function(global, require, module, exports) {  var 
+toIObject=require('core-js/library/modules/$.to-iobject.js');
+
+require('core-js/library/modules/$.object-sap.js')('getOwnPropertyDescriptor',function($getOwnPropertyDescriptor){
+return function getOwnPropertyDescriptor(it,key){
+return $getOwnPropertyDescriptor(toIObject(it),key);};});
+});
+__d('core-js/library/modules/$.to-iobject.js',function(global, require, module, exports) {  var 
+IObject=require('core-js/library/modules/$.iobject.js'),
+defined=require('core-js/library/modules/$.defined.js');
+module.exports = function(it){
+return IObject(defined(it));};
+});
+__d('core-js/library/modules/$.object-sap.js',function(global, require, module, exports) {  var 
+$export=require('core-js/library/modules/$.export.js'),
+core=require('core-js/library/modules/$.core.js'),
+fails=require('core-js/library/modules/$.fails.js');
+module.exports = function(KEY,exec){
+var fn=(core.Object || {})[KEY] || Object[KEY],
+exp={};
+exp[KEY] = exec(fn);
+$export($export.S + $export.F * fails(function(){fn(1);}),'Object',exp);};
+});
+__d('babel-runtime/helpers/inherits.js',function(global, require, module, exports) {  "use strict";
+
+var _Object$create=require("babel-runtime/core-js/object/create.js")["default"];
+
+var _Object$setPrototypeOf=require("babel-runtime/core-js/object/set-prototype-of.js")["default"];
+
+exports["default"] = function(subClass,superClass){
+if(typeof superClass !== "function" && superClass !== null){
+throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);}
+
+
+subClass.prototype = _Object$create(superClass && superClass.prototype,{
+constructor:{
+value:subClass,
+enumerable:false,
+writable:true,
+configurable:true}});
+
+
+if(superClass)_Object$setPrototypeOf?_Object$setPrototypeOf(subClass,superClass):subClass.__proto__ = superClass;};
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/core-js/object/create.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/create.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/create.js',function(global, require, module, exports) {  var $=require('core-js/library/modules/$.js');
+module.exports = function create(P,D){
+return $.create(P,D);};
+});
+__d('babel-runtime/core-js/object/set-prototype-of.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/set-prototype-of.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/set-prototype-of.js',function(global, require, module, exports) {  require('core-js/library/modules/es6.object.set-prototype-of.js');
+module.exports = require('core-js/library/modules/$.core.js').Object.setPrototypeOf;
+});
+__d('core-js/library/modules/es6.object.set-prototype-of.js',function(global, require, module, exports) {  var 
+$export=require('core-js/library/modules/$.export.js');
+$export($export.S,'Object',{setPrototypeOf:require('core-js/library/modules/$.set-proto.js').set});
+});
+__d('core-js/library/modules/$.set-proto.js',function(global, require, module, exports) {  var 
+
+getDesc=require('core-js/library/modules/$.js').getDesc,
+isObject=require('core-js/library/modules/$.is-object.js'),
+anObject=require('core-js/library/modules/$.an-object.js');
+var check=function(O,proto){
+anObject(O);
+if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");};
+
+module.exports = {
+set:Object.setPrototypeOf || ('__proto__' in {}?
+(function(test,buggy,set){
+try{
+set = require('core-js/library/modules/$.ctx.js')(Function.call,getDesc(Object.prototype,'__proto__').set,2);
+set(test,[]);
+buggy = !(test instanceof Array);}
+catch(e) {buggy = true;}
+return function setPrototypeOf(O,proto){
+check(O,proto);
+if(buggy)O.__proto__ = proto;else 
+set(O,proto);
+return O;};})(
+
+{},false):undefined),
+check:check};
+});
+__d('core-js/library/modules/$.is-object.js',function(global, require, module, exports) {  module.exports = function(it){
+return typeof it === 'object'?it !== null:typeof it === 'function';};
+});
+__d('core-js/library/modules/$.an-object.js',function(global, require, module, exports) {  var isObject=require('core-js/library/modules/$.is-object.js');
+module.exports = function(it){
+if(!isObject(it))throw TypeError(it + ' is not an object!');
+return it;};
+});
+__d('babel-runtime/helpers/create-class.js',function(global, require, module, exports) {  "use strict";
+
+var _Object$defineProperty=require("babel-runtime/core-js/object/define-property.js")["default"];
+
+exports["default"] = (function(){
+function defineProperties(target,props){
+for(var i=0;i < props.length;i++) {
+var descriptor=props[i];
+descriptor.enumerable = descriptor.enumerable || false;
+descriptor.configurable = true;
+if("value" in descriptor)descriptor.writable = true;
+
+_Object$defineProperty(target,descriptor.key,descriptor);}}
+
+
+
+return function(Constructor,protoProps,staticProps){
+if(protoProps)defineProperties(Constructor.prototype,protoProps);
+if(staticProps)defineProperties(Constructor,staticProps);
+return Constructor;};})();
+
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/core-js/object/define-property.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/define-property.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/define-property.js',function(global, require, module, exports) {  var $=require('core-js/library/modules/$.js');
+module.exports = function defineProperty(it,key,desc){
+return $.setDesc(it,key,desc);};
+});
+__d('babel-runtime/helpers/class-call-check.js',function(global, require, module, exports) {  "use strict";
+
+exports["default"] = function(instance,Constructor){
+if(!(instance instanceof Constructor)){
+throw new TypeError("Cannot call a class as a function");}};
+
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/helpers/object-without-properties.js',function(global, require, module, exports) {  "use strict";
+
+exports["default"] = function(obj,keys){
+var target={};
+
+for(var i in obj) {
+if(keys.indexOf(i) >= 0)continue;
+if(!Object.prototype.hasOwnProperty.call(obj,i))continue;
+target[i] = obj[i];}
+
+
+return target;};
+
+
+exports.__esModule = true;
+});
+__d('babel-runtime/core-js/object/keys.js',function(global, require, module, exports) {  module.exports = {"default":require("core-js/library/fn/object/keys.js"),__esModule:true};
+});
+__d('core-js/library/fn/object/keys.js',function(global, require, module, exports) {  require('core-js/library/modules/es6.object.keys.js');
+module.exports = require('core-js/library/modules/$.core.js').Object.keys;
+});
+__d('core-js/library/modules/es6.object.keys.js',function(global, require, module, exports) {  var 
+toObject=require('core-js/library/modules/$.to-object.js');
+
+require('core-js/library/modules/$.object-sap.js')('keys',function($keys){
+return function keys(it){
+return $keys(toObject(it));};});
+});
+__d('babel-runtime/helpers/interop-require-default.js',function(global, require, module, exports) {  "use strict";
+
+exports["default"] = function(obj){
+return obj && obj.__esModule?obj:{
+"default":obj};};
+
+
+
+exports.__esModule = true;
+});
+__d('react-native-parsed-text/lib/lib/TextExtraction.js',function(global, require, module, exports) {  'use strict';
+
+var _createClass=require('babel-runtime/helpers/create-class.js')['default'];
+
+var _classCallCheck=require('babel-runtime/helpers/class-call-check.js')['default'];
+
+var _extends=require('babel-runtime/helpers/extends.js')['default'];
+
+var _Object$keys=require('babel-runtime/core-js/object/keys.js')['default'];
+
+Object.defineProperty(exports,'__esModule',{
+value:true});
+
+
+var TextExtraction=(function(){
+
+
+
+
+
+
+
+function TextExtraction(text,patterns){
+_classCallCheck(this,TextExtraction);
+
+this.text = text;
+this.patterns = patterns || [];}
+
+
+
+
+
+
+
+_createClass(TextExtraction,[{
+key:'parse',
+value:function parse(){
+var _this=this;
+
+var parsedTexts=[{children:this.text}];
+this.patterns.forEach(function(pattern){
+var newParts=[];
+
+parsedTexts.forEach(function(parsedText){
+
+if(parsedText._matched){
+newParts.push(parsedText);
+
+return;}
+
+
+var parts=[];
+var textLeft=parsedText.children;
+
+while(textLeft) {
+var matches=pattern.pattern.exec(textLeft);
+
+if(!matches){
+break;}
+
+
+var previousText=textLeft.substr(0,matches.index);
+
+parts.push({children:previousText});
+
+parts.push(_this.getMatchedPart(pattern,matches[0]));
+
+textLeft = textLeft.substr(matches.index + matches[0].length);}
+
+
+parts.push({children:textLeft});
+
+newParts.push.apply(newParts,parts);});
+
+
+parsedTexts = newParts;});
+
+
+
+parsedTexts.forEach(function(parsedText){
+return delete parsedText._matched;});
+
+
+return parsedTexts.filter(function(t){
+return !!t.children;});}},
+
+
+
+
+
+
+
+
+
+
+
+{
+key:'getMatchedPart',
+value:function getMatchedPart(matchedPattern,text){
+var props={};
+
+_Object$keys(matchedPattern).forEach(function(key){
+if(key === 'pattern'){
+return;}
+
+
+if(typeof matchedPattern[key] === 'function'){
+props[key] = function(){
+return matchedPattern[key](text);};}else 
+
+{
+props[key] = matchedPattern[key];}});
+
+
+
+return _extends({},props,{
+children:text,
+_matched:true});}}]);
+
+
+
+
+return TextExtraction;})();
+
+
+exports['default'] = TextExtraction;
+module.exports = exports['default'];
+});
 __d('TipApp/app/views/FormScreen.js',function(global, require, module, exports) {  'use strict';var _createClass=(function(){function defineProperties(target,props){for(var i=0;i < props.length;i++) {var descriptor=props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if('value' in descriptor)descriptor.writable = true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};})();var _get=function get(object,property,receiver){if(object === null)object = Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc === undefined){var parent=Object.getPrototypeOf(object);if(parent === null){return undefined;}else {return get(parent,property,receiver);}}else if('value' in desc){return desc.value;}else {var getter=desc.get;if(getter === undefined){return undefined;}return getter.call(receiver);}};function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function');}}function _inherits(subClass,superClass){if(typeof superClass !== 'function' && superClass !== null){throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__ = superClass;}
 
 
@@ -89649,5 +92402,6 @@ React.createElement(Text,{style:{color:'yellow'}},'我真的没有导航栏，�
 
 module.exports = NoNavigatorPage;
 });
+;require("InitializeJavaScriptAppEngine");
 ;require("TipApp/index.ios.js");
-__SSTOKENSTRING = "@generated SignedSource<<9158f96d28c9a1088de65e514780bd57>>";
+__SSTOKENSTRING = "@generated SignedSource<<db2b62c6969abcaf9d4397fc472f211a>>";

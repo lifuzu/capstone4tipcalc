@@ -101,3 +101,5 @@ travis encrypt "ALIAS_PASSWORD=foo" --add
 ipa info TipApp.ipa
 # https://github.com/phonegap/ios-deploy
 ios-deploy --bundle TipApp.ipa
+
+react-native bundle --entry-file index.ios.js --platform ios --dev true --bundle-output ios/main.jsbundle --assets-dest ios

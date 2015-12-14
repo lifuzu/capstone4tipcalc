@@ -51,6 +51,7 @@
 		62999EFB1C149E4F0019DF18 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF61C149E4F0019DF18 /* OpenGLES.framework */; };
 		62999EFC1C149E4F0019DF18 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EF71C149E4F0019DF18 /* SystemConfiguration.framework */; };
 		62999F001C149FD30019DF18 /* libTestFairy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62999EFE1C149FD30019DF18 /* libTestFairy.a */; };
+		62E03E2B1C1E8C7800A33FCB /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E03E2A1C1E8C6800A33FCB /* libRNShare.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
 
@@ -139,6 +140,13 @@
 			remoteGlobalIDString = 327633421BFAAD7E004DA88E;
 			remoteInfo = RCTToast;
 		};
+		62E03E291C1E8C6800A33FCB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 62E03E181C1E8C6700A33FCB /* RNShare.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNShare;
+		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */;
@@ -206,6 +214,7 @@
 		62999EF71C149E4F0019DF18 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		62999EFE1C149FD30019DF18 /* libTestFairy.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTestFairy.a; path = TestFairy/libTestFairy.a; sourceTree = "<group>"; };
 		62999EFF1C149FD30019DF18 /* TestFairy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestFairy.h; path = TestFairy/TestFairy.h; sourceTree = "<group>"; };
+		62E03E181C1E8C6700A33FCB /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -222,6 +231,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62E03E2B1C1E8C7800A33FCB /* libRNShare.a in Frameworks */,
 				62999EF81C149E4F0019DF18 /* AVFoundation.framework in Frameworks */,
 				62999EF91C149E4F0019DF18 /* CoreMedia.framework in Frameworks */,
 				62999EFA1C149E4F0019DF18 /* CoreMotion.framework in Frameworks */,
@@ -415,6 +425,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		62E03E191C1E8C6700A33FCB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				62E03E2A1C1E8C6800A33FCB /* libRNShare.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -426,6 +444,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				62E03E181C1E8C6700A33FCB /* RNShare.xcodeproj */,
 				62565E7B1C101DEB00ABF3BF /* RCTToast.xcodeproj */,
 				62565E331C0FB72500ABF3BF /* ReactNativeIcons.xcodeproj */,
 				62565E221C0FB6E400ABF3BF /* RCTCamera.xcodeproj */,
@@ -593,6 +612,10 @@
 					ProductGroup = 62565E341C0FB72500ABF3BF /* Products */;
 					ProjectRef = 62565E331C0FB72500ABF3BF /* ReactNativeIcons.xcodeproj */;
 				},
+				{
+					ProductGroup = 62E03E191C1E8C6700A33FCB /* Products */;
+					ProjectRef = 62E03E181C1E8C6700A33FCB /* RNShare.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -678,6 +701,13 @@
 			fileType = archive.ar;
 			path = libRCTToast.a;
 			remoteRef = 62565E7F1C101DEB00ABF3BF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		62E03E2A1C1E8C6800A33FCB /* libRNShare.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNShare.a;
+			remoteRef = 62E03E291C1E8C6800A33FCB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
