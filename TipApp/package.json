@@ -28,6 +28,7 @@
     "react-native-share": "lifuzu/react-native-share",
     "react-native-star-rating": "lifuzu/react-native-star-rating",
     "react-native-toast": "lifuzu/react-native-toast",
+    "react-native-wechat-ios": "^0.1.6",
     "reflux": "^0.2.12"
   },
   "devDependencies": {

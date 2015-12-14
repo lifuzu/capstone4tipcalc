@@ -27,6 +27,7 @@ var netinfo = Platform.OS === 'ios' ? require('../mixins/netinfo') : {};
 var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
 var SearchItemView = require('./SearchItemView');
+var WeChatShareView = require('./WeChatShareView');
 
 var Search = React.createClass({
   mixins: [geolocation, netinfo, userinfo],
@@ -36,13 +37,18 @@ var Search = React.createClass({
     };
   },
   _handleSearch() {
-    if (this.state.initialPosition !== 'unknown') {
-      var coords = this.state.initialPosition.coords;
-      var loc = coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
-      yelpActions.search({term: this.state.text, ll: loc});
+    // Easter egg for wechat sharing
+    if (this.state.text == 'aabbwechatccdd' && Platform.OS === 'ios') {
+      this.props.navigator.push({id: 'wechat'});
     } else {
-      var loc = "37.788022,-122.399797";
-      yelpActions.search({term: this.state.text, ll: loc});
+      if (this.state.initialPosition !== 'unknown') {
+        var coords = this.state.initialPosition.coords;
+        var loc = coords.latitude.toFixed(4) + ',' + coords.longitude.toFixed(4);
+        yelpActions.search({term: this.state.text, ll: loc});
+      } else {
+        var loc = "37.788022,-122.399797";
+        yelpActions.search({term: this.state.text, ll: loc});
+      }
     }
   },
 // <View style={{paddingVertical: 4, paddingHorizontal: 5, backgroundColor: 'grey'}}>
@@ -108,6 +114,8 @@ var SearchView = React.createClass({
       }
     } else if (route.id === 'item') {
       return <SearchItemView navigator={navigator} item={route.item}/>
+    } else if (route.id === 'wechat') {
+      return <WeChatShareView navigator={navigator}/>
     }
   },
 
