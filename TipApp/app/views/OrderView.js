@@ -56,6 +56,7 @@ var PageTwo = React.createClass({
 var OrderListView = require('./OrderListView');
 var ScanView = require('./ScanView');
 var ItemDetailView = require('./ItemDetailView');
+var CalcView = require('./CalcView');
 
 var OrderView = React.createClass({
   _renderScene(route, navigator) {
@@ -69,6 +70,8 @@ var OrderView = React.createClass({
       } else {
         return <ItemDetailView navigator={navigator} />
       }
+    } else if (route.id === 'calc') {
+      return <CalcView navigator={navigator} />
     }
   },
 

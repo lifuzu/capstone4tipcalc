@@ -103,15 +103,16 @@ class OrderListView extends Component {
 
 var NavigationBarRouteMapper = {
   LeftButton(route, navigator, index, nextState) {
-    return null;
-    // return (
-    //   <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-    //       onPress={() => navigator.parentNavigator.pop()}>
-    //     <Text style={{color: 'white', margin: 10,}}>
-    //       Back
-    //     </Text>
-    //   </TouchableOpacity>
-    // );
+    return (
+      <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
+          onPress={() => navigator.parentNavigator.push({id: 'calc'})}>
+        <Icon
+          name='ion|ios-calculator'
+          size={40}
+          color='#887700'
+          style={{width: 40, height: 40}} />
+      </TouchableOpacity>
+    );
   },
   RightButton(route, navigator, index, nextState) {
     return (

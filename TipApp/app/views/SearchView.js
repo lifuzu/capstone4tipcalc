@@ -138,8 +138,8 @@ var SearchView = React.createClass({
 var stylesLocal = StyleSheet.create({
   container: {
     padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
 });
 

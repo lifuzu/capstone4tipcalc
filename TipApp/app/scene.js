@@ -10,7 +10,7 @@ var {
 var SCREEN_WIDTH = require('Dimensions').get('window').width;
 var BaseConfig = Navigator.SceneConfigs.FloatFromRight;
 
-var CustomLeftToRightGesture = Object.assign({}, BaseConfig.gestures.pop, {
+var CustomLeftToRightGesture = Object.assign({}, /*BaseConfig.gestures.pop,*/ {
   // Make it snap back really quickly after canceling pop
   snapVelocity: 8,
   // Make it so we can drag anywhere on the screen
