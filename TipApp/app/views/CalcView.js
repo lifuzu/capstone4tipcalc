@@ -28,6 +28,7 @@ class CalcView extends Component {
       amount_per_guest: 34.56,
     }
     this.calculate = this.calculate.bind(this)
+    this.onSurvey = this.onSurvey.bind(this)
   }
   render() {
     return (
@@ -57,6 +58,11 @@ class CalcView extends Component {
     this.setState({amount_per_guest: amount_per_guest});
   }
 
+  onSurvey() {
+    // console.log('onSurvey');
+    this.props.navigator.push({id: 'survey'});
+  }
+
   _renderScene(route, navigator) {
     return (
       <View style={[stylesLocal.container]}>
@@ -74,7 +80,7 @@ class CalcView extends Component {
           defaultValue={'$ ' + this.state.input_amount} />
 
         <View style={{flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginLeft: 10, marginRight: 10}}>
-          <Text>Tips</Text><Text>{this.state.tip_rate_percent + "%"}</Text><Text>></Text>
+          <Text>Tips</Text><Text>{this.state.tip_rate_percent + "%"}</Text><Text onPress={this.onSurvey.bind(this)}>></Text>
         </View>
         <SliderIOS
           style={stylesLocal.slider}
