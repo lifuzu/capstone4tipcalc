@@ -64,7 +64,7 @@ class SearchItemView extends Component {
     }
   }
   renderItemView(){
-    var navigator_placeholder = <View style={{height: NAV_HEIGHT}}></View>;
+    var navigator_placeholder = <View style={{height: NAV_HEIGHT + 5}}></View>;
     var region = {
       latitude: this.state.item.location.coordinate.latitude,
       longitude: this.state.item.location.coordinate.longitude,

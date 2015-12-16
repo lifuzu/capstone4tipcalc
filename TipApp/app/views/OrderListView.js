@@ -77,7 +77,7 @@ class OrderListView extends Component {
     );
   }
   selectionItem(item: string) {
-    console.log(item)
+    // console.log(item)
     this.props.navigator.push({id: 'detail', params: {item: item}});
   }
   componentDidMount() {

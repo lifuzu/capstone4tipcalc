@@ -56,19 +56,21 @@ class CalcView extends Component {
     this.setState({amount_total: amount_total});
     this.setState({amount_per_guest: amount_per_guest});
   }
+
   _renderScene(route, navigator) {
     return (
       <View style={[stylesLocal.container]}>
         <TextInput
           style={{height: 40, borderColor: 'gray', borderWidth: 1, padding: 5}}
-          onChange={() => this.calculate()}
-          onChangeText={(text) => this.setState({input_amount: parseFloat(text.replace('$ ', '')).toFixed(2)}) }
+          onChangeText={(text) => { this.setState({input_amount: parseFloat(text.replace('$ ', '')).toFixed(2)}); this.calculate(); } }
           autoFocus={true}
+          textAlign={"right"}
           keyboardType={"numeric"}
-          clearButtonMode={"while-editing"}
+          clearButtonMode={"always"}
           enablesReturnKeyAutomatically={true}
           returnKeyType={"go"}
-          placeholder={"Please input amount here!"}
+          placeholder={"$ 0.00"}
+          value={'$ ' + this.state.input_amount}
           defaultValue={'$ ' + this.state.input_amount} />
 
         <View style={{flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginLeft: 10, marginRight: 10}}>
