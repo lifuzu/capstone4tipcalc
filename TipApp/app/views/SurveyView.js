@@ -169,7 +169,7 @@ var NavigationBarRouteMapper = {
   Title(route, navigator, index, nextState) {
     return (
       <Text style={{color: 'white', margin: 10, fontSize: 16}}>
-        Calculator
+        Survey
       </Text>
     );
   }

@@ -16,6 +16,7 @@ var routes = require('../routes');
 var scene  = require('../scene');
 var SimpleList   = require('./components/SimpleList');
 var ConversationView = require('./ConversationView');
+var CouponView = require('./CouponView');
 
 var Information = React.createClass({
   getInitialState: function() {
@@ -29,6 +30,7 @@ var Information = React.createClass({
         subtitle: "More coupons waiting here!",
         actionType: null,
         nextIcon: true,
+        onSelection: this._gotoCoupon,
       },{
         title: "Conversations",
         subtitle: "Welcome to conversation!",
@@ -41,6 +43,10 @@ var Information = React.createClass({
         nextIcon: true,
       }*/]
     };
+  },
+
+  _gotoCoupon: function() {
+    this.props.navigator.push({id: 'coupon'});
   },
 
   _createConversation: function() {
@@ -63,6 +69,8 @@ var InformationView = React.createClass({
       return <Information navigator={navigator}/>
     } else if (route.id === 'conversation') {
       return <ConversationView navigator={navigator} />
+    } else if (route.id === 'coupon') {
+      return <CouponView navigator={navigator} />
     }
   },
 
