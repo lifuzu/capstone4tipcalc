@@ -28,6 +28,7 @@ var userinfo = require('../mixins/userinfo');
 var SearchListView = require('./SearchListView');
 var SearchItemView = require('./SearchItemView');
 var WeChatShareView = require('./WeChatShareView');
+var DeviceInfo = require('react-native-device-info');
 
 var Search = React.createClass({
   mixins: [geolocation, netinfo, userinfo],
@@ -84,6 +85,18 @@ var Search = React.createClass({
         // </Button>
   componentDidMount() {
     this.unsubscribe = yelpStore.listen(this.onSearchDone);
+
+    console.log("Device Unique ID", DeviceInfo.getUniqueID());  // e.g. FCDBD8EF-62FC-4ECB-B2F5-92C9E79AC7F9
+    console.log("Device Manufacturer", DeviceInfo.getManufacturer());  // e.g. Apple
+    console.log("Device Model", DeviceInfo.getModel());  // e.g. iPhone 6
+    console.log("Device ID", DeviceInfo.getDeviceId());  // e.g. iPhone7,2 / or the board on Android e.g. goldfish
+    console.log("Device Name", DeviceInfo.getSystemName());  // e.g. iPhone OS
+    console.log("Device Version", DeviceInfo.getSystemVersion());  // e.g. 9.0
+    console.log("Bundle Id", DeviceInfo.getBundleId());  // e.g. com.learnium.mobile
+    console.log("Build Number", DeviceInfo.getBuildNumber());  // e.g. 89
+    console.log("App Version", DeviceInfo.getVersion());  // e.g. 1.1.0
+    console.log("App Version (Readable)", DeviceInfo.getReadableVersion());  // e.g. 1.1.0.89
+    console.log("Device Name", DeviceInfo.getDeviceName());  // e.g. Becca's iPhone 6
   },
   componentWillUnmount() {
     this.unsubscribe();

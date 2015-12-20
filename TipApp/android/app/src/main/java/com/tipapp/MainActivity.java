@@ -19,6 +19,9 @@ import com.smixx.reactnativeicons.IconFont; // <--- import this if you want to s
 // react-native-share
 import cl.json.RNSharePackage;
 
+// react-native-device-info
+import com.learnium.RNDeviceInfo.*;
+
 public class MainActivity extends Activity implements DefaultHardwareBackBtnHandler {
 
     private ReactInstanceManager mReactInstanceManager;
@@ -36,6 +39,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
                 .addPackage(new MainReactPackage())
                 .addPackage(new ReactNativeIcons())             // react-native-icons
                 .addPackage(new RNSharePackage())               // react-native-share
+                .addPackage(new RNDeviceInfo())                 // react-native-device-info
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

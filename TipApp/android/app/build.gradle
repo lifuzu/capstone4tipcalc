@@ -89,4 +89,5 @@ dependencies {
     compile "com.facebook.react:react-native:0.14.+"
     compile project(':react-native-icons')
     compile project(':react-native-share')
+    compile project(':RNDeviceInfo')
 }
