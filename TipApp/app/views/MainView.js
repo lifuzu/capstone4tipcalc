@@ -16,9 +16,10 @@ var SearchView = require('./SearchView');
 var OrderView = require('./OrderView');
 var SettingsView = require('./SettingsView');
 var InformationView = require('./InformationView');
+var applink = require('../mixins/applink');
 
 var MainView = React.createClass({
-
+  mixins: [applink],
   render() {
     return (
       <View style={styles.container}>
