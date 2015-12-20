@@ -45,16 +45,16 @@ before_script:
 - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in tasks/certs/dist.p12.enc -d -a -out
   tasks/certs/dist.p12
 - ./tasks/add-key.sh
-# - ./tasks/android-sdk.macosx.sh ~/android.sdk
+- ./tasks/android-sdk.macosx.sh ~/android.sdk
 - popd
 script:
 - pushd $APP_DIR
 - npm install
 - pushd ios && ../tasks/increment-version.sh && popd
 - ./tasks/build.sh
-# - pushd android
-# - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
-# - popd
+- pushd android
+- export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
+- popd
 - popd
 after_success:
 - pushd $APP_DIR
