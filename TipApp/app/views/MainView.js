@@ -38,7 +38,7 @@ var MainView = React.createClass({
         </ScrollableTabView>
       </View>
     );
-  }
+  },
           // <ScrollView tabLabel="ion|share" style={styles.tabView}>
           //   <View style={styles.card}>
           //     <Text>Share</Text>
