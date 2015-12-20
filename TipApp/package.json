@@ -21,7 +21,7 @@
     "react-native-button": "^1.3.1",
     "react-native-camera": "^0.3.8",
     "react-native-db-models": "lifuzu/react-native-db-models",
-    "react-native-device-info": "^0.6.0",
+    "react-native-device-info": "lifuzu/react-native-device-info",
     "react-native-gifted-messenger": "^0.0.8",
     "react-native-icons": "^0.7.0",
     "react-native-refreshable-listview": "^1.3.0",

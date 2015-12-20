@@ -51,6 +51,7 @@ script:
 - pushd $APP_DIR
 - npm install
 - pushd ios && ../tasks/increment-version.sh && popd
+- pushd android && ../tasks/increment-version-android.sh && popd
 - ./tasks/build.sh
 - pushd android
 - export ANDROID_HOME=~/android.sdk/android-sdk.macosx && ./gradlew build
@@ -59,6 +60,7 @@ script:
 after_success:
 - pushd $APP_DIR
 - ./tasks/sign-and-upload.sh
+- ./tasks/sign-and-upload-android.sh
 # - ./tasks/commit-all-changes.sh
 - popd
 after_script:
